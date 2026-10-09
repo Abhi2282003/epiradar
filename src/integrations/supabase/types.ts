@@ -816,7 +816,12 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      ep_load_bt: { Args: { p: Json }; Returns: number }
+      ep_load_bt2: { Args: { p: Json }; Returns: number }
+      ep_load_countries: { Args: { p: Json }; Returns: number }
+      ep_load_fc: { Args: { p: Json }; Returns: number }
+      ep_load_series: { Args: { p: Json }; Returns: number }
+      ep_load_series2: { Args: { p: Json }; Returns: number }
     }
     Enums: {
       [_ in never]: never
