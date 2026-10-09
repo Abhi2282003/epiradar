@@ -54,7 +54,7 @@ async function refresh() {
   }
   const now = new Date().toISOString();
   if (failure) {
-    await db.from('data_sources').upsert({ id: SOURCE, ...META, status: 'degraded', note: `${failure.includes('HTTP 429') ? `${rateLimitNote()} ` : ''}Refresh stopped: ${failure}. Kept previous values; ${rows.length} of ${list.length} districts updated.`.slice(0, 500) });
+    await db.from('data_sources').upsert({ id: SOURCE, ...META, status: 'degraded', note: `${failure.includes('HTTP 429') && !/Minutely/i.test(failure) ? `${rateLimitNote()} ` : ''}Refresh stopped: ${failure}. Kept previous values; ${rows.length} of ${list.length} districts updated.`.slice(0, 500) });
     return json({ error: 'Open-Meteo refresh stopped', detail: failure, updated: rows.length }, 502);
   }
   await db.from('data_sources').upsert({ id: SOURCE, ...META, status: 'ok', last_success_at: now, rows_last_run: rows.length, note: `Last 14 days + 7-day forecast for ${rows.length} districts, as of ${today}` });
