@@ -9,9 +9,7 @@ import { pageHead } from '@/lib/epiradar';
 export const Route = createFileRoute('/alerts')({
   loaderDeps: ({ search }) => ({ disease: search.disease, horizon: search.horizon }),
   loader: async ({ context, deps }) => {
-    void context.queryClient.prefetchQuery(trustQuery(deps.disease));
-    void context.queryClient.prefetchQuery(replayQuery);
-    await Promise.all([context.queryClient.ensureQueryData(surveillanceQuery(deps.disease, deps.horizon)), context.queryClient.ensureQueryData(openAlertsQuery(deps.disease))]);
+    await Promise.all([context.queryClient.ensureQueryData(trustQuery(deps.disease)), context.queryClient.ensureQueryData(replayQuery), context.queryClient.ensureQueryData(surveillanceQuery(deps.disease, deps.horizon)), context.queryClient.ensureQueryData(openAlertsQuery(deps.disease))]);
   },
   head: () => pageHead('alerts'),
   pendingComponent: PageSkeleton,
