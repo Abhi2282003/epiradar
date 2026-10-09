@@ -6,7 +6,7 @@ const TEN_MIN = 10 * 60_000;
 export const indiaOverviewQuery = queryOptions({ queryKey: ['india', 'overview'], queryFn: () => getIndiaOverview(), staleTime: TEN_MIN, refetchInterval: TEN_MIN });
 export const indiaTopoQuery = queryOptions({
   queryKey: ['india-topo'], staleTime: Infinity, gcTime: Infinity,
-  queryFn: async () => { const r = await getIndiaTopo(); return r?.topo && typeof r.topo === 'object' ? { topo: r.topo as Topology, source: r.source, license: r.license } : null; },
+  queryFn: async () => { const r = await getIndiaTopo(); const topo = r?.topoJson ? JSON.parse(r.topoJson) as unknown : null; return r && topo && typeof topo === 'object' ? { topo: topo as Topology, source: r.source, license: r.license } : null; },
 });
 export const karnatakaHistoryQuery = queryOptions({ queryKey: ['india', 'ka-history'], queryFn: () => getKarnatakaHistory({ data: { state: 'IN-KA' } }), staleTime: Infinity });
 export const whoYearQuery = (disease: string, indicator: string, year: number | null) => queryOptions({ queryKey: ['world', 'who', disease, indicator, year], queryFn: () => getWhoYear({ data: { disease, indicator, year } }), staleTime: TEN_MIN });
