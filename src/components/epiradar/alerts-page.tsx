@@ -1,3 +1,4 @@
+import { PageTitle } from './i18n-ui';
 import { useState } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate, useSearch } from '@tanstack/react-router';
@@ -34,7 +35,7 @@ export function AlertsPage() {
   const head = (k: SortKey, label: string) => <th aria-sort={sort === k ? desc ? 'descending' : 'ascending' : 'none'}><Button variant="ghost" size="sm" onClick={() => { setDesc(sort === k ? !desc : false); setSort(k); }}>{label}{sort === k ? desc ? <ArrowDown /> : <ArrowUp /> : <ArrowUpDown />}</Button></th>;
   return <>
     <p className="eyebrow">{page.eyebrow}</p>
-    <div className="page-heading"><div><h1>{page.title}</h1><p className="page-description">{page.description}</p></div></div>
+    <div className="page-heading"><div><h1><PageTitle kind={'alerts'} /></h1><p className="page-description">{page.description}</p></div></div>
     <div className="trust-grid">
       <section className="replay-card"><h2>Active alerts</h2><p className="sub">Open alerts · {context.disease} · newest first</p>
         {alerts.length ? <ul className="alert-list">{alerts.map(a => <li key={a.id}><div className="alert-row-head"><Button variant="link" className="p-0 h-auto" onClick={() => a.region_id && open(a.region_id)}>{a.region_name ?? a.region_id ?? '—'}</Button><RiskBadge level={a.level} /></div><p>{a.message ?? '—'}</p><span className="font-mono text-xs text-muted-foreground">Lead {a.lead_weeks ?? '—'} weeks · issued {a.issued_at ? fmt(a.issued_at) : '—'}</span></li>)}</ul>

@@ -1,3 +1,4 @@
+import { PageTitle } from './i18n-ui';
 import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useSearch, useRouter, type ErrorComponentProps } from '@tanstack/react-router';
@@ -40,7 +41,7 @@ export function SurveillancePage({ kind }: { kind: 'command' | 'map' }) {
   const cutoff = cardCutoff(asCard(useQuery(trustQuery(context.disease)).data?.run?.card));
   const provenance = [...new Map(data.predictions.map(row => [`${row.issue_week}:${row.model_version}`, { week: row.issue_week, version: row.model_version }])).values()];
   return <>
-    <p className="eyebrow">{page.eyebrow}</p><div className="page-heading"><div><h1>{page.title}</h1><p className="page-description">{page.description}</p></div><Button variant="outline" size="sm" disabled={isFetching} onClick={() => refetch()} aria-label="Refresh surveillance data"><RefreshCw className={isFetching ? 'refresh-spinning' : ''} />Refresh</Button></div>
+    <p className="eyebrow">{page.eyebrow}</p><div className="page-heading"><div><h1><PageTitle kind={kind} /></h1><p className="page-description">{page.description}</p></div><Button variant="outline" size="sm" disabled={isFetching} onClick={() => refetch()} aria-label="Refresh surveillance data"><RefreshCw className={isFetching ? 'refresh-spinning' : ''} />Refresh</Button></div>
     {(error || data.errors.regions) && <div className="forecast-notice" role="alert">{error ? 'The latest refresh failed. Last retrieved data remains visible.' : 'Municipality records could not be retrieved.'}</div>}
     {kind === 'command' && <>
       <div className="kpi-strip">{[

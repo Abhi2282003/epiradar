@@ -1,3 +1,4 @@
+import { PageTitle } from './i18n-ui';
 import { Component, lazy, Suspense, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { ClientOnly, Link, useSearch } from '@tanstack/react-router';
@@ -119,7 +120,7 @@ export function ScenarioLab() {
   const rows = joinMunicipalities(surv.regions, surv.predictions);
   return <>
     <p className="eyebrow">{page.eyebrow}</p>
-    <div className="page-heading"><div><h1>{page.title}</h1><p className="page-description">{page.description}</p></div></div>
+    <div className="page-heading"><div><h1><PageTitle kind={'scenarios'} /></h1><p className="page-description">{page.description}</p></div></div>
     <Intro model={meta.climateModel} />
     {meta.hasScenarios ? <Lab disease={context.disease} horizon={context.horizon} rows={rows} /> : <EmptyLab disease={context.disease} outlook={meta.outlook} />}
     <footer className="page-footer"><span>SENSITIVITY TEST · NOT A CLIMATE PROJECTION</span><span>MODEL ASSOCIATIONS · NOT PROOF OF CAUSE</span></footer>
