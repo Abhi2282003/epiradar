@@ -7,6 +7,7 @@ import { formatNumber, formatProbability, riskLabel, type Municipality } from '@
 import { RISK_SCALE } from '@/lib/epiradar';
 import { Button } from '@/components/ui/button';
 import { LocateFixed } from 'lucide-react';
+import mapWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 
 function cssColor(token: string) {
   const canvas = document.createElement('canvas');
@@ -41,6 +42,7 @@ export default function MunicipalityMap({ rows, selected, onSelect }: { rows: Mu
     setError(false);
     void import('maplibre-gl').then(maplibre => {
       if (cancelled || !container.current) return;
+      maplibre.setWorkerUrl(mapWorkerUrl);
       const map = new maplibre.Map({
         container: container.current,
         style: light ? 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json' : 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
@@ -66,6 +68,7 @@ export default function MunicipalityMap({ rows, selected, onSelect }: { rows: Mu
         map.addLayer({ id: 'municipality-outline', type: 'line', source: 'municipalities', paint: { 'line-color': cssColor('--background'), 'line-width': 1 } });
         map.addLayer({ id: 'municipality-selected', type: 'line', source: 'municipalities', filter: ['==', ['get', 'region_id'], ''], paint: { 'line-color': cssColor('--primary'), 'line-width': 3 } });
         if (boundsRef.current) map.fitBounds(boundsRef.current, { padding: 32, duration: 0 });
+        setError(false);
         setReady(value => value + 1);
       });
       map.on('mousemove', 'municipality-fill', event => {
