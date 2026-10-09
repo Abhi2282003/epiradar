@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import type { Map as MapLibreMap, GeoJSONSource, RasterTileSource } from 'maplibre-gl';
+import type { Map as MapLibreMap, GeoJSONSource, RasterTileSource, MapLayerMouseEvent } from 'maplibre-gl';
 import { feature } from 'topojson-client';
 import type { FeatureCollection, Geometry } from 'geojson';
 import mapWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
@@ -83,7 +83,7 @@ export default function WorldMap(props: WorldMapProps) {
         map.addLayer({ id: 'country-selected', type: 'line', source: 'countries', filter: ['==', ['get', 'iso3'], ''], paint: { 'line-color': cssColor('--primary'), 'line-width': 2.5 } }, firstSymbol);
         setReady(v => v + 1);
       });
-      const hover = (e: maplibre.MapLayerMouseEvent) => {
+      const hover = (e: MapLayerMouseEvent) => {
         const p = e.features?.[0]?.properties ?? {};
         const v = propsRef.current.values.get(String(p['iso3'] ?? ''));
         map.getCanvas().style.cursor = v ? 'pointer' : '';
