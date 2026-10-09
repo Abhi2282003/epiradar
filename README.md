@@ -3,6 +3,25 @@
 This branch is **not** the app. It holds the India model code and the files the app database loads.
 The Lovable app lives on `main`; nothing here is synced to Lovable.
 
+## India district outbreak forecast, v2 (`india-epiclim-v2`, current)
+
+Weekly-issued: the latest NASA POWER daily weather is cut into 4-week windows and the forecast covers weeks 1–4, 5–8 and 9–12.
+Inputs are every signal in the HC-01 problem statement:
+- weather: rain and its anomaly, temperature, humidity, heat, wind
+- satellite-based water and energy: MERRA-2 soil wetness, CERES sunlight
+- vector suitability: Aedes and Anopheles
+- mobility: a gravity model of travel between districts
+- surveillance: IDSP outbreak history
+- population: Census density
+- the climate normal of the coming season
+
+Each row also stores:
+- the same forecast without climate
+- a weather-only forecast, used to find blind spots
+- a rain × temperature what-if grid
+
+Files are in `india/v2/` and results in `results/v2/`.
+
 ## India district outbreak forecast (`india-epiclim-v1`)
 
 - **Unit:** 640 districts (Census 2011 boundaries), monthly; forecasts 1, 2 and 3 months ahead.

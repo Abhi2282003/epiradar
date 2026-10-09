@@ -1,0 +1,452 @@
+{
+ "dengue|1": {
+  "thresholds": {
+   "very_high": 0.08817530395118003,
+   "high": 0.04430846166099739,
+   "moderate": 0.01757384676589611
+  },
+  "base_rate": 0.013671875,
+  "levels": {
+   "very_high": {
+    "share": 0.020003255208333334,
+    "outbreak_rate": 0.08462164361269324,
+    "outbreaks_caught": 0.12380952380952381
+   },
+   "high": {
+    "share": 0.05,
+    "outbreak_rate": 0.07552083333333333,
+    "outbreaks_caught": 0.2761904761904762
+   },
+   "moderate": {
+    "share": 0.12999674479166667,
+    "outbreak_rate": 0.03305371228245899,
+    "outbreaks_caught": 0.3142857142857143
+   },
+   "low": {
+    "share": 0.8,
+    "outbreak_rate": 0.0048828125,
+    "outbreaks_caught": 0.2857142857142857
+   }
+  }
+ },
+ "chikungunya|1": {
+  "thresholds": {
+   "very_high": 0.0535405260230052,
+   "high": 0.018503152023407934,
+   "moderate": 0.005080221759922519
+  },
+  "base_rate": 0.005696614583333333,
+  "levels": {
+   "very_high": {
+    "share": 0.020003255208333334,
+    "outbreak_rate": 0.07648494711147275,
+    "outbreaks_caught": 0.26857142857142857
+   },
+   "high": {
+    "share": 0.05,
+    "outbreak_rate": 0.032877604166666664,
+    "outbreaks_caught": 0.2885714285714286
+   },
+   "moderate": {
+    "share": 0.12999674479166667,
+    "outbreak_rate": 0.013521973206460498,
+    "outbreaks_caught": 0.30857142857142855
+   },
+   "low": {
+    "share": 0.8,
+    "outbreak_rate": 0.0009562174479166666,
+    "outbreaks_caught": 0.13428571428571429
+   }
+  }
+ },
+ "malaria|1": {
+  "thresholds": {
+   "very_high": 0.02488546961780676,
+   "high": 0.009852449315894685,
+   "moderate": 0.004053304166440807
+  },
+  "base_rate": 0.0035481770833333333,
+  "levels": {
+   "very_high": {
+    "share": 0.020003255208333334,
+    "outbreak_rate": 0.043124491456468676,
+    "outbreaks_caught": 0.24311926605504589
+   },
+   "high": {
+    "share": 0.05,
+    "outbreak_rate": 0.015625,
+    "outbreaks_caught": 0.22018348623853212
+   },
+   "moderate": {
+    "share": 0.12999674479166667,
+    "outbreak_rate": 0.006510579691999499,
+    "outbreaks_caught": 0.23853211009174313
+   },
+   "low": {
+    "share": 0.8,
+    "outbreak_rate": 0.0013224283854166667,
+    "outbreaks_caught": 0.2981651376146789
+   }
+  }
+ },
+ "diarrhoea|1": {
+  "thresholds": {
+   "very_high": 0.16358829396177516,
+   "high": 0.09187017459658993,
+   "moderate": 0.04579989696520915
+  },
+  "base_rate": 0.0337890625,
+  "levels": {
+   "very_high": {
+    "share": 0.020003255208333334,
+    "outbreak_rate": 0.193653376729048,
+    "outbreaks_caught": 0.11464354527938343
+   },
+   "high": {
+    "share": 0.05,
+    "outbreak_rate": 0.1123046875,
+    "outbreaks_caught": 0.16618497109826588
+   },
+   "moderate": {
+    "share": 0.12999674479166667,
+    "outbreak_rate": 0.07011393514460999,
+    "outbreaks_caught": 0.2697495183044316
+   },
+   "low": {
+    "share": 0.8,
+    "outbreak_rate": 0.01898193359375,
+    "outbreaks_caught": 0.44942196531791906
+   }
+  }
+ },
+ "cholera|1": {
+  "thresholds": {
+   "very_high": 0.02737328170778558,
+   "high": 0.010343144484270367,
+   "moderate": 0.004117425566966039
+  },
+  "base_rate": 0.003987630208333333,
+  "levels": {
+   "very_high": {
+    "share": 0.020003255208333334,
+    "outbreak_rate": 0.04800650935720097,
+    "outbreaks_caught": 0.24081632653061225
+   },
+   "high": {
+    "share": 0.05,
+    "outbreak_rate": 0.015625,
+    "outbreaks_caught": 0.19591836734693877
+   },
+   "moderate": {
+    "share": 0.12999674479166667,
+    "outbreak_rate": 0.010016276449229998,
+    "outbreaks_caught": 0.32653061224489793
+   },
+   "low": {
+    "share": 0.8,
+    "outbreak_rate": 0.0011800130208333333,
+    "outbreaks_caught": 0.23673469387755103
+   }
+  }
+ },
+ "dengue|2": {
+  "thresholds": {
+   "very_high": 0.0917835574613266,
+   "high": 0.04590210192827786,
+   "moderate": 0.017159920576920472
+  },
+  "base_rate": 0.013671875,
+  "levels": {
+   "very_high": {
+    "share": 0.020003255208333334,
+    "outbreak_rate": 0.09764035801464606,
+    "outbreaks_caught": 0.14285714285714285
+   },
+   "high": {
+    "share": 0.05,
+    "outbreak_rate": 0.07356770833333333,
+    "outbreaks_caught": 0.26904761904761904
+   },
+   "moderate": {
+    "share": 0.12999674479166667,
+    "outbreak_rate": 0.03393013647176662,
+    "outbreaks_caught": 0.32261904761904764
+   },
+   "low": {
+    "share": 0.8,
+    "outbreak_rate": 0.004536946614583333,
+    "outbreaks_caught": 0.2654761904761905
+   }
+  }
+ },
+ "chikungunya|2": {
+  "thresholds": {
+   "very_high": 0.05489600918229177,
+   "high": 0.01870005935812096,
+   "moderate": 0.004947432867672286
+  },
+  "base_rate": 0.005696614583333333,
+  "levels": {
+   "very_high": {
+    "share": 0.020003255208333334,
+    "outbreak_rate": 0.07648494711147275,
+    "outbreaks_caught": 0.26857142857142857
+   },
+   "high": {
+    "share": 0.05,
+    "outbreak_rate": 0.037434895833333336,
+    "outbreaks_caught": 0.32857142857142857
+   },
+   "moderate": {
+    "share": 0.12999674479166667,
+    "outbreak_rate": 0.012395142105922123,
+    "outbreaks_caught": 0.28285714285714286
+   },
+   "low": {
+    "share": 0.8,
+    "outbreak_rate": 0.0008544921875,
+    "outbreaks_caught": 0.12
+   }
+  }
+ },
+ "malaria|2": {
+  "thresholds": {
+   "very_high": 0.023931557700888492,
+   "high": 0.009856345536875423,
+   "moderate": 0.004130131728014517
+  },
+  "base_rate": 0.0035481770833333333,
+  "levels": {
+   "very_high": {
+    "share": 0.020003255208333334,
+    "outbreak_rate": 0.043938161106590726,
+    "outbreaks_caught": 0.24770642201834864
+   },
+   "high": {
+    "share": 0.05,
+    "outbreak_rate": 0.013997395833333334,
+    "outbreaks_caught": 0.19724770642201836
+   },
+   "moderate": {
+    "share": 0.12999674479166667,
+    "outbreak_rate": 0.006760986603230249,
+    "outbreaks_caught": 0.24770642201834864
+   },
+   "low": {
+    "share": 0.8,
+    "outbreak_rate": 0.0013631184895833333,
+    "outbreaks_caught": 0.3073394495412844
+   }
+  }
+ },
+ "diarrhoea|2": {
+  "thresholds": {
+   "very_high": 0.16340798495294218,
+   "high": 0.09146349843912063,
+   "moderate": 0.045848180235872886
+  },
+  "base_rate": 0.0337890625,
+  "levels": {
+   "very_high": {
+    "share": 0.020003255208333334,
+    "outbreak_rate": 0.19121236777868186,
+    "outbreaks_caught": 0.11319845857418112
+   },
+   "high": {
+    "share": 0.05,
+    "outbreak_rate": 0.11100260416666667,
+    "outbreaks_caught": 0.1642581888246628
+   },
+   "moderate": {
+    "share": 0.12999674479166667,
+    "outbreak_rate": 0.06786027294353324,
+    "outbreaks_caught": 0.2610789980732177
+   },
+   "low": {
+    "share": 0.8,
+    "outbreak_rate": 0.019490559895833332,
+    "outbreaks_caught": 0.4614643545279383
+   }
+  }
+ },
+ "cholera|2": {
+  "thresholds": {
+   "very_high": 0.030310531411442295,
+   "high": 0.010436263334481019,
+   "moderate": 0.0038115412375740276
+  },
+  "base_rate": 0.003987630208333333,
+  "levels": {
+   "very_high": {
+    "share": 0.020003255208333334,
+    "outbreak_rate": 0.04882017900732303,
+    "outbreaks_caught": 0.24489795918367346
+   },
+   "high": {
+    "share": 0.05,
+    "outbreak_rate": 0.016276041666666668,
+    "outbreaks_caught": 0.20408163265306123
+   },
+   "moderate": {
+    "share": 0.12999674479166667,
+    "outbreak_rate": 0.009390259171153124,
+    "outbreaks_caught": 0.30612244897959184
+   },
+   "low": {
+    "share": 0.8,
+    "outbreak_rate": 0.001220703125,
+    "outbreaks_caught": 0.24489795918367346
+   }
+  }
+ },
+ "dengue|3": {
+  "thresholds": {
+   "very_high": 0.09018785114934613,
+   "high": 0.04471536513640921,
+   "moderate": 0.017246197879487276
+  },
+  "base_rate": 0.013671875,
+  "levels": {
+   "very_high": {
+    "share": 0.020003255208333334,
+    "outbreak_rate": 0.09275834011391375,
+    "outbreaks_caught": 0.1357142857142857
+   },
+   "high": {
+    "share": 0.05,
+    "outbreak_rate": 0.07552083333333333,
+    "outbreaks_caught": 0.2761904761904762
+   },
+   "moderate": {
+    "share": 0.12999674479166667,
+    "outbreak_rate": 0.033304119193689745,
+    "outbreaks_caught": 0.31666666666666665
+   },
+   "low": {
+    "share": 0.8,
+    "outbreak_rate": 0.004638671875,
+    "outbreaks_caught": 0.2714285714285714
+   }
+  }
+ },
+ "chikungunya|3": {
+  "thresholds": {
+   "very_high": 0.05272004340627192,
+   "high": 0.018605484298890848,
+   "moderate": 0.0052170577683168335
+  },
+  "base_rate": 0.005696614583333333,
+  "levels": {
+   "very_high": {
+    "share": 0.020003255208333334,
+    "outbreak_rate": 0.07241659886086249,
+    "outbreaks_caught": 0.2542857142857143
+   },
+   "high": {
+    "share": 0.05,
+    "outbreak_rate": 0.036458333333333336,
+    "outbreaks_caught": 0.32
+   },
+   "moderate": {
+    "share": 0.12999674479166667,
+    "outbreak_rate": 0.012144735194691373,
+    "outbreaks_caught": 0.27714285714285714
+   },
+   "low": {
+    "share": 0.8,
+    "outbreak_rate": 0.0010579427083333333,
+    "outbreaks_caught": 0.14857142857142858
+   }
+  }
+ },
+ "malaria|3": {
+  "thresholds": {
+   "very_high": 0.02271445411247622,
+   "high": 0.009080412510734742,
+   "moderate": 0.004008909026484849
+  },
+  "base_rate": 0.0035481770833333333,
+  "levels": {
+   "very_high": {
+    "share": 0.020003255208333334,
+    "outbreak_rate": 0.03986981285598047,
+    "outbreaks_caught": 0.22477064220183487
+   },
+   "high": {
+    "share": 0.05,
+    "outbreak_rate": 0.018229166666666668,
+    "outbreaks_caught": 0.25688073394495414
+   },
+   "moderate": {
+    "share": 0.12999674479166667,
+    "outbreak_rate": 0.0057593589583072495,
+    "outbreaks_caught": 0.21100917431192662
+   },
+   "low": {
+    "share": 0.8,
+    "outbreak_rate": 0.0013631184895833333,
+    "outbreaks_caught": 0.3073394495412844
+   }
+  }
+ },
+ "diarrhoea|3": {
+  "thresholds": {
+   "very_high": 0.15623106702516554,
+   "high": 0.0889007187084888,
+   "moderate": 0.04599200018964265
+  },
+  "base_rate": 0.0337890625,
+  "levels": {
+   "very_high": {
+    "share": 0.020003255208333334,
+    "outbreak_rate": 0.19528071602929212,
+    "outbreaks_caught": 0.11560693641618497
+   },
+   "high": {
+    "share": 0.05,
+    "outbreak_rate": 0.1171875,
+    "outbreaks_caught": 0.17341040462427745
+   },
+   "moderate": {
+    "share": 0.12999674479166667,
+    "outbreak_rate": 0.06360335545261049,
+    "outbreaks_caught": 0.24470134874759153
+   },
+   "low": {
+    "share": 0.8,
+    "outbreak_rate": 0.019694010416666668,
+    "outbreaks_caught": 0.4662813102119461
+   }
+  }
+ },
+ "cholera|3": {
+  "thresholds": {
+   "very_high": 0.03015261149023568,
+   "high": 0.01029198591177321,
+   "moderate": 0.003832808994227791
+  },
+  "base_rate": 0.003987630208333333,
+  "levels": {
+   "very_high": {
+    "share": 0.020003255208333334,
+    "outbreak_rate": 0.044751830756712775,
+    "outbreaks_caught": 0.22448979591836735
+   },
+   "high": {
+    "share": 0.05,
+    "outbreak_rate": 0.021809895833333332,
+    "outbreaks_caught": 0.27346938775510204
+   },
+   "moderate": {
+    "share": 0.12999674479166667,
+    "outbreak_rate": 0.008138224614999374,
+    "outbreaks_caught": 0.2653061224489796
+   },
+   "low": {
+    "share": 0.8,
+    "outbreak_rate": 0.0011800130208333333,
+    "outbreaks_caught": 0.23673469387755103
+   }
+  }
+ }
+}

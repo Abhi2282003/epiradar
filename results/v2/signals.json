@@ -1,0 +1,52 @@
+{
+ "dengue": {
+  "vector": 0.2394,
+  "weather": 0.1365,
+  "surveillance": 0.3664,
+  "mobility": 0.0949,
+  "population": 0.0247,
+  "season": 0.0892,
+  "satellite": 0.0269,
+  "water": 0.022
+ },
+ "chikungunya": {
+  "vector": 0.194,
+  "weather": 0.1621,
+  "surveillance": 0.3837,
+  "mobility": 0.0819,
+  "population": 0.0417,
+  "season": 0.101,
+  "satellite": 0.0119,
+  "water": 0.0238
+ },
+ "malaria": {
+  "vector": 0.0603,
+  "weather": 0.3035,
+  "surveillance": 0.3242,
+  "mobility": 0.0501,
+  "population": 0.0665,
+  "season": 0.1323,
+  "satellite": 0.0379,
+  "water": 0.0252
+ },
+ "diarrhoea": {
+  "vector": 0.0173,
+  "weather": 0.23,
+  "surveillance": 0.5476,
+  "mobility": 0.0419,
+  "population": 0.0413,
+  "season": 0.0936,
+  "satellite": 0.0069,
+  "water": 0.0214
+ },
+ "cholera": {
+  "vector": 0.0185,
+  "weather": 0.2518,
+  "surveillance": 0.5472,
+  "mobility": 0.0391,
+  "population": 0.0592,
+  "season": 0.0551,
+  "satellite": 0.0111,
+  "water": 0.018
+ }
+}

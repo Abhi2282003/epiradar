@@ -114,20 +114,104 @@ def target_normals(nrm: pd.DataFrame) -> pd.DataFrame:
     return t
 
 
+def extra_climate_table(mon2: pd.DataFrame) -> pd.DataFrame:
+    """Satellite / water / heat / wind features of issue month m from NASA POWER monthly:
+    gw_root, gw_top (MERRA-2 soil wetness 0-1), solar (CERES/FLASHFlux all-sky surface sunlight, MJ/m2/day),
+    tmax, tmin (deg C), wind (m/s at 2 m). Anomalies use the same fixed 2008-2014 normals."""
+    w = mon2[["district_id", "ym", "gw_root", "gw_top", "solar", "tmax", "tmin", "wind"]].copy()
+    w["m"] = mi(w.ym)
+    w["cal"] = w.ym % 100
+    yr = w.ym // 100
+    nrm = (w[(yr >= NORMAL_YEARS[0]) & (yr <= NORMAL_YEARS[1])].groupby(["district_id", "cal"])
+           .agg(gw_n=("gw_root", "mean"), sol_n=("solar", "mean"), tx_n=("tmax", "mean")).reset_index())
+    full = []
+    for d, g in w.groupby("district_id", sort=False):
+        g = g.set_index("m").reindex(pd.RangeIndex(g.m.min(), g.m.max() + 1))
+        g["district_id"] = d
+        g.index.name = "m"
+        full.append(g.reset_index())
+    w = pd.concat(full, ignore_index=True)
+    w["cal"] = (w.m % 12) + 1
+    w = w.merge(nrm, on=["district_id", "cal"], how="left").sort_values(["district_id", "m"]).reset_index(drop=True)
+    g = w.groupby("district_id", sort=False)
+    f = pd.DataFrame({"district_id": w.district_id, "m": w.m})
+    f["sw0"] = w.gw_root
+    f["swa0"] = w.gw_root - w.gw_n
+    f["sw3m"] = (g.gw_root.shift(0) + g.gw_root.shift(1) + g.gw_root.shift(2)) / 3
+    f["swt0"] = w.gw_top
+    f["sol0"] = w.solar
+    f["sola0"] = w.solar - w.sol_n
+    f["tx0"] = w.tmax
+    f["txa0"] = w.tmax - w.tx_n
+    f["tn0"] = w.tmin
+    f["ws0"] = w.wind
+    return f
+
+
+# ---------------------------------------------------------------- mobility (gravity model)
+def haversine_km(lat1, lon1, lat2, lon2):
+    p1, p2 = np.radians(lat1), np.radians(lat2)
+    dphi = p2 - p1
+    dl = np.radians(lon2) - np.radians(lon1)
+    a = np.sin(dphi / 2) ** 2 + np.cos(p1) * np.cos(p2) * np.sin(dl / 2) ** 2
+    return 2 * 6371.0 * np.arcsin(np.sqrt(a))
+
+
+def mobility_matrix(districts: pd.DataFrame, k: int = 30, d_min: float = 15.0):
+    """Gravity model of travel between districts: flow_ij ~ pop_i * pop_j / d_ij^2 (Xia et al. 2004).
+
+    Returns W (row-normalised over each district's k strongest links) and the distance matrix in km.
+    """
+    lat = districts.lat.values.astype(float)
+    lon = districts.lon.values.astype(float)
+    pop = districts["pop"].astype(float)
+    pop = pop.fillna(pop.median()).values
+    D = haversine_km(lat[:, None], lon[:, None], lat[None, :], lon[None, :])
+    G = (pop[:, None] * pop[None, :]) / np.maximum(D, d_min) ** 2
+    np.fill_diagonal(G, 0.0)
+    keep = np.argsort(-G, axis=1)[:, :k]
+    W = np.zeros_like(G)
+    rows = np.arange(len(G))[:, None]
+    W[rows, keep] = G[rows, keep]
+    W = W / W.sum(1, keepdims=True)
+    return W, D
+
+
+def mobility_features(W: np.ndarray, hf: pd.DataFrame, nd: int) -> pd.DataFrame:
+    """Mobility-weighted outbreak pressure from connected districts, for rows ordered district-major (d, issue)."""
+    out = pd.DataFrame(index=hf.index)
+    n_iss = len(hf) // nd
+    for src, dst in (("st_m3_rate", "mob_m3"), ("st_rate", "mob_rate"), ("rc_3", "mob_rc3")):
+        v = hf[src].values.reshape(nd, n_iss)
+        has = ~np.isnan(v)
+        num = W @ np.nan_to_num(v)
+        den = W @ has.astype(float)
+        res = np.where(den > 0, num / np.where(den > 0, den, 1), np.nan)
+        out[dst] = res.reshape(-1)
+    return out
+
+
 # compact climate set (same skill as the full 35-feature set in experiments, easier to explain)
 CLIM = ["ra3m", "ra0", "ra6m", "r0", "r3m", "t0", "t3m", "ta3m", "rh0", "rh3m", "aed0", "aed3m", "ano0", "ano3m",
         "tgt_r_n", "tgt_t_n", "tgt_rh_n", "tgt_aed_n", "tgt_ano_n"]
+SAT = ["sw0", "swa0", "sw3m", "swt0", "sol0", "sola0", "tx0", "txa0", "tn0", "ws0"]
+MOB = ["mob_m3", "mob_rate"]
 CAL = ["tgt_cal"]
 STAT = ["st_rate", "st_m_rate", "st_m3_rate", "state_m3_rate", "st_any_rate", "state_any_rate", "log_density"]
-REC = ["rc_3", "rc_12", "rc_any_3", "rc_state_1", "rc_nat_1", "rc_nat_any_3"]
+REC = ["rc_3", "rc_12", "rc_any_3", "rc_state_1", "rc_nat_1", "rc_nat_any_3", "mob_rc3"]
 
+DEPLOYED = "full"
 VARIANTS = {
-    "climate+history": CLIM + CAL + STAT,          # deployable today (needs no live IDSP feed)
-    "history only": CAL + STAT,                    # same, without climate  -> climate ablation
-    "climate only": CLIM,                          # weather + climate normals only
-    "climate+history+recent reports": CLIM + CAL + STAT + REC,   # if a live IDSP feed is connected
+    "full": CLIM + SAT + MOB + CAL + STAT,                 # deployed: weather + satellite/water + mobility + history
+    "history+mobility": MOB + CAL + STAT,                  # the same without any climate  -> climate ablation
+    "weather+satellite+history": CLIM + SAT + CAL + STAT,  # without mobility              -> mobility ablation
+    "weather+history": CLIM + CAL + STAT,                  # without satellite/water        -> satellite ablation
+    "history only": CAL + STAT,
+    "climate only": CLIM + SAT,                            # no surveillance data at all
+    "full+recent reports": CLIM + SAT + MOB + CAL + STAT + REC,   # if a live IDSP/IHIP feed is connected
     "history+recent reports": CAL + STAT + REC,
 }
+H3_VARIANTS = ("full", "history+mobility")
 
 FAMILY = {}
 for k in (0, 1, 2):
@@ -140,7 +224,10 @@ FAMILY.update({"r3m": "rain", "ra3m": "rain_anom", "t3m": "temp", "ta3m": "temp_
                "st_rate": "history", "st_m_rate": "history", "st_m3_rate": "history", "state_m3_rate": "history",
                "st_any_rate": "surveillance", "state_any_rate": "surveillance", "log_density": "population",
                "rc_3": "recent", "rc_12": "recent", "rc_any_3": "recent", "rc_state_1": "recent",
-               "rc_nat_1": "recent", "rc_nat_any_3": "recent"})
+               "rc_nat_1": "recent", "rc_nat_any_3": "recent", "mob_rc3": "recent",
+               "sw0": "water", "swa0": "water", "sw3m": "water", "swt0": "water",
+               "sol0": "sunlight", "sola0": "sunlight", "tx0": "heat", "txa0": "heat", "tn0": "heat", "ws0": "wind",
+               "mob_m3": "mobility", "mob_rate": "mobility"})
 
 
 # ---------------------------------------------------------------- outbreak history
