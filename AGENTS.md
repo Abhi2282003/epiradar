@@ -20,3 +20,4 @@
 - The shared municipality workspace caches external GeoJSON in Query and imports MapLibre only after hydration so both workspace routes share a map without SSR browser-global failures.
 - Preserve municipality selection, map/table mode and table sorting in validated URL context so both surveillance views remain shareable.
 - Compare forecast horizons only within the same issue week and model version, and leave incomplete aggregates unavailable rather than treating unknown values as zero.
+- One app-wide realtime subscription in the shell batches pipeline bursts into a single refresh/toast; replay events and pulses live only in browser memory, never the database.
