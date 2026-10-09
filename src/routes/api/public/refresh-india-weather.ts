@@ -3,7 +3,7 @@ import { backoffUntil, rateLimitNote } from '@/lib/india';
 import { aggregateIndia, chunk, indiaToday, INDIA_DAILY_VARS, OPEN_METEO_BATCH, type IndiaDaily } from '@/lib/india';
 
 const THROTTLE_MS = 6 * 3_600_000;
-const PAUSE_MS = 3000;
+const PAUSE_MS = 20_000; // Open-Meteo counts each location; stay under the per-minute limit
 const SOURCE = 'open_meteo_india';
 const META = { name: 'Open-Meteo live district weather (India)', cadence: 'Daily ~05:40 IST; on demand at most every 6 hours' };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
