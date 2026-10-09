@@ -14,10 +14,490 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      alerts: {
+        Row: {
+          disease_id: string | null
+          id: string
+          issued_at: string | null
+          lead_weeks: number | null
+          level: string | null
+          message: string | null
+          region_id: string | null
+          status: string | null
+        }
+        Insert: {
+          disease_id?: string | null
+          id?: string
+          issued_at?: string | null
+          lead_weeks?: number | null
+          level?: string | null
+          message?: string | null
+          region_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          disease_id?: string | null
+          id?: string
+          issued_at?: string | null
+          lead_weeks?: number | null
+          level?: string | null
+          message?: string | null
+          region_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_disease_id_fkey"
+            columns: ["disease_id"]
+            isOneToOne: false
+            referencedRelation: "diseases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      backtests: {
+        Row: {
+          cases_actual: number | null
+          cases_p10: number | null
+          cases_p50: number | null
+          cases_p90: number | null
+          disease_id: string
+          horizon_weeks: number
+          outbreak_actual: boolean | null
+          outbreak_prob: number | null
+          region_id: string
+          target_week: string
+          threshold_cases: number | null
+        }
+        Insert: {
+          cases_actual?: number | null
+          cases_p10?: number | null
+          cases_p50?: number | null
+          cases_p90?: number | null
+          disease_id: string
+          horizon_weeks: number
+          outbreak_actual?: boolean | null
+          outbreak_prob?: number | null
+          region_id: string
+          target_week: string
+          threshold_cases?: number | null
+        }
+        Update: {
+          cases_actual?: number | null
+          cases_p10?: number | null
+          cases_p50?: number | null
+          cases_p90?: number | null
+          disease_id?: string
+          horizon_weeks?: number
+          outbreak_actual?: boolean | null
+          outbreak_prob?: number | null
+          region_id?: string
+          target_week?: string
+          threshold_cases?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backtests_disease_id_fkey"
+            columns: ["disease_id"]
+            isOneToOne: false
+            referencedRelation: "diseases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "backtests_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      data_sources: {
+        Row: {
+          cadence: string | null
+          id: string
+          last_success_at: string | null
+          name: string | null
+          note: string | null
+          rows_last_run: number | null
+          status: string | null
+        }
+        Insert: {
+          cadence?: string | null
+          id: string
+          last_success_at?: string | null
+          name?: string | null
+          note?: string | null
+          rows_last_run?: number | null
+          status?: string | null
+        }
+        Update: {
+          cadence?: string | null
+          id?: string
+          last_success_at?: string | null
+          name?: string | null
+          note?: string | null
+          rows_last_run?: number | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      diseases: {
+        Row: {
+          color: string | null
+          id: string
+          name: string
+          vector: string | null
+        }
+        Insert: {
+          color?: string | null
+          id: string
+          name: string
+          vector?: string | null
+        }
+        Update: {
+          color?: string | null
+          id?: string
+          name?: string
+          vector?: string | null
+        }
+        Relationships: []
+      }
+      drivers: {
+        Row: {
+          contribution: number | null
+          family: string | null
+          label: string | null
+          prediction_id: string
+          rank: number
+        }
+        Insert: {
+          contribution?: number | null
+          family?: string | null
+          label?: string | null
+          prediction_id: string
+          rank: number
+        }
+        Update: {
+          contribution?: number | null
+          family?: string | null
+          label?: string | null
+          prediction_id?: string
+          rank?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drivers_prediction_id_fkey"
+            columns: ["prediction_id"]
+            isOneToOne: false
+            referencedRelation: "latest_predictions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drivers_prediction_id_fkey"
+            columns: ["prediction_id"]
+            isOneToOne: false
+            referencedRelation: "predictions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      live_events: {
+        Row: {
+          id: number
+          kind: string | null
+          message: string | null
+          payload: Json | null
+          region_id: string | null
+          severity: string | null
+          ts: string | null
+        }
+        Insert: {
+          id?: never
+          kind?: string | null
+          message?: string | null
+          payload?: Json | null
+          region_id?: string | null
+          severity?: string | null
+          ts?: string | null
+        }
+        Update: {
+          id?: never
+          kind?: string | null
+          message?: string | null
+          payload?: Json | null
+          region_id?: string | null
+          severity?: string | null
+          ts?: string | null
+        }
+        Relationships: []
+      }
+      model_runs: {
+        Row: {
+          card: Json | null
+          created_at: string | null
+          disease_id: string | null
+          model_version: string
+        }
+        Insert: {
+          card?: Json | null
+          created_at?: string | null
+          disease_id?: string | null
+          model_version: string
+        }
+        Update: {
+          card?: Json | null
+          created_at?: string | null
+          disease_id?: string | null
+          model_version?: string
+        }
+        Relationships: []
+      }
+      observations: {
+        Row: {
+          cases: number | null
+          cases_est: number | null
+          disease_id: string
+          humidity: number | null
+          incidence: number | null
+          ndvi: number | null
+          rain_mm: number | null
+          region_id: string
+          river_discharge: number | null
+          soil_moisture: number | null
+          temp_mean: number | null
+          threshold_cases: number | null
+          week_start: string
+        }
+        Insert: {
+          cases?: number | null
+          cases_est?: number | null
+          disease_id: string
+          humidity?: number | null
+          incidence?: number | null
+          ndvi?: number | null
+          rain_mm?: number | null
+          region_id: string
+          river_discharge?: number | null
+          soil_moisture?: number | null
+          temp_mean?: number | null
+          threshold_cases?: number | null
+          week_start: string
+        }
+        Update: {
+          cases?: number | null
+          cases_est?: number | null
+          disease_id?: string
+          humidity?: number | null
+          incidence?: number | null
+          ndvi?: number | null
+          rain_mm?: number | null
+          region_id?: string
+          river_discharge?: number | null
+          soil_moisture?: number | null
+          temp_mean?: number | null
+          threshold_cases?: number | null
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "observations_disease_id_fkey"
+            columns: ["disease_id"]
+            isOneToOne: false
+            referencedRelation: "diseases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "observations_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      predictions: {
+        Row: {
+          cases_p10: number | null
+          cases_p50: number | null
+          cases_p90: number | null
+          disease_id: string | null
+          horizon_weeks: number | null
+          id: string
+          issue_week: string | null
+          issued_at: string | null
+          model_version: string | null
+          narrative: string | null
+          outbreak_prob: number | null
+          region_id: string | null
+          risk_level: string | null
+          target_week: string | null
+          threshold_cases: number | null
+        }
+        Insert: {
+          cases_p10?: number | null
+          cases_p50?: number | null
+          cases_p90?: number | null
+          disease_id?: string | null
+          horizon_weeks?: number | null
+          id?: string
+          issue_week?: string | null
+          issued_at?: string | null
+          model_version?: string | null
+          narrative?: string | null
+          outbreak_prob?: number | null
+          region_id?: string | null
+          risk_level?: string | null
+          target_week?: string | null
+          threshold_cases?: number | null
+        }
+        Update: {
+          cases_p10?: number | null
+          cases_p50?: number | null
+          cases_p90?: number | null
+          disease_id?: string | null
+          horizon_weeks?: number | null
+          id?: string
+          issue_week?: string | null
+          issued_at?: string | null
+          model_version?: string | null
+          narrative?: string | null
+          outbreak_prob?: number | null
+          region_id?: string | null
+          risk_level?: string | null
+          target_week?: string | null
+          threshold_cases?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "predictions_disease_id_fkey"
+            columns: ["disease_id"]
+            isOneToOne: false
+            referencedRelation: "diseases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "predictions_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      regions: {
+        Row: {
+          admin1: string | null
+          country: string
+          density: number | null
+          id: string
+          lat: number | null
+          lon: number | null
+          name: string
+          official_code: string | null
+          population: number | null
+          rain_2050_pct: number | null
+          temp_2050_c: number | null
+        }
+        Insert: {
+          admin1?: string | null
+          country: string
+          density?: number | null
+          id: string
+          lat?: number | null
+          lon?: number | null
+          name: string
+          official_code?: string | null
+          population?: number | null
+          rain_2050_pct?: number | null
+          temp_2050_c?: number | null
+        }
+        Update: {
+          admin1?: string | null
+          country?: string
+          density?: number | null
+          id?: string
+          lat?: number | null
+          lon?: number | null
+          name?: string
+          official_code?: string | null
+          population?: number | null
+          rain_2050_pct?: number | null
+          temp_2050_c?: number | null
+        }
+        Relationships: []
+      }
+      scenarios: {
+        Row: {
+          disease_id: string
+          horizon_weeks: number
+          outbreak_prob: number | null
+          rain_delta_pct: number
+          region_id: string
+          temp_delta_c: number
+        }
+        Insert: {
+          disease_id: string
+          horizon_weeks: number
+          outbreak_prob?: number | null
+          rain_delta_pct: number
+          region_id: string
+          temp_delta_c: number
+        }
+        Update: {
+          disease_id?: string
+          horizon_weeks?: number
+          outbreak_prob?: number | null
+          rain_delta_pct?: number
+          region_id?: string
+          temp_delta_c?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      latest_predictions: {
+        Row: {
+          cases_p10: number | null
+          cases_p50: number | null
+          cases_p90: number | null
+          disease_id: string | null
+          horizon_weeks: number | null
+          id: string | null
+          issue_week: string | null
+          issued_at: string | null
+          model_version: string | null
+          narrative: string | null
+          outbreak_prob: number | null
+          region_id: string | null
+          risk_level: string | null
+          target_week: string | null
+          threshold_cases: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "predictions_disease_id_fkey"
+            columns: ["disease_id"]
+            isOneToOne: false
+            referencedRelation: "diseases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "predictions_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
