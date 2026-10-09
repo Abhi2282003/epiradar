@@ -92,7 +92,13 @@ export default function MunicipalityMap({ rows, selected, onSelect }: { rows: Mu
         if (row) { popup.remove(); selectRef.current(row.region.id); }
       });
       map.on('error', () => { if (!map.isStyleLoaded()) setError(true); });
-      const resize = new ResizeObserver(() => map.resize()); resize.observe(container.current);
+      let previousWidth = container.current.clientWidth;
+      const resize = new ResizeObserver(() => {
+        map.resize();
+        const width = container.current?.clientWidth ?? previousWidth;
+        if (width !== previousWidth && boundsRef.current && map.getLayer('municipality-fill')) map.fitBounds(boundsRef.current, { padding: 32, duration: 0 });
+        previousWidth = width;
+      }); resize.observe(container.current);
       cleanup = () => { resize.disconnect(); popup.remove(); map.remove(); mapRef.current = null; };
     }).catch(() => setError(true));
     return () => { cancelled = true; cleanup?.(); };

@@ -44,7 +44,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="nav-heading">WORKSPACE</div>
       <nav>{navigation.map(item => <Link key={item.to} to={item.to} search={context} activeOptions={{ exact: true }} className="nav-link" title={item.label} aria-label={item.label}><item.icon /><span className="sidebar-text">{item.label}</span></Link>)}</nav>
       <div className="sidebar-bottom">
-        <div className="connection-status"><p><span className="status-dot" />Awaiting data connection</p><small>Surveillance data not loaded</small></div>
+        <div className="connection-status"><p><span className="status-dot" />Read-only surveillance</p><small>Real data · live refresh</small></div>
         <Button variant="ghost" className="theme-control" onClick={toggleTheme} aria-label={light ? 'Switch to dark mode' : 'Switch to light mode'} title={light ? 'Switch to dark mode' : 'Switch to light mode'}>{light ? <Moon /> : <Sun />}<span className="sidebar-text">{light ? 'Dark appearance' : 'Light appearance'}</span></Button>
       </div>
     </aside>
@@ -53,7 +53,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <label className="context-control"><span className="control-label">DISEASE</span><span className="select-wrap"><select aria-label="Disease" value={context.disease} onChange={event => navigate({ search: prev => ({ ...prev, disease: event.target.value, horizon: context.horizon }) })}>{DISEASES.map(disease => <option key={disease}>{disease}</option>)}</select><ChevronDown /></span></label>
         <div className="topbar-divider" />
         <label className="context-control"><span className="control-label">FORECAST HORIZON</span><span className="select-wrap"><select aria-label="Forecast horizon" value={context.horizon} onChange={event => navigate({ search: prev => ({ ...prev, disease: context.disease, horizon: Number(event.target.value) }) })}>{Array.from({ length: 8 }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1} {i === 0 ? 'week' : 'weeks'} ahead</option>)}</select><ChevronDown /></span></label>
-        <div className="topbar-tools"><Button variant="ghost" className="search-trigger" aria-label="Search regions" onClick={() => setPaletteOpen(true)}><Search /><span className="search-label">Search regions</span><kbd>⌘ K</kbd></Button><span className="live-pill" title="Live monitoring — data not loaded yet"><span className="status-dot" />LIVE</span></div>
+        <div className="topbar-tools"><Button variant="ghost" className="search-trigger" aria-label="Search regions" onClick={() => setPaletteOpen(true)}><Search /><span className="search-label">Search regions</span><kbd>⌘ K</kbd></Button><span className="live-pill" title="Live monitoring — forecasts refresh as data arrives"><span className="status-dot" />LIVE</span></div>
       </header>
       <main id="main-content" className="content">{children}</main>
     </div>
