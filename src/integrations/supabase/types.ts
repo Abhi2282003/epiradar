@@ -461,6 +461,59 @@ export type Database = {
         }
         Relationships: []
       }
+      weather_now: {
+        Row: {
+          daily: Json
+          fc_rain_16d_mm: number | null
+          fc_tmean_16d: number | null
+          fc_tsuit_16d: number | null
+          rain_28d_mm: number | null
+          rain_7d_mm: number | null
+          region_id: string
+          rh_7d: number | null
+          tmax_7d: number | null
+          tmean_7d: number | null
+          tsuit_7d: number | null
+          updated_at: string
+        }
+        Insert: {
+          daily?: Json
+          fc_rain_16d_mm?: number | null
+          fc_tmean_16d?: number | null
+          fc_tsuit_16d?: number | null
+          rain_28d_mm?: number | null
+          rain_7d_mm?: number | null
+          region_id: string
+          rh_7d?: number | null
+          tmax_7d?: number | null
+          tmean_7d?: number | null
+          tsuit_7d?: number | null
+          updated_at?: string
+        }
+        Update: {
+          daily?: Json
+          fc_rain_16d_mm?: number | null
+          fc_tmean_16d?: number | null
+          fc_tsuit_16d?: number | null
+          rain_28d_mm?: number | null
+          rain_7d_mm?: number | null
+          region_id?: string
+          rh_7d?: number | null
+          tmax_7d?: number | null
+          tmean_7d?: number | null
+          tsuit_7d?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weather_now_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: true
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       latest_predictions: {

@@ -11,3 +11,7 @@
 - [x] Rule tests and desktop/mobile flow verification
 
 - [ ] Verify populated forecast KPIs and live events end to end — blocked until real prediction and event rows arrive.
+
+# Live weather layer
+- [x] weather_now table, refresh route, 6-hourly schedule, first run (92 municipalities)
+- [x] Map layer switch, drawer Weather and Cases and climate sections, tests
