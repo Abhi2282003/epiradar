@@ -23,3 +23,6 @@
 - One app-wide realtime subscription in the shell batches pipeline bursts into a single refresh/toast; replay events and pulses live only in browser memory, never the database.
 - Live weather enters only through the throttled public route /api/public/refresh-weather (Open-Meteo batches, 30-min throttle, scheduled every 6 h); weather aggregation and suitability live in one browser-safe module shared with tests.
 - Scenario lab reads scenarios through server functions scoped to one municipality or one scenario at a time (never the full table); steps come from the data. Time machine seasons are derived from target_week (year of the week's Wednesday).
+- The World workspace reads countries, latest country forecasts (view) and 12-month case totals (view) through one public server function; satellite layers use a typed, capability-verified GIBS config in src/lib/world.ts, and rasters are added to the map only while switched on.
+- The live world weather grid enters only through the throttled public route /api/public/refresh-world-weather (10° Open-Meteo grid, 30-min throttle, scheduled every 6 h); wind and cloud are drawn client-side from that grid.
+- model_runs.scope separates model cards (brazil-municipal, world-national); Model & data shows the latest run per scope in tabs.
