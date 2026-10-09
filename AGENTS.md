@@ -16,3 +16,7 @@
 - Render explicit empty states until real data is connected; do not seed demonstration health records.
 - Use theme storage only for appearance preferences, never for surveillance data.
 - Pipeline data enters only through the token-protected server route /api/public/ingest (allow-listed tables, service-role upsert); clients get read-only access except alert status updates by signed-in users.
+- Public surveillance reads use a publishable-key server function with Query loader priming, polling and realtime invalidation so incoming pipeline data appears without fabricated fallbacks.
+- The shared municipality workspace caches external GeoJSON in Query and imports MapLibre only after hydration so both workspace routes share a map without SSR browser-global failures.
+- Preserve municipality selection, map/table mode and table sorting in validated URL context so both surveillance views remain shareable.
+- Compare forecast horizons only within the same issue week and model version, and leave incomplete aggregates unavailable rather than treating unknown values as zero.
