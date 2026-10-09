@@ -45,7 +45,7 @@ async function refresh() {
     }
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    await db.from('data_sources').upsert({ id: SOURCE, name: 'Open-Meteo world grid', cadence: 'Every 12 hours', status: 'degraded', note: `Refresh failed: ${message}`.slice(0, 500) });
+    await db.from('data_sources').upsert({ id: SOURCE, name: 'Open-Meteo world grid', cadence: 'Every 12 hours', status: 'degraded', note: `${message.includes('HTTP 429') ? `${rateLimitNote()} ` : ''}Refresh failed: ${message}. Kept the last good values.`.slice(0, 500) });
     return json({ error: 'Open-Meteo refresh failed', detail: message }, 502);
   }
   const up = await db.from('world_weather_grid').upsert(rows as never, { onConflict: 'lat,lon' });

@@ -43,7 +43,7 @@ async function refresh() {
     }
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    await db.from('data_sources').update({ status: 'degraded', note: `Refresh failed: ${message}`.slice(0, 500) }).eq('id', 'open_meteo');
+    await db.from('data_sources').update({ status: 'degraded', note: `${message.includes('HTTP 429') ? `${rateLimitNote()} ` : ''}Refresh failed: ${message}. Kept the last good values.`.slice(0, 500) }).eq('id', 'open_meteo');
     return json({ error: 'Open-Meteo refresh failed', detail: message }, 502);
   }
   const up = await db.from('weather_now').upsert(rows as never, { onConflict: 'region_id' });
