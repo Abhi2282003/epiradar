@@ -1,0 +1,28 @@
+{
+  "source_rows": 8985,
+  "rows_with_known_disease_group": 8984,
+  "unknown_disease_labels": {
+    "pyrexia of unknown origin": 1
+  },
+  "map_method": {
+    "inside": 8943,
+    "nearest_same_state": 35,
+    "inside_other_state": 7
+  },
+  "onset_date_used_as_given": 8737,
+  "onset_from_reporting_week": 248,
+  "events_by_group": {
+    "diarrhoea": 5228,
+    "dengue": 1698,
+    "chikungunya": 794,
+    "cholera": 668,
+    "malaria": 548,
+    "aes": 111
+  },
+  "districts_with_any_event": 566,
+  "districts_total": 641,
+  "years": [
+    2008,
+    2022
+  ]
+}
