@@ -17,10 +17,10 @@ import { BASE_LAYERS, OVERLAYS, addDays, layerDate } from '@/lib/world';
 import { DISEASE_KEY, formatIN, stateName, useT, type Key, type Lang } from '@/lib/i18n';
 import { DataBadge } from './i18n-ui';
 import { suitClass, type DistrictPoint, type Focus, type StateValue } from './india-map';
-import { IndiaForecastPanel, TierBadge, addMonths, useForecastContext } from './india-forecast';
+import { IndiaForecastPanel, TierBadge, tierStats, useForecastContext, useScenarioRows } from './india-forecast';
 import { IndiaDistrictDrawer } from './india-district-drawer';
-import { indiaForecastQuery } from '@/lib/india-query';
-import { DISEASE_FC_KEY, TIERS, TIER_KEY, isTier, monthLabel, pctText, tierIndex } from '@/lib/india-forecast';
+import { indiaDistrictQuery, indiaForecastQuery, indiaModelCardQuery } from '@/lib/india-query';
+import { DISEASE_FC_KEY, TIERS, TIER_KEY, WEEKS_OF, monthLabel, monthShort, pctText, tierIndex, windowLabel, windowStart } from '@/lib/india-forecast';
 
 const IndiaMap = lazy(() => import('./india-map'));
 const axis = { tick: { fill: 'var(--muted-foreground)', fontSize: 11 }, stroke: 'var(--border)' };
@@ -90,8 +90,16 @@ export function IndiaPage() {
   const [dotMode, setDotMode] = useState<'forecast' | 'suit'>('forecast');
   const fcx = useForecastContext();
   const fq = useQuery(indiaForecastQuery(fcx.disease, fcx.horizon));
-  const fcBy = useMemo(() => new Map((fq.data?.rows ?? []).map(r => [r.district_id, r])), [fq.data]);
-  const fcMonth = fq.data?.issue_month ? addMonths(fq.data.issue_month, fcx.horizon) : null;
+  const cardQ = useQuery(indiaModelCardQuery);
+  const scen = useScenarioRows(fq.data?.rows ?? [], tierStats(cardQ.data?.card, fcx.disease, fcx.horizon), fcx.wr, fcx.wt, fcx.whatIf);
+  const fcBy = useMemo(() => new Map(scen.map(r => [r.district_id, r])), [scen]);
+  const fcWin = fq.data?.issue_month ? `${t('fcx.weeks', { w: WEEKS_OF[fcx.horizon]! })}, ${windowLabel(windowStart(fq.data.issue_month, fcx.horizon), t.lang)}` : '—';
+  const sel = useQuery({ ...indiaDistrictQuery(context.district ?? 'IN-D0'), enabled: !!context.district });
+  const links = useMemo(() => {
+    const from = data.districts.find(d => d.id === context.district);
+    if (!from || from.lat == null || from.lon == null) return [];
+    return (sel.data?.links ?? []).slice(0, 6).flatMap(l => { const to = data.districts.find(d => d.id === l.to_district_id); return to?.lat != null && to.lon != null ? [{ from: [from.lon!, from.lat!] as [number, number], to: [to.lon, to.lat] as [number, number], share: l.share }] : []; });
+  }, [sel.data, context.district, data.districts]);
   const byForecast = dotMode === 'forecast' && fcBy.size > 0;
   useEffect(() => { setToday(indiaToday()); }, []);
   useEffect(() => { const h = setTimeout(() => setPicked(dateInput || null), 400); return () => clearTimeout(h); }, [dateInput]);
@@ -123,11 +131,11 @@ export function IndiaPage() {
   const points: DistrictPoint[] = useMemo(() => data.districts.flatMap(d => {
     if (d.lat == null || d.lon == null) return [];
     const w = weatherBy.get(d.id); const suit = w ? (vector === 'aedes' ? w.aedes_suitability : w.anopheles_suitability) : null;
-    const f = fcBy.get(d.id); const level = f && isTier(f.risk_level) ? tierIndex(f.risk_level) : null;
-    const fcLines = f ? [`${t(DISEASE_FC_KEY[fcx.disease])} · ${monthLabel(fcMonth, t.lang)}: ${isTier(f.risk_level) ? t(TIER_KEY[f.risk_level]) : '—'} (${pctText(f.prob)})`] : [];
+    const f = fcBy.get(d.id); const level = f?.level ? tierIndex(f.level) : null;
+    const fcLines = f ? [`${t(DISEASE_FC_KEY[fcx.disease])} · ${fcWin}: ${f.level ? t(TIER_KEY[f.level]) : '—'} (${pctText(f.p)})`] : [];
     return [{ id: d.id, name: d.name, lat: d.lat, lon: d.lon, population: d.population, suit, level, windSpeed: w?.wind_speed_max ?? null, windDir: w?.wind_dir_deg ?? null, cloud: w?.cloud_cover ?? null,
       lines: [...fcLines, `${t('term.suitability')}: ${n1(suit, 2)}`, `${t('term.temperature')}: ${n1(w?.temp_mean_7d)} °C · ${t('term.humidity')}: ${n1(w?.humidity_7d, 0)}%`, `${t('drawer.rain14')}: ${n1(w?.rain_14d_mm)} mm`, `${t('term.population')}: ${formatIN(d.population)}`] }];
-  }), [data.districts, weatherBy, vector, t.lang, fcBy, fcx.disease, fcMonth]); // eslint-disable-line react-hooks/exhaustive-deps
+  }), [data.districts, weatherBy, vector, t.lang, fcBy, fcx.disease, fcWin]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const kpi = useMemo(() => {
     const withCases = yearRows.filter(r => r.cases != null);
@@ -205,7 +213,7 @@ export function IndiaPage() {
           {topoQ.isError ? <p className="layer-unavailable">{t('map.boundariesFailed')}</p> : topoQ.isSuccess && !topoQ.data && <p className="layer-unavailable">{t('map.noBoundaries')}</p>}
         </fieldset>
         <fieldset><legend className="control-label">{t('fcx.mapMode')} <DataBadge kind={byForecast ? 'forecast' : 'suitability'} /></legend>
-          <label className="layer-row"><input type="radio" name="india-dots" checked={dotMode === 'forecast'} disabled={!fcBy.size} onChange={() => setDotMode('forecast')} /><span>{t('fcx.mapForecast', { disease: t(DISEASE_FC_KEY[fcx.disease]), month: monthLabel(fcMonth, t.lang) })}</span></label>
+          <label className="layer-row"><input type="radio" name="india-dots" checked={dotMode === 'forecast'} disabled={!fcBy.size} onChange={() => setDotMode('forecast')} /><span>{t('fcx.mapForecast', { disease: t(DISEASE_FC_KEY[fcx.disease]), month: fcWin })}</span></label>
           <label className="layer-row"><input type="radio" name="india-dots" checked={dotMode === 'suit'} onChange={() => setDotMode('suit')} /><span>{t('fcx.mapSuit')}<small>{t(`vector.${vector}`)}</small></span></label>
           <label className="layer-row"><input type="checkbox" checked={dots} onChange={e => setDots(e.target.checked)} /><span>{t('map.dots')}</span></label>
           {dots && (byForecast ? <ul className="world-legend">{[...TIERS].reverse().map(k => <li key={k}><TierBadge tier={k} /></li>)}</ul>
@@ -240,7 +248,7 @@ export function IndiaPage() {
         {today ? <Suspense fallback={<Skeleton className="map-loading" />}>
           <IndiaMap topo={topoQ.data?.topo ?? null} globe={globe} base={base} overlays={overlays} today={today} picked={picked} states={stateValues} choropleth={choropleth}
             districts={points} dots={dots} wind={wind} cloud={cloud} selected={context.state} focus={focus} noDataLabel={t('map.noDataArea')} failedLabel={t('map.failed')}
-            colorBy={byForecast ? 'level' : 'suit'} onSelectDistrict={id => setSearch({ district: id })}
+            colorBy={byForecast ? 'level' : 'suit'} onSelectDistrict={id => setSearch({ district: id })} links={links}
             onSelect={id => setSearch({ state: id })} onLayerStatus={(k, ok) => setStatus(p => (p[k] === true || p[k] === ok ? p : { ...p, [k]: ok }))} />
         </Suspense> : <Skeleton className="map-loading" />}
       </section>
@@ -293,8 +301,8 @@ function Seasonality({ series }: { series: Overview['series'] }) {
   const t = useT();
   return <section className="replay-card"><div className="panel-title-row"><h2><Sigma className="inline size-4 mr-1" />{t('season.title')}</h2><DataBadge kind="reported" /></div>
     <p className="sub mt-1">{t('season.caption')}</p>
-    {series.length ? <div className="h-56 mt-2"><ResponsiveContainer><ComposedChart data={series} margin={{ left: -4, right: 8 }}><CartesianGrid stroke="var(--border)" vertical={false} /><XAxis dataKey="month" {...axis} tickFormatter={m => String(m).slice(0, 4)} minTickGap={30} /><YAxis {...axis} tickFormatter={v => formatIN(v)} />
-      <Tooltip {...tip} labelFormatter={m => String(m).slice(0, 7)} formatter={v => [typeof v === 'number' ? formatIN(v) : '—', t('term.cases')]} /><Bar dataKey="cases" fill="var(--primary)" isAnimationActive={false} /></ComposedChart></ResponsiveContainer></div>
+    {series.length ? <div className="h-56 mt-2"><ResponsiveContainer><ComposedChart data={series} margin={{ left: -4, right: 8 }}><CartesianGrid stroke="var(--border)" vertical={false} /><XAxis dataKey="month" {...axis} tickFormatter={m => monthShort(String(m), t.lang)} minTickGap={24} /><YAxis {...axis} tickFormatter={v => formatIN(v)} />
+      <Tooltip {...tip} labelFormatter={m => monthLabel(String(m), t.lang)} formatter={v => [typeof v === 'number' ? formatIN(v) : '—', t('term.cases')]} /><Bar dataKey="cases" fill="var(--primary)" isAnimationActive={false} /></ComposedChart></ResponsiveContainer></div>
       : <p className="drawer-empty">{t('empty.series')}</p>}
   </section>;
 }

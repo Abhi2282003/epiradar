@@ -499,9 +499,12 @@ export type Database = {
           issue_month: string
           model_version: string
           prob: number
+          prob_climate_only: number | null
           prob_no_climate: number | null
           rank_india: number | null
           risk_level: string
+          scenarios: Json | null
+          silent: boolean
           target_month: string
           typical_prob: number | null
         }
@@ -515,9 +518,12 @@ export type Database = {
           issue_month: string
           model_version: string
           prob: number
+          prob_climate_only?: number | null
           prob_no_climate?: number | null
           rank_india?: number | null
           risk_level: string
+          scenarios?: Json | null
+          silent?: boolean
           target_month: string
           typical_prob?: number | null
         }
@@ -531,9 +537,12 @@ export type Database = {
           issue_month?: string
           model_version?: string
           prob?: number
+          prob_climate_only?: number | null
           prob_no_climate?: number | null
           rank_india?: number | null
           risk_level?: string
+          scenarios?: Json | null
+          silent?: boolean
           target_month?: string
           typical_prob?: number | null
         }
@@ -541,6 +550,45 @@ export type Database = {
           {
             foreignKeyName: "india_forecasts_district_id_fkey"
             columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "india_districts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      india_mobility: {
+        Row: {
+          distance_km: number
+          district_id: string
+          rank: number
+          share: number
+          to_district_id: string
+        }
+        Insert: {
+          distance_km: number
+          district_id: string
+          rank: number
+          share: number
+          to_district_id: string
+        }
+        Update: {
+          distance_km?: number
+          district_id?: string
+          rank?: number
+          share?: number
+          to_district_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "india_mobility_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "india_districts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "india_mobility_to_district_id_fkey"
+            columns: ["to_district_id"]
             isOneToOne: false
             referencedRelation: "india_districts"
             referencedColumns: ["id"]

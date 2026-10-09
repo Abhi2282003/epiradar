@@ -50,6 +50,13 @@
       "when": 1791569792152,
       "tag": "0006_india_forecast",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791588267781,
+      "tag": "0007_india_forecast_v2",
+      "breakpoints": true
     }
   ]
 }

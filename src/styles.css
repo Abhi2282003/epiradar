@@ -416,12 +416,12 @@ h1 { font-size: 29px; font-weight: 600; line-height: 1.3; margin: 0 0 9px; }
 .india-kpis .command-metric > strong { font-size: 24px; margin: 6px 0 2px; }
 .india-kpis .command-metric .metric-label { min-height: 0; }
 .india-toolbar { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin: 4px 0 18px; }
-.disease-tabs { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-.disease-tabs button { padding: 7px 14px; font-size: 13px; background: transparent; border: 0; color: var(--muted-foreground); cursor: pointer; }
+.disease-tabs { display: inline-flex; max-width: 100%; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; overflow-x: auto; scrollbar-width: thin; }
+.disease-tabs button { flex: none; white-space: nowrap; padding: 7px 14px; font-size: 13px; background: transparent; border: 0; color: var(--muted-foreground); cursor: pointer; }
 .disease-tabs button + button { border-left: 1px solid var(--border); }
 .disease-tabs button[aria-selected='true'] { background: color-mix(in oklch, var(--primary) 16%, transparent); color: var(--primary); font-weight: 600; }
-.year-slider { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-.year-slider input { accent-color: var(--primary); width: 200px; }
+.year-slider { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 13px; max-width: 100%; }
+.year-slider input { accent-color: var(--primary); width: 200px; max-width: 100%; flex: 0 1 200px; }
 .year-slider output { font-family: var(--font-mono); min-width: 44px; }
 .partial-tag { font-family: var(--font-mono); font-size: 10px; color: var(--risk-moderate); border: 1px solid currentColor; border-radius: 4px; padding: 0 5px; }
 .focus-row { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -432,9 +432,11 @@ h1 { font-size: 29px; font-weight: 600; line-height: 1.3; margin: 0 0 9px; }
 .mini-stats dt { font-size: 11px; color: var(--muted-foreground); }
 .mini-stats dd { margin: 2px 0 0; font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .suit-chip { display: inline-block; min-width: 42px; text-align: center; border-radius: 4px; padding: 0 4px; font-variant-numeric: tabular-nums; color: var(--background); }
-.suit-0 { background: var(--risk-low); } .suit-1 { background: var(--risk-moderate); } .suit-2 { background: var(--risk-high); } .suit-3 { background: var(--risk-very-high); color: var(--foreground); }
+.suit-0 { background: var(--risk-low); } .suit-1 { background: var(--risk-moderate); } .suit-2 { background: var(--risk-high); } .suit-3 { background: var(--risk-very-high); }
+.suit-chip.suit-0, .suit-chip.suit-1 { color: var(--on-risk-light); } .suit-chip.suit-2, .suit-chip.suit-3 { color: var(--on-risk-dark); font-weight: 600; }
 .sortable-th button { background: none; border: 0; color: inherit; font: inherit; cursor: pointer; padding: 0; }
-@media (max-width: 1100px) { .india-kpis { grid-template-columns: repeat(3, minmax(0,1fr)); } .india-cards { grid-template-columns: 1fr; } }
+@media (max-width: 1560px) { .india-kpis { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+@media (max-width: 1100px) { .india-cards { grid-template-columns: 1fr; } }
 @media (max-width: 650px) { .india-kpis { grid-template-columns: repeat(2, minmax(0,1fr)); } }
 
 /* ---- India outbreak forecast (all districts) ---- */
@@ -442,6 +444,7 @@ h1 { font-size: 29px; font-weight: 600; line-height: 1.3; margin: 0 0 9px; }
 .fc-hero h2 { font-size: 20px; font-weight: 650; margin: 0; }
 .fc-toolbar { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end; margin-top: 14px; }
 .fc-toolbar .control-label { display: block; margin-bottom: 6px; }
+.fc-toolbar > div, .whatif-controls > label, .whatif-controls > div { min-width: 0; max-width: 100%; }
 .fc-kpis { grid-template-columns: repeat(5, minmax(0,1fr)); }
 .fc-kpis .command-metric > strong { font-size: 26px; margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
 .fc-kpis .command-metric .metric-label { min-height: 0; display: flex; gap: 6px; align-items: center; }
@@ -484,3 +487,45 @@ h1 { font-size: 29px; font-weight: 600; line-height: 1.3; margin: 0 0 9px; }
 @media (max-width: 1100px) { .fc-kpis { grid-template-columns: repeat(3, minmax(0,1fr)); } .fc-grid { grid-template-columns: 1fr; } }
 @media (max-width: 650px) { .fc-kpis { grid-template-columns: repeat(2, minmax(0,1fr)); } .dd-charts { grid-template-columns: 1fr; } .fc-hero { padding: 14px; } }
 .fc-note { font-size: 11px; line-height: 1.5; color: var(--muted-foreground); }
+
+/* ---- India forecast v2: brief, what-if, signals, blind spots, mobility, advisories ---- */
+.fc-brief { margin-top: 14px; border: 1px solid var(--border); border-left: 3px solid var(--primary); border-radius: 0.6rem; padding: 12px 14px; background: var(--background); }
+.fc-brief ul { margin: 6px 0 0; padding-left: 18px; list-style: disc; display: flex; flex-direction: column; gap: 3px; font-size: 13px; line-height: 1.5; }
+.whatif { margin-top: 14px; border: 1px dashed color-mix(in oklch, var(--primary) 45%, var(--border)); border-radius: 0.6rem; padding: 12px 14px; }
+.whatif-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+.whatif-head svg { color: var(--primary); align-self: center; }
+.whatif-head .sub { font-size: 12px; }
+.whatif-controls { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: flex-end; margin-top: 10px; }
+.whatif-controls .control-label { display: block; margin-bottom: 4px; }
+.whatif-controls .disease-tabs button { padding: 5px 10px; font-size: 12px; font-variant-numeric: tabular-nums; }
+.fc-whatif-note { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; padding: 8px 12px; border-radius: 0.5rem; background: color-mix(in oklch, var(--primary) 12%, transparent); margin: 10px 0 0; }
+.fc-whatif-note svg { flex-shrink: 0; margin-top: 2px; color: var(--primary); }
+.fc-signals { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px; }
+.sigbar { margin-top: 8px; }
+.sigbar-track { display: flex; height: 14px; border-radius: 999px; overflow: hidden; background: var(--muted); }
+.sigbar-compact .sigbar-track { height: 10px; }
+.sigbar-seg { display: block; height: 100%; }
+.sigbar-legend { list-style: none; padding: 0; margin: 8px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 14px; font-size: 12px; }
+.sigbar-compact .sigbar-legend { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); font-size: 11px; }
+.sigbar-legend li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 6px; }
+.sigbar-compact .sigbar-legend { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.sigbar-legend li b { white-space: nowrap; }
+.sigbar-legend small { width: 100%; color: var(--muted-foreground); font-size: 10.5px; padding-left: 16px; }
+.sigbar-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; align-self: center; }
+.sig-weather { background: oklch(0.68 0.13 240); } .sig-water { background: oklch(0.74 0.12 200); } .sig-satellite { background: oklch(0.80 0.15 85); }
+.sig-vector { background: oklch(0.62 0.20 25); } .sig-season { background: oklch(0.70 0.08 160); } .sig-mobility { background: oklch(0.62 0.17 300); }
+.sig-surveillance { background: oklch(0.60 0.03 260); } .sig-population { background: oklch(0.62 0.09 60); }
+.climate-tag.sig-tag-water { border-color: oklch(0.74 0.12 200); color: oklch(0.74 0.12 200); }
+.climate-tag.sig-tag-satellite { border-color: oklch(0.80 0.15 85); color: oklch(0.80 0.15 85); }
+.climate-tag.sig-tag-vector { border-color: oklch(0.62 0.20 25); color: oklch(0.70 0.17 25); }
+.climate-tag.sig-tag-mobility { border-color: oklch(0.62 0.17 300); color: oklch(0.72 0.15 300); }
+.climate-tag.sig-tag-season { border-color: oklch(0.70 0.08 160); color: oklch(0.70 0.08 160); }
+.bs-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; padding: 1px 6px; border-radius: 999px; border: 1px solid oklch(0.62 0.17 300); color: oklch(0.72 0.15 300); }
+.mob-list { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.mob-list li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; }
+.mob-list button { background: none; border: 0; padding: 0; color: var(--foreground); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; text-align: left; }
+.adv-preview { white-space: pre-wrap; font: inherit; font-size: 12px; line-height: 1.5; margin: 10px 0 0; padding: 10px 12px; border: 1px solid var(--border); border-radius: 0.5rem; background: var(--background); max-height: 220px; overflow: auto; }
+.whatif-table td, .whatif-table th { text-align: center; font-variant-numeric: tabular-nums; font-size: 12px; padding: 6px 4px; }
+.whatif-table .whatif-obs { outline: 2px solid var(--foreground); outline-offset: -2px; font-weight: 700; }
+.mini-stats-4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+@media (max-width: 650px) { .mini-stats-4 { grid-template-columns: repeat(2, minmax(0,1fr)); } .mob-list li { grid-template-columns: 1fr auto; } }

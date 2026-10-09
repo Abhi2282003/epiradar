@@ -27,6 +27,9 @@ export function validateContext(search: Record<string, unknown>) {
     ...(typeof search['fd'] === 'string' && ['dengue', 'chikungunya', 'malaria', 'add', 'cholera'].includes(search['fd']) ? { fd: search['fd'] as 'dengue' | 'chikungunya' | 'malaria' | 'add' | 'cholera' } : {}),
     ...([1, 2, 3].includes(Number(search['fh'])) ? { fh: Number(search['fh']) as 1 | 2 | 3 } : {}),
     ...(typeof search['district'] === 'string' && /^IN-D\d{1,4}$/.test(search['district']) ? { district: search['district'] } : {}),
+    // India what-if lab: index into the rain multipliers (0–5, 2 = observed) and temperature offsets (0–3, 1 = observed)
+    ...([0, 1, 3, 4, 5].includes(Number(search['wr'])) && search['wr'] !== '' && search['wr'] != null ? { wr: Number(search['wr']) } : {}),
+    ...([0, 2, 3].includes(Number(search['wt'])) && search['wt'] !== '' && search['wt'] != null ? { wt: Number(search['wt']) } : {}),
   };
 }
 export const PAGE_DETAILS = {

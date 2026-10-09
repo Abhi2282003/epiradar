@@ -18,6 +18,8 @@ export type IndiaMapProps = {
   noDataLabel: string; onSelect: (id: string) => void; onLayerStatus: (key: string, ok: boolean) => void; failedLabel: string;
   /** 'level' colours dots by forecast risk level (0 low … 3 very high); default colours by suitability. */
   colorBy?: 'suit' | 'level'; onSelectDistrict?: (id: string) => void;
+  /** Travel links of the selected district (gravity model), drawn as lines. */
+  links?: { from: [number, number]; to: [number, number]; share: number }[];
 };
 const ALL_RASTERS = [...BASE_LAYERS, ...OVERLAYS];
 const rid = (l: RasterLayer) => `raster-${l.key}`;
@@ -72,6 +74,7 @@ export default function IndiaMap(props: IndiaMapProps) {
         const empty = { type: 'FeatureCollection' as const, features: [] };
         map.addSource('states', { type: 'geojson', data: empty });
         map.addSource('districts', { type: 'geojson', data: empty });
+        map.addSource('links', { type: 'geojson', data: empty });
         if (!map.hasImage('hatch')) map.addImage('hatch', hatch(cssColor('--muted-foreground')));
         if (!map.hasImage('arrow')) map.addImage('arrow', arrowImage(cssColor('--foreground')));
         map.addLayer({ id: 'state-fill', type: 'fill', source: 'states', filter: ['==', ['get', 'has'], true], paint: { 'fill-color': ['coalesce', ['get', 'fill'], cssColor('--risk-no-data')], 'fill-opacity': 0.65 } }, firstSymbol);
@@ -79,6 +82,7 @@ export default function IndiaMap(props: IndiaMapProps) {
         map.addLayer({ id: 'state-line', type: 'line', source: 'states', paint: { 'line-color': cssColor('--muted-foreground'), 'line-width': 0.7 } }, firstSymbol);
         map.addLayer({ id: 'state-selected', type: 'line', source: 'states', filter: ['==', ['get', 'id'], ''], paint: { 'line-color': cssColor('--primary'), 'line-width': 2.5 } }, firstSymbol);
         map.addLayer({ id: 'district-cloud', type: 'circle', source: 'districts', filter: ['!=', ['get', 'cloud'], null], layout: { visibility: 'none' }, paint: { 'circle-color': cssColor('--foreground'), 'circle-radius': ['interpolate', ['linear'], ['zoom'], 3, 14, 6, 50, 9, 160], 'circle-blur': 1, 'circle-opacity': ['*', 0.45, ['/', ['get', 'cloud'], 100]] } });
+        map.addLayer({ id: 'district-links', type: 'line', source: 'links', layout: { 'line-cap': 'round' }, paint: { 'line-color': cssColor('--primary'), 'line-opacity': 0.85, 'line-width': ['interpolate', ['linear'], ['get', 'share'], 0, 1, 0.5, 6] } });
         map.addLayer({ id: 'district-dots', type: 'circle', source: 'districts', layout: { visibility: 'none' }, paint: {
           'circle-color': ['coalesce', ['get', 'suitColor'], cssColor('--risk-no-data')],
           'circle-radius': ['interpolate', ['linear'], ['zoom'], 3, ['+', 1.5, ['*', 0.0011, ['sqrt', ['coalesce', ['get', 'population'], 0]]]], 8, ['+', 4, ['*', 0.004, ['sqrt', ['coalesce', ['get', 'population'], 0]]]]],
@@ -175,6 +179,13 @@ export default function IndiaMap(props: IndiaMapProps) {
     map!.setLayoutProperty('district-wind', 'visibility', props.wind ? 'visible' : 'none');
     map!.setLayoutProperty('district-cloud', 'visibility', props.cloud ? 'visible' : 'none');
   }, [props.districts, props.dots, props.wind, props.cloud, props.colorBy, ready]);
+
+  // Travel links of the selected district
+  useEffect(() => {
+    const map = mapRef.current; const src = map?.getSource('links') as GeoJSONSource | undefined;
+    if (!src) return;
+    src.setData({ type: 'FeatureCollection', features: (props.links ?? []).map(l => ({ type: 'Feature', geometry: { type: 'LineString', coordinates: [l.from, l.to] }, properties: { share: l.share } })) });
+  }, [props.links, ready]);
 
   // Focus
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 import type { Topology } from 'topojson-specification';
 import { getCountryWho, getIndiaOverview, getIndiaTopo, getKarnatakaHistory, getWhoYear } from '@/lib/india.functions';
-import { getIndiaDistrict, getIndiaForecast, getIndiaModelCard } from '@/lib/india-forecast.functions';
+import { getIndiaDistrict, getIndiaForecast, getIndiaMobility, getIndiaModelCard, getIndiaSummary } from '@/lib/india-forecast.functions';
 
 const TEN_MIN = 10 * 60_000;
 export const indiaOverviewQuery = queryOptions({ queryKey: ['india', 'overview'], queryFn: () => getIndiaOverview(), staleTime: TEN_MIN, refetchInterval: TEN_MIN });
@@ -19,3 +19,5 @@ export const indiaModelCardQuery = queryOptions({
   queryKey: ['india', 'model-card'], staleTime: TEN_MIN,
   queryFn: async () => { const r = await getIndiaModelCard(); if (!r) return null; const card = JSON.parse(r.cardJson) as unknown; return { model_version: r.model_version, created_at: r.created_at, card: card && typeof card === 'object' ? card as Record<string, unknown> : null }; },
 });
+export const indiaSummaryQuery = (horizon: number) => queryOptions({ queryKey: ['india', 'summary', horizon], queryFn: () => getIndiaSummary({ data: { horizon } }), staleTime: TEN_MIN });
+export const indiaMobilityQuery = queryOptions({ queryKey: ['india', 'mobility'], queryFn: () => getIndiaMobility(), staleTime: Infinity });

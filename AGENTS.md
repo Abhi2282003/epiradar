@@ -26,3 +26,7 @@
 - The World workspace reads countries, latest country forecasts (view) and 12-month case totals (view) through one public server function; satellite layers use a typed, capability-verified GIBS config in src/lib/world.ts, and rasters are added to the map only while switched on.
 - The live world weather grid enters only through the throttled public route /api/public/refresh-world-weather (10° Open-Meteo grid, 30-min throttle, scheduled every 6 h); wind and cloud are drawn client-side from that grid.
 - model_runs.scope separates model cards (brazil-municipal, world-national); Model & data shows the latest run per scope in tabs.
+- India district forecasts (india_forecasts) are issued weekly for 4-week windows (weeks 1–4, 5–8, 9–12 after the last weather day); window dates are derived from issue_month + horizon in src/lib/india-forecast.ts, and the UI reads only the latest issue.
+- The India what-if lab reads the precomputed per-district scenarios grid (rain × temperature, same model) from each forecast row; it never runs a model in the browser, and what-if state lives only in validated URL context (wr, wt).
+- Blind spots, the situation brief and expected outbreaks by state are derived from india_forecasts rows (silent, prob_climate_only, risk_level, prob) through server functions; nothing is fabricated when rows are missing.
+- india_mobility holds gravity-model travel links (6 per district); the district drawer reads at most 10 links for one district and the map draws only the selected district's links.
