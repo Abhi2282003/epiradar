@@ -4,7 +4,7 @@
 @source "../src";
 @custom-variant dark (&:is(.dark *));
 @theme inline {
-  --font-sans: 'Inter', sans-serif;
+  --font-sans: 'Inter', 'Noto Sans Devanagari', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -61,7 +61,7 @@
   --status-ok: oklch(0.52 0.15 150);
 }
 * { border-color: var(--border); }
-body { margin: 0; background: var(--background); color: var(--foreground); font-family: 'Inter', sans-serif; font-size: 14px; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+body { margin: 0; background: var(--background); color: var(--foreground); font-family: 'Inter', 'Noto Sans Devanagari', sans-serif; font-size: 14px; letter-spacing: 0; font-variant-numeric: tabular-nums; }
 button, select, input { font: inherit; }
 button, a, select { -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
@@ -395,3 +395,44 @@ h1 { font-size: 29px; font-weight: 600; line-height: 1.3; margin: 0 0 9px; }
 .country-forecast-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
 .country-forecast-values { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 6px; }
 @media (max-width: 1000px) { .world-layout { grid-template-columns: 1fr; } .world-controls { max-height: none; } .world-kpis { grid-template-columns: repeat(2, minmax(0,1fr)); } .world-stage { height: 480px; } }
+
+/* Languages and grouped navigation */
+:lang(hi), :lang(mr) { font-family: 'Noto Sans Devanagari', 'Inter', sans-serif; }
+.nav-group { margin-bottom: 14px; }
+.nav-group .nav-heading { padding-bottom: 6px; line-height: 1.4; }
+.nav-group .nav-link { padding: 9px 14px; margin-bottom: 2px; }
+.topbar-spacer { flex: 1; }
+.lang-switch { display: inline-flex; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+.lang-switch button { padding: 5px 9px; font-size: 12px; color: var(--muted-foreground); background: transparent; border: 0; cursor: pointer; min-width: 38px; }
+.lang-switch button + button { border-left: 1px solid var(--border); }
+.lang-switch button[aria-pressed='true'] { background: color-mix(in oklch, var(--primary) 16%, transparent); color: var(--primary); font-weight: 600; }
+.lang-switch button:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.data-badge { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .5px; text-transform: uppercase; border: 1px solid currentColor; border-radius: 4px; padding: 1px 6px; background: transparent; cursor: help; }
+.data-badge-reported { color: var(--rain-2); }
+.data-badge-suitability { color: var(--risk-moderate); }
+.data-badge-forecast { color: var(--primary); }
+.panel-title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.india-kpis { grid-template-columns: repeat(6, minmax(0,1fr)); }
+.india-kpis .command-metric > strong { font-size: 24px; margin: 6px 0 2px; }
+.india-kpis .command-metric .metric-label { min-height: 0; }
+.india-toolbar { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin: 4px 0 18px; }
+.disease-tabs { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.disease-tabs button { padding: 7px 14px; font-size: 13px; background: transparent; border: 0; color: var(--muted-foreground); cursor: pointer; }
+.disease-tabs button + button { border-left: 1px solid var(--border); }
+.disease-tabs button[aria-selected='true'] { background: color-mix(in oklch, var(--primary) 16%, transparent); color: var(--primary); font-weight: 600; }
+.year-slider { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.year-slider input { accent-color: var(--primary); width: 200px; }
+.year-slider output { font-family: var(--font-mono); min-width: 44px; }
+.partial-tag { font-family: var(--font-mono); font-size: 10px; color: var(--risk-moderate); border: 1px solid currentColor; border-radius: 4px; padding: 0 5px; }
+.focus-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.india-cards { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; margin-top: 16px; }
+.india-cards .replay-card h2 { font-size: 16px; font-weight: 600; margin: 0; }
+.mini-stats { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-top: 12px; }
+.mini-stats div { border: 1px solid var(--border); border-radius: 0.5rem; padding: 8px 10px; }
+.mini-stats dt { font-size: 11px; color: var(--muted-foreground); }
+.mini-stats dd { margin: 2px 0 0; font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.suit-chip { display: inline-block; min-width: 42px; text-align: center; border-radius: 4px; padding: 0 4px; font-variant-numeric: tabular-nums; color: var(--background); }
+.suit-0 { background: var(--risk-low); } .suit-1 { background: var(--risk-moderate); } .suit-2 { background: var(--risk-high); } .suit-3 { background: var(--risk-very-high); color: var(--foreground); }
+.sortable-th button { background: none; border: 0; color: inherit; font: inherit; cursor: pointer; padding: 0; }
+@media (max-width: 1100px) { .india-kpis { grid-template-columns: repeat(3, minmax(0,1fr)); } .india-cards { grid-template-columns: 1fr; } }
+@media (max-width: 650px) { .india-kpis { grid-template-columns: repeat(2, minmax(0,1fr)); } }

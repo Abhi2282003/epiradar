@@ -19,9 +19,14 @@ export function validateContext(search: Record<string, unknown>) {
     ...(typeof search['sort'] === 'string' && ['name', 'population', 'probability', 'level', 'cases'].includes(search['sort']) ? { sort: search['sort'] } : {}),
     ...(search['desc'] === true || search['desc'] === 'true' ? { desc: true } : {}),
     ...(typeof search['country'] === 'string' && /^[A-Z]{3}$/.test(search['country']) ? { country: search['country'] } : {}),
+    ...(typeof search['state'] === 'string' && /^IN-[A-Z]{2,3}$/.test(search['state']) ? { state: search['state'] } : {}),
+    ...(typeof search['india'] === 'string' && ['dengue', 'chikungunya', 'malaria'].includes(search['india']) ? { india: search['india'] as 'dengue' | 'chikungunya' | 'malaria' } : {}),
+    ...(Number.isInteger(Number(search['year'])) && Number(search['year']) >= 2000 && Number(search['year']) <= 2100 && search['year'] != null && search['year'] !== '' ? { year: Number(search['year']) } : {}),
+    ...(typeof search['who'] === 'string' && ['malaria', 'cholera'].includes(search['who']) ? { who: search['who'] as 'malaria' | 'cholera' } : {}),
   };
 }
 export const PAGE_DETAILS = {
+  india: { title: 'India overview', description: 'India: reported dengue, chikungunya and malaria by state, with live district climate suitability.', eyebrow: 'INDIA' },
   world: { title: 'World', description: 'Global dengue outlook by country with live satellite, climate and weather layers.', eyebrow: 'GLOBAL SURVEILLANCE' },
   command: { title: 'Command centre', description: 'Anticipate emerging outbreaks and prioritise your public health response.', eyebrow: 'OUTBREAK INTELLIGENCE' },
   map: { title: 'Map', description: 'Locate regional outbreak risk to focus surveillance and resources.', eyebrow: 'REGIONAL SURVEILLANCE' },

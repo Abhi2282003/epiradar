@@ -1,3 +1,4 @@
+import { PageTitle, RiskName } from './i18n-ui';
 import { Component, lazy, Suspense, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { ClientOnly, Link, useSearch } from '@tanstack/react-router';
@@ -106,7 +107,7 @@ function Lab({ disease, horizon, rows }: { disease: string; horizon: number; row
       <div className="replay-map"><Boundary><ClientOnly fallback={<Skeleton className="h-full" />}><Suspense fallback={<Skeleton className="h-full" />}>
         <MunicipalityMap rows={mapRows} selected={chosen ?? undefined} onSelect={id => setRegion(id)} label="Municipality outbreak risk under the chosen scenario" tooltip={row => [`Under scenario: ${formatProbability(row.prediction?.outbreak_prob)} · ${riskFromProbability(row.prediction?.outbreak_prob) ?? 'No data'}`]} />
       </Suspense></ClientOnly></Boundary></div>
-      <div className="replay-legend">{RISK_SCALE.map((r, i) => <span className="risk-item" key={r.label}><span className={`risk-swatch risk-${i}`} />{r.label}</span>)}</div>
+      <div className="replay-legend">{RISK_SCALE.map((r, i) => <span className="risk-item" key={r.label}><span className={`risk-swatch risk-${i}`} /><RiskName label={r.label} /></span>)}</div>
     </section>
   </>;
 }
@@ -119,7 +120,7 @@ export function ScenarioLab() {
   const rows = joinMunicipalities(surv.regions, surv.predictions);
   return <>
     <p className="eyebrow">{page.eyebrow}</p>
-    <div className="page-heading"><div><h1>{page.title}</h1><p className="page-description">{page.description}</p></div></div>
+    <div className="page-heading"><div><h1><PageTitle kind={'scenarios'} /></h1><p className="page-description">{page.description}</p></div></div>
     <Intro model={meta.climateModel} />
     {meta.hasScenarios ? <Lab disease={context.disease} horizon={context.horizon} rows={rows} /> : <EmptyLab disease={context.disease} outlook={meta.outlook} />}
     <footer className="page-footer"><span>SENSITIVITY TEST · NOT A CLIMATE PROJECTION</span><span>MODEL ASSOCIATIONS · NOT PROOF OF CAUSE</span></footer>

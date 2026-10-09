@@ -1,6 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Link, useNavigate, useSearch } from '@tanstack/react-router';
-import { Bell, ChevronDown, Command, FlaskConical, Globe2, History, LayoutDashboard, Map, Moon, Radar, Search, ShieldCheck, Sun } from 'lucide-react';
+import { Link, useNavigate, useRouterState, useSearch } from '@tanstack/react-router';
+import { Bell, ChevronDown, Command, FlaskConical, Globe2, History, LayoutDashboard, Map, MapPinned, Moon, Radar, Search, ShieldCheck, Sun } from 'lucide-react';
+import { useT, DISEASE_KEY, type Key } from '@/lib/i18n';
+import { LanguageSwitch } from './i18n-ui';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { useQuery } from '@tanstack/react-query';
@@ -9,19 +11,27 @@ import { getRegionList } from '@/lib/region.functions';
 import { RegionDrawer } from './region-drawer';
 import { LivePill, useRealtimeUpdates } from './realtime';
 import { Toaster } from '@/components/ui/sonner';
-const navigation = [
-  { to: '/world', label: 'World', icon: Globe2 },
-  { to: '/', label: 'Command centre', icon: LayoutDashboard },
-  { to: '/map', label: 'Map', icon: Map },
-  { to: '/scenarios', label: 'Scenario lab', icon: FlaskConical },
-  { to: '/replay', label: 'Time machine', icon: History },
-  { to: '/alerts', label: 'Alerts', icon: Bell },
-  { to: '/trust', label: 'Model & data', icon: ShieldCheck },
-] as const;
+const groups = [
+  { heading: 'nav.group.india', items: [{ to: '/india', label: 'nav.india', icon: MapPinned }] },
+  { heading: 'nav.group.world', items: [{ to: '/world', label: 'nav.world', icon: Globe2 }] },
+  { heading: 'nav.group.brazil', items: [
+    { to: '/brazil', label: 'nav.command', icon: LayoutDashboard },
+    { to: '/map', label: 'nav.map', icon: Map },
+    { to: '/scenarios', label: 'nav.scenarios', icon: FlaskConical },
+    { to: '/replay', label: 'nav.replay', icon: History },
+    { to: '/alerts', label: 'nav.alerts', icon: Bell },
+  ] },
+  { heading: 'nav.group.trust', items: [{ to: '/trust', label: 'nav.trust', icon: ShieldCheck }] },
+] as const satisfies readonly { heading: Key; items: readonly { to: string; label: Key; icon: unknown }[] }[];
+/** Pages that use the weekly municipal DISEASE / HORIZON controls. */
+export const BRAZIL_PATHS = ['/brazil', '/map', '/scenarios', '/replay', '/alerts'];
 export function AppShell({ children }: { children: ReactNode }) {
   const search = useSearch({ strict: false });
   const context = validateContext(search);
-  const navigate = useNavigate({ from: '/' });
+  const navigate = useNavigate({ from: '/brazil' });
+  const t = useT();
+  const pathname = useRouterState({ select: st => st.location.pathname });
+  const brazil = BRAZIL_PATHS.includes(pathname);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [light, setLight] = useState(false);
@@ -47,23 +57,24 @@ export function AppShell({ children }: { children: ReactNode }) {
     localStorage.setItem('epiradar-theme', next ? 'light' : 'dark');
   };
   return <div className="app-shell">
-    <a href="#main-content" className="sr-only focus:not-sr-only">Skip to content</a>
+    <a href="#main-content" className="sr-only focus:not-sr-only">{t('shell.skip')}</a>
     <aside className="sidebar" aria-label="Main navigation">
-      <Link to="/" search={context} className="wordmark" aria-label="EpiRadar home"><Radar className="brand-icon" /><span className="sidebar-text">EpiRadar<span className="text-primary">.</span></span></Link>
-      <div className="sidebar-caption">CLIMATE. HEALTH. FORESIGHT.</div>
-      <div className="nav-heading">WORKSPACE</div>
-      <nav>{navigation.map(item => <Link key={item.to} to={item.to} search={context} activeOptions={{ exact: true }} className="nav-link" title={item.label} aria-label={item.label}><item.icon /><span className="sidebar-text">{item.label}</span></Link>)}</nav>
+      <Link to="/india" search={context} className="wordmark" aria-label={t('shell.home')}><Radar className="brand-icon" /><span className="sidebar-text">EpiRadar<span className="text-primary">.</span></span></Link>
+      <div className="sidebar-caption">{t('shell.caption')}</div>
+      <nav>{groups.map(g => <div key={g.heading} className="nav-group"><div className="nav-heading">{t(g.heading)}</div>{g.items.map(item => <Link key={item.to} to={item.to} search={context} activeOptions={{ exact: true }} className="nav-link" title={t(item.label)} aria-label={t(item.label)}><item.icon /><span className="sidebar-text">{t(item.label)}</span></Link>)}</div>)}</nav>
       <div className="sidebar-bottom">
-        <div className="connection-status"><p><span className="status-dot" />Read-only surveillance</p><small>Real data · live refresh</small></div>
-        <Button variant="ghost" className="theme-control" onClick={toggleTheme} aria-label={light ? 'Switch to dark mode' : 'Switch to light mode'} title={light ? 'Switch to dark mode' : 'Switch to light mode'}>{light ? <Moon /> : <Sun />}<span className="sidebar-text">{light ? 'Dark appearance' : 'Light appearance'}</span></Button>
+        <div className="connection-status"><p><span className="status-dot" />{t('shell.readOnly')}</p><small>{t('shell.realData')}</small></div>
+        <Button variant="ghost" className="theme-control" onClick={toggleTheme} aria-label={light ? 'Switch to dark mode' : 'Switch to light mode'} title={light ? 'Switch to dark mode' : 'Switch to light mode'}>{light ? <Moon /> : <Sun />}<span className="sidebar-text">{light ? t('shell.dark') : t('shell.light')}</span></Button>
       </div>
     </aside>
     <div className="workspace">
       <header className="topbar">
-        <label className="context-control"><span className="control-label">DISEASE</span><span className="select-wrap"><select aria-label="Disease" value={context.disease} onChange={event => navigate({ search: prev => ({ ...prev, disease: event.target.value, horizon: context.horizon }) })}>{DISEASES.map(disease => <option key={disease}>{disease}</option>)}</select><ChevronDown /></span></label>
+        {brazil ? <>
+        <label className="context-control"><span className="control-label">{t('topbar.disease')}</span><span className="select-wrap"><select aria-label={t('topbar.disease')} value={context.disease} onChange={event => navigate({ to: '.', search: prev => ({ ...prev, disease: event.target.value, horizon: context.horizon }) } as never)}>{DISEASES.map(disease => <option key={disease} value={disease}>{DISEASE_KEY[disease] ? t(DISEASE_KEY[disease]!) : disease}</option>)}</select><ChevronDown /></span></label>
         <div className="topbar-divider" />
-        <label className="context-control"><span className="control-label">FORECAST HORIZON</span><span className="select-wrap"><select aria-label="Forecast horizon" value={context.horizon} onChange={event => navigate({ search: prev => ({ ...prev, disease: context.disease, horizon: Number(event.target.value) }) })}>{Array.from({ length: 8 }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1} {i === 0 ? 'week' : 'weeks'} ahead</option>)}</select><ChevronDown /></span></label>
-        <div className="topbar-tools"><Button variant="ghost" className="search-trigger" aria-label="Search regions" onClick={() => setPaletteOpen(true)}><Search /><span className="search-label">Search regions</span><kbd>⌘ K</kbd></Button><LivePill /></div>
+        <label className="context-control"><span className="control-label">{t('topbar.horizon')}</span><span className="select-wrap"><select aria-label={t('topbar.horizon')} value={context.horizon} onChange={event => navigate({ to: '.', search: prev => ({ ...prev, disease: context.disease, horizon: Number(event.target.value) }) } as never)}>{Array.from({ length: 8 }, (_, i) => <option key={i + 1} value={i + 1}>{i === 0 ? t('topbar.weekAhead') : t('topbar.weeksAhead', { n: i + 1 })}</option>)}</select><ChevronDown /></span></label>
+        </> : <div className="topbar-spacer" />}
+        <div className="topbar-tools"><LanguageSwitch />{brazil && <Button variant="ghost" className="search-trigger" aria-label={t('topbar.search')} onClick={() => setPaletteOpen(true)}><Search /><span className="search-label">{t('topbar.search')}</span><kbd>⌘ K</kbd></Button>}<LivePill /></div>
       </header>
       <main id="main-content" className="content">{children}</main>
       <RegionDrawer />

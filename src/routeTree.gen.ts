@@ -11,13 +11,17 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AlertsRouteImport } from './routes/alerts'
+import { Route as BrazilRouteImport } from './routes/brazil'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as ReplayRouteImport } from './routes/replay'
 import { Route as ScenariosRouteImport } from './routes/scenarios'
 import { Route as TrustRouteImport } from './routes/trust'
 import { Route as WorldRouteImport } from './routes/world'
 import { Route as ApiPublicIngestRouteImport } from './routes/api/public/ingest'
+import { Route as ApiPublicRefreshIctsRouteImport } from './routes/api/public/refresh-icts'
+import { Route as ApiPublicRefreshIndiaWeatherRouteImport } from './routes/api/public/refresh-india-weather'
 import { Route as ApiPublicRefreshWeatherRouteImport } from './routes/api/public/refresh-weather'
+import { Route as ApiPublicRefreshWhoRouteImport } from './routes/api/public/refresh-who'
 import { Route as ApiPublicRefreshWorldWeatherRouteImport } from './routes/api/public/refresh-world-weather'
 
 const IndexRoute = IndexRouteImport.update({
@@ -28,6 +32,11 @@ const IndexRoute = IndexRouteImport.update({
 const AlertsRoute = AlertsRouteImport.update({
   id: '/alerts',
   path: '/alerts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrazilRoute = BrazilRouteImport.update({
+  id: '/brazil',
+  path: '/brazil',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MapRoute = MapRouteImport.update({
@@ -60,9 +69,25 @@ const ApiPublicIngestRoute = ApiPublicIngestRouteImport.update({
   path: '/api/public/ingest',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicRefreshIctsRoute = ApiPublicRefreshIctsRouteImport.update({
+  id: '/api/public/refresh-icts',
+  path: '/api/public/refresh-icts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicRefreshIndiaWeatherRoute =
+  ApiPublicRefreshIndiaWeatherRouteImport.update({
+    id: '/api/public/refresh-india-weather',
+    path: '/api/public/refresh-india-weather',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicRefreshWeatherRoute = ApiPublicRefreshWeatherRouteImport.update({
   id: '/api/public/refresh-weather',
   path: '/api/public/refresh-weather',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicRefreshWhoRoute = ApiPublicRefreshWhoRouteImport.update({
+  id: '/api/public/refresh-who',
+  path: '/api/public/refresh-who',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicRefreshWorldWeatherRoute =
@@ -75,38 +100,50 @@ const ApiPublicRefreshWorldWeatherRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/alerts': typeof AlertsRoute
+  '/brazil': typeof BrazilRoute
   '/map': typeof MapRoute
   '/replay': typeof ReplayRoute
   '/scenarios': typeof ScenariosRoute
   '/trust': typeof TrustRoute
   '/world': typeof WorldRoute
   '/api/public/ingest': typeof ApiPublicIngestRoute
+  '/api/public/refresh-icts': typeof ApiPublicRefreshIctsRoute
+  '/api/public/refresh-india-weather': typeof ApiPublicRefreshIndiaWeatherRoute
   '/api/public/refresh-weather': typeof ApiPublicRefreshWeatherRoute
+  '/api/public/refresh-who': typeof ApiPublicRefreshWhoRoute
   '/api/public/refresh-world-weather': typeof ApiPublicRefreshWorldWeatherRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/alerts': typeof AlertsRoute
+  '/brazil': typeof BrazilRoute
   '/map': typeof MapRoute
   '/replay': typeof ReplayRoute
   '/scenarios': typeof ScenariosRoute
   '/trust': typeof TrustRoute
   '/world': typeof WorldRoute
   '/api/public/ingest': typeof ApiPublicIngestRoute
+  '/api/public/refresh-icts': typeof ApiPublicRefreshIctsRoute
+  '/api/public/refresh-india-weather': typeof ApiPublicRefreshIndiaWeatherRoute
   '/api/public/refresh-weather': typeof ApiPublicRefreshWeatherRoute
+  '/api/public/refresh-who': typeof ApiPublicRefreshWhoRoute
   '/api/public/refresh-world-weather': typeof ApiPublicRefreshWorldWeatherRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/alerts': typeof AlertsRoute
+  '/brazil': typeof BrazilRoute
   '/map': typeof MapRoute
   '/replay': typeof ReplayRoute
   '/scenarios': typeof ScenariosRoute
   '/trust': typeof TrustRoute
   '/world': typeof WorldRoute
   '/api/public/ingest': typeof ApiPublicIngestRoute
+  '/api/public/refresh-icts': typeof ApiPublicRefreshIctsRoute
+  '/api/public/refresh-india-weather': typeof ApiPublicRefreshIndiaWeatherRoute
   '/api/public/refresh-weather': typeof ApiPublicRefreshWeatherRoute
+  '/api/public/refresh-who': typeof ApiPublicRefreshWhoRoute
   '/api/public/refresh-world-weather': typeof ApiPublicRefreshWorldWeatherRoute
 }
 export interface FileRouteTypes {
@@ -114,50 +151,66 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/alerts'
+    | '/brazil'
     | '/map'
     | '/replay'
     | '/scenarios'
     | '/trust'
     | '/world'
     | '/api/public/ingest'
+    | '/api/public/refresh-icts'
+    | '/api/public/refresh-india-weather'
     | '/api/public/refresh-weather'
+    | '/api/public/refresh-who'
     | '/api/public/refresh-world-weather'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/alerts'
+    | '/brazil'
     | '/map'
     | '/replay'
     | '/scenarios'
     | '/trust'
     | '/world'
     | '/api/public/ingest'
+    | '/api/public/refresh-icts'
+    | '/api/public/refresh-india-weather'
     | '/api/public/refresh-weather'
+    | '/api/public/refresh-who'
     | '/api/public/refresh-world-weather'
   id:
     | '__root__'
     | '/'
     | '/alerts'
+    | '/brazil'
     | '/map'
     | '/replay'
     | '/scenarios'
     | '/trust'
     | '/world'
     | '/api/public/ingest'
+    | '/api/public/refresh-icts'
+    | '/api/public/refresh-india-weather'
     | '/api/public/refresh-weather'
+    | '/api/public/refresh-who'
     | '/api/public/refresh-world-weather'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AlertsRoute: typeof AlertsRoute
+  BrazilRoute: typeof BrazilRoute
   MapRoute: typeof MapRoute
   ReplayRoute: typeof ReplayRoute
   ScenariosRoute: typeof ScenariosRoute
   TrustRoute: typeof TrustRoute
   WorldRoute: typeof WorldRoute
   ApiPublicIngestRoute: typeof ApiPublicIngestRoute
+  ApiPublicRefreshIctsRoute: typeof ApiPublicRefreshIctsRoute
+  ApiPublicRefreshIndiaWeatherRoute: typeof ApiPublicRefreshIndiaWeatherRoute
   ApiPublicRefreshWeatherRoute: typeof ApiPublicRefreshWeatherRoute
+  ApiPublicRefreshWhoRoute: typeof ApiPublicRefreshWhoRoute
   ApiPublicRefreshWorldWeatherRoute: typeof ApiPublicRefreshWorldWeatherRoute
 }
 
@@ -175,6 +228,13 @@ declare module '@tanstack/react-router' {
       path: '/alerts'
       fullPath: '/alerts'
       preLoaderRoute: typeof AlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brazil': {
+      id: '/brazil'
+      path: '/brazil'
+      fullPath: '/brazil'
+      preLoaderRoute: typeof BrazilRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/map': {
@@ -219,11 +279,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicIngestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/refresh-icts': {
+      id: '/api/public/refresh-icts'
+      path: '/api/public/refresh-icts'
+      fullPath: '/api/public/refresh-icts'
+      preLoaderRoute: typeof ApiPublicRefreshIctsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/refresh-india-weather': {
+      id: '/api/public/refresh-india-weather'
+      path: '/api/public/refresh-india-weather'
+      fullPath: '/api/public/refresh-india-weather'
+      preLoaderRoute: typeof ApiPublicRefreshIndiaWeatherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/refresh-weather': {
       id: '/api/public/refresh-weather'
       path: '/api/public/refresh-weather'
       fullPath: '/api/public/refresh-weather'
       preLoaderRoute: typeof ApiPublicRefreshWeatherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/refresh-who': {
+      id: '/api/public/refresh-who'
+      path: '/api/public/refresh-who'
+      fullPath: '/api/public/refresh-who'
+      preLoaderRoute: typeof ApiPublicRefreshWhoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/refresh-world-weather': {
@@ -239,13 +320,17 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AlertsRoute: AlertsRoute,
+  BrazilRoute: BrazilRoute,
   MapRoute: MapRoute,
   ReplayRoute: ReplayRoute,
   ScenariosRoute: ScenariosRoute,
   TrustRoute: TrustRoute,
   WorldRoute: WorldRoute,
   ApiPublicIngestRoute: ApiPublicIngestRoute,
+  ApiPublicRefreshIctsRoute: ApiPublicRefreshIctsRoute,
+  ApiPublicRefreshIndiaWeatherRoute: ApiPublicRefreshIndiaWeatherRoute,
   ApiPublicRefreshWeatherRoute: ApiPublicRefreshWeatherRoute,
+  ApiPublicRefreshWhoRoute: ApiPublicRefreshWhoRoute,
   ApiPublicRefreshWorldWeatherRoute: ApiPublicRefreshWorldWeatherRoute,
 }
 export const routeTree = rootRouteImport

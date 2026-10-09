@@ -1,3 +1,4 @@
+import { RiskName } from './i18n-ui';
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
@@ -107,7 +108,7 @@ export function WorldPage() {
         <fieldset><legend className="control-label">COUNTRIES</legend>
           <select className="world-select" aria-label="Country metric" value={metric} onChange={e => setMetric(e.target.value as typeof metric)}>
             <option value="prob">Dengue outbreak probability, next month</option><option value="cases">Dengue cases, latest 12 months, per 100k</option><option value="none">Outlines only</option></select>
-          {metric === 'prob' && <ul className="world-legend">{RISK_SCALE.slice(0, 4).map((r, i) => <li key={r.label}><span className={`risk-swatch risk-${i}`} />{r.label}</li>)}<li><span className="hatch-swatch" />No data</li></ul>}
+          {metric === 'prob' && <ul className="world-legend">{RISK_SCALE.slice(0, 4).map((r, i) => <li key={r.label}><span className={`risk-swatch risk-${i}`} /><RiskName label={r.label} /></li>)}<li><span className="hatch-swatch" />No data</li></ul>}
           {metric === 'cases' && <ul className="world-legend">{[0, 1, 2, 3, 4].map(i => <li key={i}><span className="risk-swatch" style={{ background: `var(--rain-${i})` }} />{i === 0 ? `< ${INCIDENCE_BINS[0]}` : i === 4 ? `≥ ${formatNumber(INCIDENCE_BINS[3])}` : `${formatNumber(INCIDENCE_BINS[i - 1])}–${formatNumber(INCIDENCE_BINS[i])}`}</li>)}<li><span className="hatch-swatch" />No data</li></ul>}
           {!boundariesOk && <p className="layer-unavailable">Country boundaries unavailable (world-atlas could not be loaded).</p>}
         </fieldset>
@@ -172,8 +173,8 @@ function CountryDrawer({ grid, today }: { grid: GridCell[] | null; today: string
           <header className="drawer-header"><span className="control-label">{context.disease.toUpperCase()} · NATIONAL</span><SheetTitle className="drawer-title">{k.name ?? k.iso3}</SheetTitle>
             <SheetDescription>{[k.subregion, k.region].filter(Boolean).join(', ') || '—'} · Population {formatNumber(k.population)}</SheetDescription></header>
           <div className="flex flex-wrap gap-2">
-            {k.iso3 === 'BRA' && <Button asChild size="sm"><Link to="/" search={{ disease: context.disease, horizon: context.horizon }}>Open municipal view</Link></Button>}
-            {k.iso3 === 'IND' && <Button size="sm" disabled title="Coming next">Open India view · coming next</Button>}
+            {k.iso3 === 'BRA' && <Button asChild size="sm"><Link to="/brazil" search={{ disease: context.disease, horizon: context.horizon }}>Open municipal view</Link></Button>}
+            {k.iso3 === 'IND' && <Button asChild size="sm"><Link to="/india" search={{ disease: context.disease, horizon: context.horizon }}>Open India view</Link></Button>}
           </div>
           <section className="drawer-section"><h3><Globe2 />Data coverage</h3>
             <dl className="def-list"><div><dt>Resolution</dt><dd>{k.dengue_resolution ?? '—'}</dd></div><div><dt>First month</dt><dd>{monthLabel(k.dengue_first)}</dd></div><div><dt>Last month</dt><dd>{monthLabel(k.dengue_last)}</dd></div></dl>
@@ -193,7 +194,7 @@ function CountryDrawer({ grid, today }: { grid: GridCell[] | null; today: string
           <section className="drawer-section"><h3><ShieldCheck />Forecast, next 3 months</h3>
             {q.data.forecasts.length ? <div className="flex flex-col gap-4">{q.data.forecasts.map(f => { const lvl = riskLabel(f.risk_level) !== 'No data' ? riskLabel(f.risk_level) : bandFromProb(f.outbreak_prob); const drv = parseDrivers(f.drivers); return <div key={f.horizon_months} className="country-forecast">
               <div className="country-forecast-head"><strong>{monthLabel(f.target_month)}</strong><span className="text-xs text-muted-foreground">{f.horizon_months} month{f.horizon_months === 1 ? '' : 's'} ahead · issued {monthLabel(f.issue_month)}</span></div>
-              <div className="country-forecast-values"><span className="tabular-nums text-lg font-semibold">{formatProbability(f.outbreak_prob)}</span><span className="risk-item"><span className={`risk-swatch risk-${RISK_INDEX[lvl] ?? 4}`} />{lvl}</span><span className="text-sm">P10–P90: {formatNumber(f.cases_p10)}–{formatNumber(f.cases_p90)} cases</span></div>
+              <div className="country-forecast-values"><span className="tabular-nums text-lg font-semibold">{formatProbability(f.outbreak_prob)}</span><span className="risk-item"><span className={`risk-swatch risk-${RISK_INDEX[lvl] ?? 4}`} /><RiskName label={lvl} /></span><span className="text-sm">P10–P90: {formatNumber(f.cases_p10)}–{formatNumber(f.cases_p90)} cases</span></div>
               {drv.length > 0 && <ul className="text-sm mt-2">{drv.slice(0, 3).map((d, i) => <li key={i}>{d.label ?? '—'} <span className="text-muted-foreground">({d.family ?? '—'}, {num(d.contribution, 3)})</span></li>)}</ul>}
               {f.narrative && <p className="drawer-narrative mt-2">{f.narrative}</p>}
             </div>; })}<p className="sub">Drivers are associations, not proof of cause.</p></div> : <p className="drawer-empty">No forecast is loaded for this country yet.</p>}

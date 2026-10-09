@@ -18,34 +18,46 @@ export type Database = {
         Row: {
           admin1: string
           cases: number | null
+          confirmed: number | null
           country_iso3: string
+          deaths: number | null
           disease_id: string
           incidence: number | null
           note: string | null
+          pf: number | null
           population: number | null
           source: string | null
+          tested: number | null
           year: number
         }
         Insert: {
           admin1: string
           cases?: number | null
+          confirmed?: number | null
           country_iso3: string
+          deaths?: number | null
           disease_id: string
           incidence?: number | null
           note?: string | null
+          pf?: number | null
           population?: number | null
           source?: string | null
+          tested?: number | null
           year: number
         }
         Update: {
           admin1?: string
           cases?: number | null
+          confirmed?: number | null
           country_iso3?: string
+          deaths?: number | null
           disease_id?: string
           incidence?: number | null
           note?: string | null
+          pf?: number | null
           population?: number | null
           source?: string | null
+          tested?: number | null
           year?: number
         }
         Relationships: []
@@ -284,6 +296,33 @@ export type Database = {
         }
         Relationships: []
       }
+      country_reported: {
+        Row: {
+          disease_id: string
+          indicator: string
+          iso3: string
+          source: string | null
+          value: number | null
+          year: number
+        }
+        Insert: {
+          disease_id: string
+          indicator: string
+          iso3: string
+          source?: string | null
+          value?: number | null
+          year: number
+        }
+        Update: {
+          disease_id?: string
+          indicator?: string
+          iso3?: string
+          source?: string | null
+          value?: number | null
+          year?: number
+        }
+        Relationships: []
+      }
       country_series: {
         Row: {
           cases: number | null
@@ -403,6 +442,190 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      geo_assets: {
+        Row: {
+          id: string
+          license: string | null
+          source: string | null
+          topo: Json
+          updated_at: string | null
+        }
+        Insert: {
+          id: string
+          license?: string | null
+          source?: string | null
+          topo: Json
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          license?: string | null
+          source?: string | null
+          topo?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      india_district_history: {
+        Row: {
+          cases: number | null
+          deaths: number | null
+          district_name: string
+          week_start: string
+        }
+        Insert: {
+          cases?: number | null
+          deaths?: number | null
+          district_name: string
+          week_start: string
+        }
+        Update: {
+          cases?: number | null
+          deaths?: number | null
+          district_name?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
+      india_district_weather: {
+        Row: {
+          aedes_suitability: number | null
+          anopheles_suitability: number | null
+          as_of: string | null
+          cloud_cover: number | null
+          district_id: string
+          humidity_7d: number | null
+          rain_14d_mm: number | null
+          rain_7d_mm: number | null
+          rain_next7d_mm: number | null
+          temp_max_7d: number | null
+          temp_mean_7d: number | null
+          temp_min_7d: number | null
+          temp_next7d: number | null
+          updated_at: string | null
+          wind_dir_deg: number | null
+          wind_speed_max: number | null
+        }
+        Insert: {
+          aedes_suitability?: number | null
+          anopheles_suitability?: number | null
+          as_of?: string | null
+          cloud_cover?: number | null
+          district_id: string
+          humidity_7d?: number | null
+          rain_14d_mm?: number | null
+          rain_7d_mm?: number | null
+          rain_next7d_mm?: number | null
+          temp_max_7d?: number | null
+          temp_mean_7d?: number | null
+          temp_min_7d?: number | null
+          temp_next7d?: number | null
+          updated_at?: string | null
+          wind_dir_deg?: number | null
+          wind_speed_max?: number | null
+        }
+        Update: {
+          aedes_suitability?: number | null
+          anopheles_suitability?: number | null
+          as_of?: string | null
+          cloud_cover?: number | null
+          district_id?: string
+          humidity_7d?: number | null
+          rain_14d_mm?: number | null
+          rain_7d_mm?: number | null
+          rain_next7d_mm?: number | null
+          temp_max_7d?: number | null
+          temp_mean_7d?: number | null
+          temp_min_7d?: number | null
+          temp_next7d?: number | null
+          updated_at?: string | null
+          wind_dir_deg?: number | null
+          wind_speed_max?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "india_district_weather_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: true
+            referencedRelation: "india_districts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      india_districts: {
+        Row: {
+          area_km2: number | null
+          census_code: string | null
+          id: string
+          lat: number | null
+          lon: number | null
+          name: string
+          population: number | null
+          state_id: string
+        }
+        Insert: {
+          area_km2?: number | null
+          census_code?: string | null
+          id: string
+          lat?: number | null
+          lon?: number | null
+          name: string
+          population?: number | null
+          state_id: string
+        }
+        Update: {
+          area_km2?: number | null
+          census_code?: string | null
+          id?: string
+          lat?: number | null
+          lon?: number | null
+          name?: string
+          population?: number | null
+          state_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "india_districts_state_id_fkey"
+            columns: ["state_id"]
+            isOneToOne: false
+            referencedRelation: "india_states"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      india_states: {
+        Row: {
+          area_km2: number | null
+          id: string
+          lat: number | null
+          lon: number | null
+          name: string
+          name_hi: string | null
+          name_mr: string | null
+          population: number | null
+        }
+        Insert: {
+          area_km2?: number | null
+          id: string
+          lat?: number | null
+          lon?: number | null
+          name: string
+          name_hi?: string | null
+          name_mr?: string | null
+          population?: number | null
+        }
+        Update: {
+          area_km2?: number | null
+          id?: string
+          lat?: number | null
+          lon?: number | null
+          name?: string
+          name_hi?: string | null
+          name_mr?: string | null
+          population?: number | null
+        }
+        Relationships: []
       }
       live_events: {
         Row: {
@@ -816,7 +1039,12 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      ep_load_bt: { Args: { p: Json }; Returns: number }
+      ep_load_bt2: { Args: { p: Json }; Returns: number }
+      ep_load_countries: { Args: { p: Json }; Returns: number }
+      ep_load_fc: { Args: { p: Json }; Returns: number }
+      ep_load_series: { Args: { p: Json }; Returns: number }
+      ep_load_series2: { Args: { p: Json }; Returns: number }
     }
     Enums: {
       [_ in never]: never

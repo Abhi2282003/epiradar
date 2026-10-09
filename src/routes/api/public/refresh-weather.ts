@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { backoffUntil, rateLimitNote } from '@/lib/india';
 import { aggregateWeather, localDate, type OpenMeteoDaily } from '@/lib/weather';
 
 const TZ = 'America/Sao_Paulo';
@@ -12,6 +13,8 @@ const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 async function refresh() {
   const { supabaseAdmin: db } = await import('@/integrations/supabase/client.server');
   const source = await db.from('data_sources').select('last_success_at,status,rows_last_run,note').eq('id', 'open_meteo').maybeSingle();
+  const until = backoffUntil(source.data?.note);
+  if (until && Date.now() < Date.parse(until)) return json({ cached: true, backoff: true, status: 'degraded', last_success_at: source.data?.last_success_at, next_allowed_at: until, detail: 'Open-Meteo rate limit reached; keeping the last good values' });
   const last = source.data?.last_success_at ? Date.parse(source.data.last_success_at) : NaN;
   if (Number.isFinite(last) && Date.now() - last < THROTTLE_MS) {
     return json({ cached: true, status: source.data?.status, last_success_at: source.data?.last_success_at, updated: source.data?.rows_last_run, next_allowed_at: new Date(last + THROTTLE_MS).toISOString() });
@@ -40,7 +43,7 @@ async function refresh() {
     }
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    await db.from('data_sources').update({ status: 'degraded', note: `Refresh failed: ${message}`.slice(0, 500) }).eq('id', 'open_meteo');
+    await db.from('data_sources').update({ status: 'degraded', note: `${message.includes('HTTP 429') ? `${rateLimitNote()} ` : ''}Refresh failed: ${message}. Kept the last good values.`.slice(0, 500) }).eq('id', 'open_meteo');
     return json({ error: 'Open-Meteo refresh failed', detail: message }, 502);
   }
   const up = await db.from('weather_now').upsert(rows as never, { onConflict: 'region_id' });
