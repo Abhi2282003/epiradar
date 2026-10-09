@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { backoffUntil, rateLimitNote } from '@/lib/india';
 import { aggregateIndia, chunk, indiaToday, INDIA_DAILY_VARS, OPEN_METEO_BATCH, type IndiaDaily } from '@/lib/india';
 
 const THROTTLE_MS = 6 * 3_600_000;
@@ -12,7 +13,9 @@ const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 // Open-Meteo; the 6-hour throttle stops repeated calls from reaching the API.
 async function refresh() {
   const { supabaseAdmin: db } = await import('@/integrations/supabase/client.server');
-  const source = await db.from('data_sources').select('last_success_at,status,rows_last_run').eq('id', SOURCE).maybeSingle();
+  const source = await db.from('data_sources').select('last_success_at,status,rows_last_run,note').eq('id', SOURCE).maybeSingle();
+  const until = backoffUntil(source.data?.note);
+  if (until && Date.now() < Date.parse(until)) return json({ cached: true, backoff: true, status: 'degraded', last_success_at: source.data?.last_success_at, next_allowed_at: until, detail: 'Open-Meteo rate limit reached; keeping the last good values' });
   const last = source.data?.last_success_at ? Date.parse(source.data.last_success_at) : NaN;
   if (Number.isFinite(last) && Date.now() - last < THROTTLE_MS) {
     return json({ cached: true, status: source.data?.status, last_success_at: source.data?.last_success_at, updated: source.data?.rows_last_run, next_allowed_at: new Date(last + THROTTLE_MS).toISOString() });

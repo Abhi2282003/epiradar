@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { backoffUntil, rateLimitNote } from '@/lib/india';
 import { gridPoints } from '@/lib/world';
 
 const BATCH = 100;
@@ -13,7 +14,9 @@ const n = (v: unknown) => typeof v === 'number' && Number.isFinite(v) ? v : null
 // from Open-Meteo; the 30-minute throttle keeps repeated calls from reaching the API.
 async function refresh() {
   const { supabaseAdmin: db } = await import('@/integrations/supabase/client.server');
-  const source = await db.from('data_sources').select('last_success_at,status,rows_last_run').eq('id', SOURCE).maybeSingle();
+  const source = await db.from('data_sources').select('last_success_at,status,rows_last_run,note').eq('id', SOURCE).maybeSingle();
+  const until = backoffUntil(source.data?.note);
+  if (until && Date.now() < Date.parse(until)) return json({ cached: true, backoff: true, status: 'degraded', last_success_at: source.data?.last_success_at, next_allowed_at: until, detail: 'Open-Meteo rate limit reached; keeping the last good values' });
   const last = source.data?.last_success_at ? Date.parse(source.data.last_success_at) : NaN;
   if (Number.isFinite(last) && Date.now() - last < THROTTLE_MS) {
     return json({ cached: true, status: source.data?.status, last_success_at: source.data?.last_success_at, updated: source.data?.rows_last_run, next_allowed_at: new Date(last + THROTTLE_MS).toISOString() });
@@ -42,13 +45,13 @@ async function refresh() {
     }
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    await db.from('data_sources').upsert({ id: SOURCE, name: 'Open-Meteo world grid', cadence: 'Every 6 hours', status: 'degraded', note: `Refresh failed: ${message}`.slice(0, 500) });
+    await db.from('data_sources').upsert({ id: SOURCE, name: 'Open-Meteo world grid', cadence: 'Every 12 hours', status: 'degraded', note: `Refresh failed: ${message}`.slice(0, 500) });
     return json({ error: 'Open-Meteo refresh failed', detail: message }, 502);
   }
   const up = await db.from('world_weather_grid').upsert(rows as never, { onConflict: 'lat,lon' });
   if (up.error) return json({ error: 'Grid rows could not be saved', detail: up.error.message }, 500);
   const now = new Date().toISOString();
-  await db.from('data_sources').upsert({ id: SOURCE, name: 'Open-Meteo world grid', cadence: 'Every 6 hours', status: 'ok', last_success_at: now, rows_last_run: rows.length, note: `Live current conditions on a 10° global grid, ${rows.length} cells` });
+  await db.from('data_sources').upsert({ id: SOURCE, name: 'Open-Meteo world grid', cadence: 'Every 12 hours', status: 'ok', last_success_at: now, rows_last_run: rows.length, note: `Live current conditions on a 10° global grid, ${rows.length} cells` });
   await db.from('live_events').insert({ kind: 'weather', severity: 'info', message: `World weather grid refreshed: ${rows.length} cells (Open-Meteo)` });
   return json({ cached: false, status: 'ok', last_success_at: now, updated: rows.length });
 }

@@ -147,3 +147,12 @@ export function weeklyFromCsv(csv: string) {
   return { rows: [...weeks.values()], lastDate };
 }
 
+
+/** After an HTTP 429, refresh routes back off: the failure time is written into the source note as "[429 at ISO]". */
+export const BACKOFF_HOURS = 12;
+export const rateLimitNote = (now = new Date()) => `[429 at ${now.toISOString()}]`;
+export function backoffUntil(note: string | null | undefined, hours = BACKOFF_HOURS) {
+  const m = note?.match(/\[429 at ([^\]]+)\]/); if (!m) return null;
+  const t = Date.parse(m[1]!); if (!Number.isFinite(t)) return null;
+  return new Date(t + hours * 3_600_000).toISOString();
+}
