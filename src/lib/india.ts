@@ -124,3 +124,26 @@ export const FOCUS = [
 export const PUNE = 'IN-D521';
 export const MAHARASHTRA = 'IN-MH';
 export const KARNATAKA = 'IN-KA';
+
+/** Parse the ICTS CSV and sum daily counts into Monday-starting weeks per district. */
+export function weeklyFromCsv(csv: string) {
+  const lines = csv.split(/\r?\n/).filter(Boolean);
+  const head = (lines.shift() ?? '').split(',').map(h => h.replace(/"/g, '').trim());
+  const iDate = head.indexOf('metadata.recordDate'), iName = head.indexOf('location.admin2.name');
+  const iPos = head.indexOf('daily_positive_total'), iDeath = head.indexOf('daily_deaths');
+  if ([iDate, iName, iPos, iDeath].some(i => i < 0)) throw new Error('Unexpected ICTS columns');
+  const weeks = new Map<string, { district_name: string; week_start: string; cases: number; deaths: number }>();
+  let lastDate = '';
+  for (const line of lines) {
+    const c = line.split(',').map(s => s.replace(/"/g, '').trim());
+    const date = c[iDate] ?? '', name = c[iName] ?? '';
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !name) continue;
+    const pos = Number(c[iPos]), death = Number(c[iDeath]);
+    const key = `${name}|${weekStart(date)}`;
+    const w = weeks.get(key) ?? { district_name: name, week_start: weekStart(date), cases: 0, deaths: 0 };
+    if (Number.isFinite(pos)) w.cases += pos; if (Number.isFinite(death)) w.deaths += death;
+    weeks.set(key, w); if (date > lastDate) lastDate = date;
+  }
+  return { rows: [...weeks.values()], lastDate };
+}
+

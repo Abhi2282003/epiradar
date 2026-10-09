@@ -4,7 +4,7 @@ import { chunk } from '@/lib/india';
 const THROTTLE_MS = 6 * 3_600_000;
 const SOURCE = 'who_gho';
 const META = { name: 'WHO Global Health Observatory: malaria estimates and cholera reports', cadence: 'Weekly; on demand at most every 6 hours' };
-export const WHO_CODES = [
+const WHO_CODES = [
   { code: 'MALARIA_EST_CASES', disease: 'malaria', indicator: 'est_cases' },
   { code: 'MALARIA_EST_INCIDENCE', disease: 'malaria', indicator: 'est_incidence' },
   { code: 'MALARIA_EST_DEATHS', disease: 'malaria', indicator: 'est_deaths' },
