@@ -9,6 +9,8 @@ import { PAGE_DETAILS, validateContext } from '@/lib/epiradar';
 import { trustQuery } from '@/lib/surveillance-query';
 import { formatNumber } from '@/lib/surveillance';
 import { ablationReading, accuracyReading, asCard, caveats, climateAblation, climateFeatures, dec, driverBars, horizonMetrics, num, pct, scopeLabel, sourceTone, text, wideLeadTimes, type Card } from '@/lib/trust';
+import { useT } from '@/lib/i18n';
+import { IndiaTrust } from './india-trust';
 
 const axis = { tick: { fill: 'var(--muted-foreground)', fontSize: 11 }, stroke: 'var(--border)' };
 const dash = (v: string | null) => v ?? '—';
@@ -38,6 +40,7 @@ export function TrustPage() {
   const context = validateContext(useSearch({ strict: false }));
   const { data } = useSuspenseQuery(trustQuery(context.disease));
   const page = PAGE_DETAILS.trust;
+  const t = useT();
   return <>
     <p className="eyebrow">{page.eyebrow}</p>
     <div className="page-heading"><div><h1>{page.title}</h1><p className="page-description">{page.description}</p></div></div>
