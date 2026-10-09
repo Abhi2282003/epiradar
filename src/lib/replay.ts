@@ -78,3 +78,10 @@ export function firstAlertsAt(regions: Map<string, BacktestRow[]>, week: string)
     return first?.target_week === week ? [{ id, prob: first.outbreak_prob! }] : [];
   });
 }
+
+/** Epidemiological season of a Sunday-start week: the calendar year of its Wednesday (so 2023-12-31 is week 1 of 2024). */
+export const seasonOf = (week: string) => new Date(t(week) + 3 * DAY).getUTCFullYear();
+export function seasonsOf(rows: { target_week: string }[]) {
+  return [...new Set(rows.map(r => seasonOf(r.target_week)))].sort((a, b) => a - b);
+}
+export const defaultSeason = (seasons: number[]) => seasons.includes(2024) ? 2024 : seasons[seasons.length - 1] ?? null;

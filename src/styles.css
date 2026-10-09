@@ -341,3 +341,29 @@ h1 { font-size: 29px; font-weight: 600; line-height: 1.3; margin: 0 0 9px; }
 .weather-stats span { display: block; font-size: 11px; color: var(--muted-foreground); }
 .weather-stats strong { font-variant-numeric: tabular-nums; font-size: 16px; }
 @media (max-width: 560px) { .weather-stats { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+
+:root { --on-risk-light: oklch(0.2 0.03 260); --on-risk-dark: oklch(0.98 0 0); }
+.scenario-controls { display: grid; grid-template-columns: minmax(200px,1.2fr) 1fr 1fr; gap: 24px; align-items: start; }
+.scenario-controls > p { grid-column: 1 / -1; }
+.scenario-picker { position: relative; }
+.scenario-search { width: 100%; margin-top: 6px; background: var(--card); color: var(--foreground); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; font-size: 13px; }
+.scenario-matches { position: absolute; z-index: 20; left: 0; right: 0; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 4px; margin-top: 4px; }
+.scenario-slider label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted-foreground); margin-bottom: 10px; }
+.scenario-slider strong { color: var(--foreground); font-variant-numeric: tabular-nums; }
+.scenario-numbers { font-size: 15px; margin: 8px 0; } .scenario-numbers strong { font-size: 28px; font-variant-numeric: tabular-nums; }
+.scenario-headline p { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.scenario-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; }
+.heatmap { display: grid; gap: 3px; margin-top: 12px; }
+.heat-head { font-size: 11px; color: var(--muted-foreground); font-variant-numeric: tabular-nums; display: flex; align-items: center; justify-content: center; padding: 4px; }
+.heat-cell { border-radius: 6px; padding: 10px 4px; font-size: 12px; font-variant-numeric: tabular-nums; border: 2px solid transparent; cursor: pointer; }
+.heat-cell:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.heat-0 { background: var(--risk-low); color: var(--on-risk-light); } .heat-1 { background: var(--risk-moderate); color: var(--on-risk-light); }
+.heat-2 { background: var(--risk-high); color: var(--on-risk-dark); } .heat-3 { background: var(--risk-very-high); color: var(--on-risk-dark); } .heat-4 { background: var(--risk-no-data); color: var(--on-risk-dark); }
+.heat-selected { border-color: var(--foreground); box-shadow: 0 0 0 2px var(--background) inset; }
+.panel-header-inline { display: flex; justify-content: space-between; align-items: center; }
+.climate-tag { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 999px; border: 1px solid var(--rain-3); color: var(--rain-2); font-size: 10px; letter-spacing: .04em; text-transform: lowercase; vertical-align: middle; }
+.driver-up.driver-climate { background: var(--rain-3); } .driver-down.driver-climate { background: var(--rain-1); }
+.bar-fill.bar-climate { background: var(--rain-3); }
+.season-picker { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; }
+.season-picker select { background: var(--card); color: var(--foreground); border: 1px solid var(--border); border-radius: 7px; padding: 5px 8px; font-size: 12px; }
+@media (max-width: 900px) { .scenario-controls, .scenario-grid { grid-template-columns: 1fr; } }

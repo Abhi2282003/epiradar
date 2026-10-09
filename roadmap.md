@@ -15,3 +15,8 @@
 # Live weather layer
 - [x] weather_now table, refresh route, 6-hourly schedule, first run (92 municipalities)
 - [x] Map layer switch, drawer Weather and Cases and climate sections, tests
+
+# Scenario lab, climate-aware trust, seasons
+- [x] Scenario lab with empty state + live climate outlook
+- [x] Climate card keys, climate driver tags, season picker, tests
+- [ ] Verify the full Scenario lab with real rows — blocked until the climate model writes scenarios
