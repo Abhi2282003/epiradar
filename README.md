@@ -22,6 +22,40 @@ Each row also stores:
 
 Files are in `india/v2/` and results in `results/v2/`.
 
+### Weekly run (automatic)
+
+The GitHub Actions workflow `india-weekly` (on `main`, every Monday 06:53 IST, or run by hand) checks out this
+branch and runs:
+
+```bash
+pip install -r pipeline/requirements-weekly.txt
+python pipeline/scripts/weekly_india.py --runtime runtime/india-epiclim-v2 --fetch --out out/weekly
+```
+
+1. It fetches NASA POWER daily weather (community AG) for every district centroid, going back 24 weeks.
+   The variables are rain, temperature, humidity, soil wetness, sunlight, maximum and minimum temperature, and wind.
+2. It sets the issue date to the last day with weather for at least 98% of districts. It stops if the weather is missing or more than 3 weeks old.
+3. It forecasts weeks 1–4, 5–8 and 9–12 for every district and disease, with:
+   - drivers;
+   - blind spots;
+   - the what-if grid.
+4. With `--ingest` it loads the rows through the app's token-protected `/api/public/ingest` route. This needs:
+   - the repository secret `INGEST_TOKEN`;
+   - the repository variable `EPIRADAR_URL`, which is optional.
+
+   It loads `india_forecasts`, then the model card, then `data_sources`.
+   Without the token, the forecast files are attached to the workflow run instead.
+
+`runtime/india-epiclim-v2/` is the portable model bundle (3.7 MB). `pipeline/scripts/make_runtime.py` builds it from the training outputs. It contains:
+- LightGBM text models;
+- Platt calibration;
+- risk-level and blind-spot thresholds;
+- climate normals;
+- districts;
+- outbreak history.
+
+On the saved weather to 6 Oct 2026 it reproduces the loaded forecast exactly.
+
 ## India district outbreak forecast (`india-epiclim-v1`)
 
 - **Unit:** 640 districts (Census 2011 boundaries), monthly; forecasts 1, 2 and 3 months ahead.
