@@ -380,9 +380,9 @@
    "disease": "chikungunya",
    "h": 3,
    "variant": "climate only",
-   "mean_year_roc": NaN,
-   "mean_year_pr": NaN,
-   "mean_year_top10": NaN
+   "mean_year_roc": null,
+   "mean_year_pr": null,
+   "mean_year_top10": null
   },
   {
    "pr_auc": 0.0547,
@@ -646,9 +646,9 @@
    "disease": "cholera",
    "h": 3,
    "variant": "climate only",
-   "mean_year_roc": NaN,
-   "mean_year_pr": NaN,
-   "mean_year_top10": NaN
+   "mean_year_roc": null,
+   "mean_year_pr": null,
+   "mean_year_top10": null
   },
   {
    "pr_auc": 0.0375,
@@ -912,9 +912,9 @@
    "disease": "dengue",
    "h": 3,
    "variant": "climate only",
-   "mean_year_roc": NaN,
-   "mean_year_pr": NaN,
-   "mean_year_top10": NaN
+   "mean_year_roc": null,
+   "mean_year_pr": null,
+   "mean_year_top10": null
   },
   {
    "pr_auc": 0.0707,
@@ -1178,9 +1178,9 @@
    "disease": "add",
    "h": 3,
    "variant": "climate only",
-   "mean_year_roc": NaN,
-   "mean_year_pr": NaN,
-   "mean_year_top10": NaN
+   "mean_year_roc": null,
+   "mean_year_pr": null,
+   "mean_year_top10": null
   },
   {
    "pr_auc": 0.1112,
@@ -1444,9 +1444,9 @@
    "disease": "malaria",
    "h": 3,
    "variant": "climate only",
-   "mean_year_roc": NaN,
-   "mean_year_pr": NaN,
-   "mean_year_top10": NaN
+   "mean_year_roc": null,
+   "mean_year_pr": null,
+   "mean_year_top10": null
   },
   {
    "pr_auc": 0.0281,

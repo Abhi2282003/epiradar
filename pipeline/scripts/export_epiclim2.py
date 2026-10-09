@@ -31,6 +31,17 @@ def pooled(o):
                 positives=int(y.sum()), n=int(len(y)))
 
 
+def clean(x):
+    """JSON-safe: NaN/inf -> None, recursively."""
+    if isinstance(x, dict):
+        return {k: clean(v) for k, v in x.items()}
+    if isinstance(x, list):
+        return [clean(v) for v in x]
+    if isinstance(x, float) and not np.isfinite(x):
+        return None
+    return x
+
+
 def card():
     res = pd.read_csv(OUT / "rolling_results.csv")
     oof = pd.read_parquet(OUT / "oof.parquet")
@@ -102,7 +113,8 @@ def card():
             "Drivers are model associations (SHAP), not proof of cause.",
         ],
     }
-    json.dump(c, open(OUT / "model_card.json", "w"), indent=1)
+    c = clean(c)
+    json.dump(c, open(OUT / "model_card.json", "w"), indent=1, allow_nan=False)
     return c, fc
 
 
@@ -133,7 +145,7 @@ def main():
         print(p.name, len(recs), p.stat().st_size)
     links = pd.read_parquet(OUT / "links.parquet")
     (data_dir / "mobility_links.json").write_text(json.dumps(links.to_dict(orient="records"), separators=(",", ":")))
-    (data_dir / f"model_card_{VERSION}.json").write_text(json.dumps(c, separators=(",", ":")))
+    (data_dir / f"model_card_{VERSION}.json").write_text(json.dumps(c, separators=(",", ":"), allow_nan=False))
     print("links", len(links), "card", (data_dir / f"model_card_{VERSION}.json").stat().st_size)
 
 
