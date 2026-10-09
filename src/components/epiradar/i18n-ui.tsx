@@ -33,3 +33,4 @@ export function RiskName({ label }: { label: string }) {
   const t = useT();
   return <>{t.lang === 'en' ? label : t(`risk.${label}` as Key) ?? label}</>;
 }
+export function RiskScaleTitle() { const t = useT(); return <>{t('legend.riskScale')}</>; }

@@ -1,3 +1,4 @@
+import { RiskName } from './i18n-ui';
 import { Component, lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { ClientOnly } from '@tanstack/react-router';
@@ -139,7 +140,7 @@ export function TimeMachine() {
           <div className="replay-map"><Boundary><ClientOnly fallback={<Skeleton className="h-full" />}><Suspense fallback={<Skeleton className="h-full" />}>
             <MunicipalityMap rows={rows} outlined={outlined} selected={selected ?? undefined} onSelect={setSelected} tooltip={tooltip} label={`Replay map for the week of ${fmt(week)}`} />
           </Suspense></ClientOnly></Boundary></div>
-          <div className="replay-legend"><strong>Fill = risk forecast 4 weeks earlier · Outline = outbreak actually happened</strong>{RISK_SCALE.map((r, i) => <span className="risk-item" key={r.label}><span className={`risk-swatch risk-${i}`} />{r.label}</span>)}</div>
+          <div className="replay-legend"><strong>Fill = risk forecast 4 weeks earlier · Outline = outbreak actually happened</strong>{RISK_SCALE.map((r, i) => <span className="risk-item" key={r.label}><span className={`risk-swatch risk-${i}`} /><RiskName label={r.label} /></span>)}</div>
         </section>
         {selected && regions.get(selected) && <MunicipalityReplay name={names.get(selected) ?? selected} rows={regions.get(selected)!} week={week} onClose={() => setSelected(null)} />}
         <section className="replay-card"><h2>State-wide season</h2><p className="sub">Reported cases (bars) and municipalities with forecast ≥ 40% (line)</p>
