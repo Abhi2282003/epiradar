@@ -57,10 +57,11 @@ export function ablationReading(rows: AblationRow[]) {
   const weeks = (h: number) => `${h} ${h === 1 ? 'week' : 'weeks'} ahead`;
   const best = known.reduce((a, b) => (b.gain! > a.gain! ? b : a));
   const flat = known.filter(r => r.gain! < 0.005).map(r => r.h);
-  const span = (hs: number[]) => hs.length === 1 ? `${hs[0]} ${hs[0] === 1 ? 'week' : 'weeks'}` : `${hs[0]}–${hs[hs.length - 1]} weeks`;
+  const contiguous = (hs: number[]) => hs.every((h, i) => i === 0 || h === hs[i - 1]! + 1);
+  const span = (hs: number[]) => hs.length === 1 ? `${hs[0]} ${hs[0] === 1 ? 'week' : 'weeks'}` : contiguous(hs) ? `${hs[0]}–${hs[hs.length - 1]} weeks` : `${hs.join(', ')} weeks`;
   if (best.gain! < 0.005) return `No measurable gain from climate at any horizon (best ${best.gain! >= 0 ? '+' : ''}${best.gain!.toFixed(3)} PR-AUC at ${weeks(best.h)}).`;
   const head = `Climate adds +${best.gain!.toFixed(2)} PR-AUC at ${weeks(best.h)}`;
-  return flat.length ? `${head}; no measurable gain at ${span(flat)}${flat.length > 1 && flat.some((h, i) => i && h !== flat[i - 1]! + 1) ? ' (not contiguous)' : ''}.` : `${head}.`;
+  return flat.length ? `${head}; no measurable gain at ${span(flat)}.` : `${head}.`;
 }
 export function driverBars(card: Card) {
   const d = asCard(card?.['driver_importance_h4_focus']) ?? asCard(card?.['driver_importance_h4_focus_2024']);
