@@ -8,6 +8,7 @@ import { RISK_SCALE } from '@/lib/epiradar';
 import { Button } from '@/components/ui/button';
 import { LocateFixed } from 'lucide-react';
 import { usePulsingRegions } from '@/lib/live-store';
+import { layerBin, type WeatherLayer } from '@/lib/weather';
 import mapWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 
 function cssColor(token: string) {
@@ -20,7 +21,7 @@ function cssColor(token: string) {
   const pixel = ctx.getImageData(0, 0, 1, 1).data;
   return `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
 }
-export default function MunicipalityMap({ rows, selected, onSelect, outlined, tooltip, label }: { rows: Municipality[]; selected?: string | undefined; onSelect: (id: string) => void; outlined?: Set<string> | undefined; tooltip?: ((row: Municipality) => string[]) | undefined; label?: string | undefined }) {
+export default function MunicipalityMap({ rows, selected, onSelect, outlined, tooltip, label, layer = 'risk', values }: { layer?: WeatherLayer | undefined; values?: Map<string, number | null> | undefined; rows: Municipality[]; selected?: string | undefined; onSelect: (id: string) => void; outlined?: Set<string> | undefined; tooltip?: ((row: Municipality) => string[]) | undefined; label?: string | undefined }) {
   const pulsing = usePulsingRegions();
   const tooltipRef = useRef(tooltip); tooltipRef.current = tooltip;
   const { data: boundaries } = useSuspenseQuery(boundariesQuery);
@@ -66,7 +67,7 @@ export default function MunicipalityMap({ rows, selected, onSelect, outlined, to
       if (!bounds.isEmpty()) boundsRef.current = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()];
       map.on('load', () => {
         map.addSource('municipalities', { type: 'geojson', data: boundaries });
-        const color: ExpressionSpecification = ['match', ['get', 'risk'], RISK_SCALE[0].label, cssColor('--risk-low'), RISK_SCALE[1].label, cssColor('--risk-moderate'), RISK_SCALE[2].label, cssColor('--risk-high'), RISK_SCALE[3].label, cssColor('--risk-very-high'), cssColor('--risk-no-data')];
+        const color: ExpressionSpecification = ['coalesce', ['get', 'fill'], cssColor('--risk-no-data')];
         map.addLayer({ id: 'municipality-fill', type: 'fill', source: 'municipalities', paint: { 'fill-color': color, 'fill-opacity': 0.65 } });
         map.addLayer({ id: 'municipality-outline', type: 'line', source: 'municipalities', paint: { 'line-color': cssColor('--background'), 'line-width': 1 } });
         map.addLayer({ id: 'municipality-actual', type: 'line', source: 'municipalities', filter: ['==', ['get', 'actual'], true], paint: { 'line-color': '#ffffff', 'line-width': 3 } });
@@ -113,12 +114,20 @@ export default function MunicipalityMap({ rows, selected, onSelect, outlined, to
     const source = map?.getSource('municipalities') as GeoJSONSource | undefined;
     if (!source) return;
     const byCode = new Map(rows.map(row => [String(row.region.official_code), row]));
+    const riskColors: Record<string, string> = { [RISK_SCALE[0].label]: cssColor('--risk-low'), [RISK_SCALE[1].label]: cssColor('--risk-moderate'), [RISK_SCALE[2].label]: cssColor('--risk-high'), [RISK_SCALE[3].label]: cssColor('--risk-very-high') };
+    const scale = layer === 'risk' ? [] : [0, 1, 2, 3, 4].map(i => cssColor(`--${layer === 'suit' ? 'suit' : 'rain'}-${i}`));
+    const fillFor = (row: Municipality | undefined) => {
+      if (!row) return null;
+      if (layer === 'risk') return riskColors[riskLabel(row.prediction?.risk_level)] ?? null;
+      const bin = layerBin(layer, values?.get(row.region.id) ?? null);
+      return bin < 0 ? null : scale[bin] ?? null;
+    };
     source.setData({ ...boundaries, features: boundaries.features.map(feature => {
       const row = byCode.get(String(feature.properties.id));
-      return { ...feature, properties: { ...feature.properties, risk: riskLabel(row?.prediction?.risk_level), region_id: row?.region.id ?? '', actual: !!row && !!outlined?.has(row.region.id), pulse: !!row && pulsing.includes(row.region.id) } };
+      return { ...feature, properties: { ...feature.properties, risk: riskLabel(row?.prediction?.risk_level), fill: fillFor(row), region_id: row?.region.id ?? '', actual: !!row && !!outlined?.has(row.region.id), pulse: !!row && pulsing.includes(row.region.id) } };
     }) });
     map?.setFilter('municipality-selected', ['==', ['get', 'region_id'], selected ?? '']);
-  }, [rows, selected, boundaries, ready, outlined, pulsing]);
+  }, [rows, selected, boundaries, ready, outlined, pulsing, layer, values]);
   useEffect(() => {
     const map = mapRef.current;
     if (!pulsing.length || !map?.getLayer('municipality-pulse') || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
