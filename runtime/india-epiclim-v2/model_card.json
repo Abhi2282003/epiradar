@@ -1,0 +1,2497 @@
+{
+ "model_version": "india-epiclim-v2",
+ "scope": "india-district",
+ "issue_date": "2026-10-06",
+ "unit": "640 districts (Census 2011 boundaries); forecasts for weeks 1-4, 5-8 and 9-12 after the latest weather",
+ "target": "an IDSP-reported outbreak of the disease with onset in the window",
+ "diseases": [
+  "dengue",
+  "chikungunya",
+  "malaria",
+  "add",
+  "cholera"
+ ],
+ "data": "IDSP weekly outbreak reports 2009-2022 compiled by EpiClim (8,985 reports); NASA POWER rain, temperature, humidity, soil wetness (MERRA-2), all-sky sunlight (CERES), maximum/minimum temperature and wind for every district, 2008-2026; gravity model of travel between districts; Census 2011 population",
+ "events_used": 8985,
+ "events_by_disease": {
+  "add": 5228,
+  "dengue": 1698,
+  "chikungunya": 794,
+  "cholera": 668,
+  "malaria": 548,
+  "aes": 111
+ },
+ "validation": "rolling origin: each test year 2015-2022 predicted by a model trained on earlier years only (early stopping on the year before)",
+ "climate_normals": "fixed 2008-2014 monthly normals per district (before every test year)",
+ "issuance": "the latest daily weather is cut into 4-week windows (4 weeks back, 5-8, 9-12, up to 24 weeks for rain memory); the model was trained on calendar months",
+ "features": {
+  "weather": [
+   "ra3m",
+   "ra0",
+   "ra6m",
+   "r0",
+   "r3m",
+   "t0",
+   "t3m",
+   "ta3m",
+   "rh0",
+   "rh3m",
+   "aed0",
+   "aed3m",
+   "ano0",
+   "ano3m",
+   "tgt_r_n",
+   "tgt_t_n",
+   "tgt_rh_n",
+   "tgt_aed_n",
+   "tgt_ano_n"
+  ],
+  "satellite_water": [
+   "sw0",
+   "swa0",
+   "sw3m",
+   "swt0",
+   "sol0",
+   "sola0",
+   "tx0",
+   "txa0",
+   "tn0",
+   "ws0"
+  ],
+  "mobility": [
+   "mob_m3",
+   "mob_rate"
+  ],
+  "calendar": [
+   "tgt_cal"
+  ],
+  "history": [
+   "st_rate",
+   "st_m_rate",
+   "st_m3_rate",
+   "state_m3_rate",
+   "st_any_rate",
+   "state_any_rate",
+   "log_density"
+  ],
+  "recent_reports": [
+   "rc_3",
+   "rc_12",
+   "rc_any_3",
+   "rc_state_1",
+   "rc_nat_1",
+   "rc_nat_any_3",
+   "mob_rc3"
+  ]
+ },
+ "signals": {
+  "dengue": {
+   "vector": 0.2394,
+   "weather": 0.1365,
+   "surveillance": 0.3664,
+   "mobility": 0.0949,
+   "population": 0.0247,
+   "season": 0.0892,
+   "satellite": 0.0269,
+   "water": 0.022
+  },
+  "chikungunya": {
+   "vector": 0.194,
+   "weather": 0.1621,
+   "surveillance": 0.3837,
+   "mobility": 0.0819,
+   "population": 0.0417,
+   "season": 0.101,
+   "satellite": 0.0119,
+   "water": 0.0238
+  },
+  "malaria": {
+   "vector": 0.0603,
+   "weather": 0.3035,
+   "surveillance": 0.3242,
+   "mobility": 0.0501,
+   "population": 0.0665,
+   "season": 0.1323,
+   "satellite": 0.0379,
+   "water": 0.0252
+  },
+  "add": {
+   "vector": 0.0173,
+   "weather": 0.23,
+   "surveillance": 0.5476,
+   "mobility": 0.0419,
+   "population": 0.0413,
+   "season": 0.0936,
+   "satellite": 0.0069,
+   "water": 0.0214
+  },
+  "cholera": {
+   "vector": 0.0185,
+   "weather": 0.2518,
+   "surveillance": 0.5472,
+   "mobility": 0.0391,
+   "population": 0.0592,
+   "season": 0.0551,
+   "satellite": 0.0111,
+   "water": 0.018
+  }
+ },
+ "variants": {
+  "full": "deployed: weather + satellite/water + mobility + calendar + outbreak history up to the previous year",
+  "weather+satellite+history": "without mobility",
+  "weather+history": "without satellite sunlight, soil moisture, heat and wind",
+  "history+mobility": "no climate at all",
+  "history only": "outbreak history and calendar only",
+  "climate only": "weather, satellite and climate normals only (no surveillance)",
+  "full+recent reports": "adds outbreak reports up to the issue month (needs a live IDSP/IHIP feed)"
+ },
+ "metrics": [
+  {
+   "pr_auc": 0.0354,
+   "roc_auc": 0.8616,
+   "recall_top10": 0.5257,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 1,
+   "variant": "climate only",
+   "mean_year_roc": 0.8514,
+   "mean_year_pr": 0.0433,
+   "mean_year_top10": 0.5336
+  },
+  {
+   "pr_auc": 0.0611,
+   "roc_auc": 0.8998,
+   "recall_top10": 0.6971,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 1,
+   "variant": "full",
+   "mean_year_roc": 0.8992,
+   "mean_year_pr": 0.0772,
+   "mean_year_top10": 0.7063
+  },
+  {
+   "pr_auc": 0.1114,
+   "roc_auc": 0.9266,
+   "recall_top10": 0.7943,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 1,
+   "variant": "full+recent reports",
+   "mean_year_roc": 0.9237,
+   "mean_year_pr": 0.1248,
+   "mean_year_top10": 0.7769
+  },
+  {
+   "pr_auc": 0.0584,
+   "roc_auc": 0.8932,
+   "recall_top10": 0.68,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 1,
+   "variant": "history only",
+   "mean_year_roc": 0.9074,
+   "mean_year_pr": 0.0724,
+   "mean_year_top10": 0.7402
+  },
+  {
+   "pr_auc": 0.0558,
+   "roc_auc": 0.8969,
+   "recall_top10": 0.6886,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 1,
+   "variant": "history+mobility",
+   "mean_year_roc": 0.9062,
+   "mean_year_pr": 0.0663,
+   "mean_year_top10": 0.7204
+  },
+  {
+   "pr_auc": 0.0982,
+   "roc_auc": 0.9272,
+   "recall_top10": 0.7914,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 1,
+   "variant": "history+recent reports",
+   "mean_year_roc": 0.9309,
+   "mean_year_pr": 0.1138,
+   "mean_year_top10": 0.817
+  },
+  {
+   "pr_auc": 0.0587,
+   "roc_auc": 0.8991,
+   "recall_top10": 0.6943,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 1,
+   "variant": "weather+history",
+   "mean_year_roc": 0.9027,
+   "mean_year_pr": 0.07,
+   "mean_year_top10": 0.6933
+  },
+  {
+   "pr_auc": 0.0601,
+   "roc_auc": 0.9015,
+   "recall_top10": 0.6971,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 1,
+   "variant": "weather+satellite+history",
+   "mean_year_roc": 0.9002,
+   "mean_year_pr": 0.0732,
+   "mean_year_top10": 0.6994
+  },
+  {
+   "pr_auc": 0.0371,
+   "roc_auc": 0.8561,
+   "recall_top10": 0.5543,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 2,
+   "variant": "climate only",
+   "mean_year_roc": 0.8534,
+   "mean_year_pr": 0.0453,
+   "mean_year_top10": 0.5532
+  },
+  {
+   "pr_auc": 0.0596,
+   "roc_auc": 0.9041,
+   "recall_top10": 0.6914,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 2,
+   "variant": "full",
+   "mean_year_roc": 0.9045,
+   "mean_year_pr": 0.0732,
+   "mean_year_top10": 0.7017
+  },
+  {
+   "pr_auc": 0.0819,
+   "roc_auc": 0.915,
+   "recall_top10": 0.76,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 2,
+   "variant": "full+recent reports",
+   "mean_year_roc": 0.9156,
+   "mean_year_pr": 0.0958,
+   "mean_year_top10": 0.7483
+  },
+  {
+   "pr_auc": 0.0582,
+   "roc_auc": 0.8952,
+   "recall_top10": 0.6771,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 2,
+   "variant": "history only",
+   "mean_year_roc": 0.9087,
+   "mean_year_pr": 0.0708,
+   "mean_year_top10": 0.724
+  },
+  {
+   "pr_auc": 0.0582,
+   "roc_auc": 0.901,
+   "recall_top10": 0.6914,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 2,
+   "variant": "history+mobility",
+   "mean_year_roc": 0.9058,
+   "mean_year_pr": 0.0706,
+   "mean_year_top10": 0.7231
+  },
+  {
+   "pr_auc": 0.0767,
+   "roc_auc": 0.9162,
+   "recall_top10": 0.7543,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 2,
+   "variant": "history+recent reports",
+   "mean_year_roc": 0.9234,
+   "mean_year_pr": 0.0924,
+   "mean_year_top10": 0.7872
+  },
+  {
+   "pr_auc": 0.0569,
+   "roc_auc": 0.8996,
+   "recall_top10": 0.6657,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 2,
+   "variant": "weather+history",
+   "mean_year_roc": 0.9066,
+   "mean_year_pr": 0.0734,
+   "mean_year_top10": 0.6966
+  },
+  {
+   "pr_auc": 0.0581,
+   "roc_auc": 0.9004,
+   "recall_top10": 0.6886,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 2,
+   "variant": "weather+satellite+history",
+   "mean_year_roc": 0.8987,
+   "mean_year_pr": 0.0732,
+   "mean_year_top10": 0.6814
+  },
+  {
+   "pr_auc": 0.0352,
+   "roc_auc": 0.8637,
+   "recall_top10": 0.5571,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 3,
+   "variant": "climate only",
+   "mean_year_roc": null,
+   "mean_year_pr": null,
+   "mean_year_top10": null
+  },
+  {
+   "pr_auc": 0.0547,
+   "roc_auc": 0.8978,
+   "recall_top10": 0.7,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 3,
+   "variant": "full",
+   "mean_year_roc": 0.9032,
+   "mean_year_pr": 0.0649,
+   "mean_year_top10": 0.6934
+  },
+  {
+   "pr_auc": 0.0564,
+   "roc_auc": 0.8996,
+   "recall_top10": 0.7114,
+   "base_rate": 0.0057,
+   "positives": 350,
+   "n": 61440,
+   "disease": "chikungunya",
+   "h": 3,
+   "variant": "history+mobility",
+   "mean_year_roc": 0.9077,
+   "mean_year_pr": 0.0684,
+   "mean_year_top10": 0.7358
+  },
+  {
+   "pr_auc": 0.011,
+   "roc_auc": 0.7474,
+   "recall_top10": 0.2816,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 1,
+   "variant": "climate only",
+   "mean_year_roc": 0.7345,
+   "mean_year_pr": 0.0139,
+   "mean_year_top10": 0.2711
+  },
+  {
+   "pr_auc": 0.0305,
+   "roc_auc": 0.8431,
+   "recall_top10": 0.5714,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 1,
+   "variant": "full",
+   "mean_year_roc": 0.8524,
+   "mean_year_pr": 0.0387,
+   "mean_year_top10": 0.5333
+  },
+  {
+   "pr_auc": 0.0753,
+   "roc_auc": 0.8855,
+   "recall_top10": 0.6286,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 1,
+   "variant": "full+recent reports",
+   "mean_year_roc": 0.8809,
+   "mean_year_pr": 0.0592,
+   "mean_year_top10": 0.5747
+  },
+  {
+   "pr_auc": 0.0347,
+   "roc_auc": 0.8385,
+   "recall_top10": 0.5306,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 1,
+   "variant": "history only",
+   "mean_year_roc": 0.8496,
+   "mean_year_pr": 0.0349,
+   "mean_year_top10": 0.531
+  },
+  {
+   "pr_auc": 0.0368,
+   "roc_auc": 0.84,
+   "recall_top10": 0.5306,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 1,
+   "variant": "history+mobility",
+   "mean_year_roc": 0.8599,
+   "mean_year_pr": 0.0351,
+   "mean_year_top10": 0.5651
+  },
+  {
+   "pr_auc": 0.077,
+   "roc_auc": 0.9024,
+   "recall_top10": 0.6735,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 1,
+   "variant": "history+recent reports",
+   "mean_year_roc": 0.8825,
+   "mean_year_pr": 0.0727,
+   "mean_year_top10": 0.5728
+  },
+  {
+   "pr_auc": 0.03,
+   "roc_auc": 0.8387,
+   "recall_top10": 0.5469,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 1,
+   "variant": "weather+history",
+   "mean_year_roc": 0.8567,
+   "mean_year_pr": 0.0405,
+   "mean_year_top10": 0.502
+  },
+  {
+   "pr_auc": 0.0308,
+   "roc_auc": 0.8443,
+   "recall_top10": 0.5347,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 1,
+   "variant": "weather+satellite+history",
+   "mean_year_roc": 0.8492,
+   "mean_year_pr": 0.0358,
+   "mean_year_top10": 0.5129
+  },
+  {
+   "pr_auc": 0.0104,
+   "roc_auc": 0.7343,
+   "recall_top10": 0.2898,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 2,
+   "variant": "climate only",
+   "mean_year_roc": 0.7014,
+   "mean_year_pr": 0.0111,
+   "mean_year_top10": 0.2208
+  },
+  {
+   "pr_auc": 0.0327,
+   "roc_auc": 0.8519,
+   "recall_top10": 0.5633,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 2,
+   "variant": "full",
+   "mean_year_roc": 0.8551,
+   "mean_year_pr": 0.0358,
+   "mean_year_top10": 0.5102
+  },
+  {
+   "pr_auc": 0.0527,
+   "roc_auc": 0.8593,
+   "recall_top10": 0.5878,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 2,
+   "variant": "full+recent reports",
+   "mean_year_roc": 0.8471,
+   "mean_year_pr": 0.043,
+   "mean_year_top10": 0.4803
+  },
+  {
+   "pr_auc": 0.0342,
+   "roc_auc": 0.8407,
+   "recall_top10": 0.5388,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 2,
+   "variant": "history only",
+   "mean_year_roc": 0.8503,
+   "mean_year_pr": 0.0352,
+   "mean_year_top10": 0.5201
+  },
+  {
+   "pr_auc": 0.0386,
+   "roc_auc": 0.8394,
+   "recall_top10": 0.551,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 2,
+   "variant": "history+mobility",
+   "mean_year_roc": 0.8613,
+   "mean_year_pr": 0.035,
+   "mean_year_top10": 0.5579
+  },
+  {
+   "pr_auc": 0.0489,
+   "roc_auc": 0.8807,
+   "recall_top10": 0.6,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 2,
+   "variant": "history+recent reports",
+   "mean_year_roc": 0.8627,
+   "mean_year_pr": 0.0462,
+   "mean_year_top10": 0.54
+  },
+  {
+   "pr_auc": 0.0376,
+   "roc_auc": 0.8514,
+   "recall_top10": 0.5633,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 2,
+   "variant": "weather+history",
+   "mean_year_roc": 0.8572,
+   "mean_year_pr": 0.0365,
+   "mean_year_top10": 0.5334
+  },
+  {
+   "pr_auc": 0.0394,
+   "roc_auc": 0.8398,
+   "recall_top10": 0.551,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 2,
+   "variant": "weather+satellite+history",
+   "mean_year_roc": 0.8579,
+   "mean_year_pr": 0.0351,
+   "mean_year_top10": 0.5248
+  },
+  {
+   "pr_auc": 0.0108,
+   "roc_auc": 0.739,
+   "recall_top10": 0.2939,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 3,
+   "variant": "climate only",
+   "mean_year_roc": null,
+   "mean_year_pr": null,
+   "mean_year_top10": null
+  },
+  {
+   "pr_auc": 0.0375,
+   "roc_auc": 0.8608,
+   "recall_top10": 0.5551,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 3,
+   "variant": "full",
+   "mean_year_roc": 0.8591,
+   "mean_year_pr": 0.049,
+   "mean_year_top10": 0.5118
+  },
+  {
+   "pr_auc": 0.0363,
+   "roc_auc": 0.8405,
+   "recall_top10": 0.5673,
+   "base_rate": 0.00399,
+   "positives": 245,
+   "n": 61440,
+   "disease": "cholera",
+   "h": 3,
+   "variant": "history+mobility",
+   "mean_year_roc": 0.8626,
+   "mean_year_pr": 0.0347,
+   "mean_year_top10": 0.5619
+  },
+  {
+   "pr_auc": 0.0525,
+   "roc_auc": 0.7755,
+   "recall_top10": 0.3345,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 1,
+   "variant": "climate only",
+   "mean_year_roc": 0.787,
+   "mean_year_pr": 0.0604,
+   "mean_year_top10": 0.3781
+  },
+  {
+   "pr_auc": 0.0667,
+   "roc_auc": 0.836,
+   "recall_top10": 0.4905,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 1,
+   "variant": "full",
+   "mean_year_roc": 0.8571,
+   "mean_year_pr": 0.0886,
+   "mean_year_top10": 0.5276
+  },
+  {
+   "pr_auc": 0.1247,
+   "roc_auc": 0.8801,
+   "recall_top10": 0.6071,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 1,
+   "variant": "full+recent reports",
+   "mean_year_roc": 0.8834,
+   "mean_year_pr": 0.1305,
+   "mean_year_top10": 0.6043
+  },
+  {
+   "pr_auc": 0.0686,
+   "roc_auc": 0.8335,
+   "recall_top10": 0.5107,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 1,
+   "variant": "history only",
+   "mean_year_roc": 0.8581,
+   "mean_year_pr": 0.0918,
+   "mean_year_top10": 0.545
+  },
+  {
+   "pr_auc": 0.0709,
+   "roc_auc": 0.8398,
+   "recall_top10": 0.5048,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 1,
+   "variant": "history+mobility",
+   "mean_year_roc": 0.8586,
+   "mean_year_pr": 0.0889,
+   "mean_year_top10": 0.5323
+  },
+  {
+   "pr_auc": 0.1209,
+   "roc_auc": 0.8798,
+   "recall_top10": 0.6214,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 1,
+   "variant": "history+recent reports",
+   "mean_year_roc": 0.8815,
+   "mean_year_pr": 0.1248,
+   "mean_year_top10": 0.6294
+  },
+  {
+   "pr_auc": 0.0705,
+   "roc_auc": 0.8401,
+   "recall_top10": 0.5131,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 1,
+   "variant": "weather+history",
+   "mean_year_roc": 0.8599,
+   "mean_year_pr": 0.0988,
+   "mean_year_top10": 0.5419
+  },
+  {
+   "pr_auc": 0.0673,
+   "roc_auc": 0.8365,
+   "recall_top10": 0.4833,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 1,
+   "variant": "weather+satellite+history",
+   "mean_year_roc": 0.8591,
+   "mean_year_pr": 0.0891,
+   "mean_year_top10": 0.5207
+  },
+  {
+   "pr_auc": 0.0548,
+   "roc_auc": 0.788,
+   "recall_top10": 0.3857,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 2,
+   "variant": "climate only",
+   "mean_year_roc": 0.792,
+   "mean_year_pr": 0.0599,
+   "mean_year_top10": 0.3975
+  },
+  {
+   "pr_auc": 0.07,
+   "roc_auc": 0.8414,
+   "recall_top10": 0.5048,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 2,
+   "variant": "full",
+   "mean_year_roc": 0.8555,
+   "mean_year_pr": 0.0904,
+   "mean_year_top10": 0.5278
+  },
+  {
+   "pr_auc": 0.0943,
+   "roc_auc": 0.8642,
+   "recall_top10": 0.5655,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 2,
+   "variant": "full+recent reports",
+   "mean_year_roc": 0.8696,
+   "mean_year_pr": 0.1037,
+   "mean_year_top10": 0.5782
+  },
+  {
+   "pr_auc": 0.0699,
+   "roc_auc": 0.8327,
+   "recall_top10": 0.4988,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 2,
+   "variant": "history only",
+   "mean_year_roc": 0.8573,
+   "mean_year_pr": 0.096,
+   "mean_year_top10": 0.5312
+  },
+  {
+   "pr_auc": 0.0693,
+   "roc_auc": 0.8359,
+   "recall_top10": 0.4845,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 2,
+   "variant": "history+mobility",
+   "mean_year_roc": 0.8565,
+   "mean_year_pr": 0.0921,
+   "mean_year_top10": 0.5199
+  },
+  {
+   "pr_auc": 0.0888,
+   "roc_auc": 0.8589,
+   "recall_top10": 0.5548,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 2,
+   "variant": "history+recent reports",
+   "mean_year_roc": 0.8659,
+   "mean_year_pr": 0.098,
+   "mean_year_top10": 0.5619
+  },
+  {
+   "pr_auc": 0.0682,
+   "roc_auc": 0.8371,
+   "recall_top10": 0.5071,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 2,
+   "variant": "weather+history",
+   "mean_year_roc": 0.8536,
+   "mean_year_pr": 0.0849,
+   "mean_year_top10": 0.5235
+  },
+  {
+   "pr_auc": 0.0733,
+   "roc_auc": 0.8374,
+   "recall_top10": 0.5036,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 2,
+   "variant": "weather+satellite+history",
+   "mean_year_roc": 0.8553,
+   "mean_year_pr": 0.0968,
+   "mean_year_top10": 0.5445
+  },
+  {
+   "pr_auc": 0.049,
+   "roc_auc": 0.7859,
+   "recall_top10": 0.3714,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 3,
+   "variant": "climate only",
+   "mean_year_roc": null,
+   "mean_year_pr": null,
+   "mean_year_top10": null
+  },
+  {
+   "pr_auc": 0.0707,
+   "roc_auc": 0.8374,
+   "recall_top10": 0.4964,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 3,
+   "variant": "full",
+   "mean_year_roc": 0.8552,
+   "mean_year_pr": 0.0905,
+   "mean_year_top10": 0.5301
+  },
+  {
+   "pr_auc": 0.0714,
+   "roc_auc": 0.8363,
+   "recall_top10": 0.4881,
+   "base_rate": 0.01367,
+   "positives": 840,
+   "n": 61440,
+   "disease": "dengue",
+   "h": 3,
+   "variant": "history+mobility",
+   "mean_year_roc": 0.8556,
+   "mean_year_pr": 0.0932,
+   "mean_year_top10": 0.5233
+  },
+  {
+   "pr_auc": 0.0722,
+   "roc_auc": 0.6894,
+   "recall_top10": 0.2505,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 1,
+   "variant": "climate only",
+   "mean_year_roc": 0.6739,
+   "mean_year_pr": 0.0713,
+   "mean_year_top10": 0.202
+  },
+  {
+   "pr_auc": 0.1121,
+   "roc_auc": 0.7687,
+   "recall_top10": 0.3574,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 1,
+   "variant": "full",
+   "mean_year_roc": 0.7493,
+   "mean_year_pr": 0.104,
+   "mean_year_top10": 0.303
+  },
+  {
+   "pr_auc": 0.1645,
+   "roc_auc": 0.8088,
+   "recall_top10": 0.4234,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 1,
+   "variant": "full+recent reports",
+   "mean_year_roc": 0.7844,
+   "mean_year_pr": 0.1365,
+   "mean_year_top10": 0.388
+  },
+  {
+   "pr_auc": 0.1141,
+   "roc_auc": 0.7617,
+   "recall_top10": 0.3565,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 1,
+   "variant": "history only",
+   "mean_year_roc": 0.7466,
+   "mean_year_pr": 0.1065,
+   "mean_year_top10": 0.3038
+  },
+  {
+   "pr_auc": 0.1174,
+   "roc_auc": 0.7648,
+   "recall_top10": 0.3622,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 1,
+   "variant": "history+mobility",
+   "mean_year_roc": 0.7482,
+   "mean_year_pr": 0.1068,
+   "mean_year_top10": 0.3145
+  },
+  {
+   "pr_auc": 0.1633,
+   "roc_auc": 0.8084,
+   "recall_top10": 0.435,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 1,
+   "variant": "history+recent reports",
+   "mean_year_roc": 0.7815,
+   "mean_year_pr": 0.1351,
+   "mean_year_top10": 0.3884
+  },
+  {
+   "pr_auc": 0.1112,
+   "roc_auc": 0.7633,
+   "recall_top10": 0.3492,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 1,
+   "variant": "weather+history",
+   "mean_year_roc": 0.7457,
+   "mean_year_pr": 0.1064,
+   "mean_year_top10": 0.3031
+  },
+  {
+   "pr_auc": 0.1093,
+   "roc_auc": 0.7631,
+   "recall_top10": 0.3526,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 1,
+   "variant": "weather+satellite+history",
+   "mean_year_roc": 0.7446,
+   "mean_year_pr": 0.1025,
+   "mean_year_top10": 0.296
+  },
+  {
+   "pr_auc": 0.0713,
+   "roc_auc": 0.681,
+   "recall_top10": 0.251,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 2,
+   "variant": "climate only",
+   "mean_year_roc": 0.6701,
+   "mean_year_pr": 0.0701,
+   "mean_year_top10": 0.2074
+  },
+  {
+   "pr_auc": 0.1158,
+   "roc_auc": 0.76,
+   "recall_top10": 0.3516,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 2,
+   "variant": "full",
+   "mean_year_roc": 0.744,
+   "mean_year_pr": 0.1044,
+   "mean_year_top10": 0.2994
+  },
+  {
+   "pr_auc": 0.1296,
+   "roc_auc": 0.7801,
+   "recall_top10": 0.3791,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 2,
+   "variant": "full+recent reports",
+   "mean_year_roc": 0.7554,
+   "mean_year_pr": 0.1157,
+   "mean_year_top10": 0.3145
+  },
+  {
+   "pr_auc": 0.1132,
+   "roc_auc": 0.7621,
+   "recall_top10": 0.3593,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 2,
+   "variant": "history only",
+   "mean_year_roc": 0.7446,
+   "mean_year_pr": 0.1073,
+   "mean_year_top10": 0.3152
+  },
+  {
+   "pr_auc": 0.1107,
+   "roc_auc": 0.7635,
+   "recall_top10": 0.3555,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 2,
+   "variant": "history+mobility",
+   "mean_year_roc": 0.7457,
+   "mean_year_pr": 0.1062,
+   "mean_year_top10": 0.3152
+  },
+  {
+   "pr_auc": 0.1283,
+   "roc_auc": 0.7731,
+   "recall_top10": 0.3849,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 2,
+   "variant": "history+recent reports",
+   "mean_year_roc": 0.7483,
+   "mean_year_pr": 0.1104,
+   "mean_year_top10": 0.3081
+  },
+  {
+   "pr_auc": 0.1248,
+   "roc_auc": 0.7592,
+   "recall_top10": 0.3512,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 2,
+   "variant": "weather+history",
+   "mean_year_roc": 0.7417,
+   "mean_year_pr": 0.1055,
+   "mean_year_top10": 0.3006
+  },
+  {
+   "pr_auc": 0.1161,
+   "roc_auc": 0.7576,
+   "recall_top10": 0.3454,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 2,
+   "variant": "weather+satellite+history",
+   "mean_year_roc": 0.7429,
+   "mean_year_pr": 0.1039,
+   "mean_year_top10": 0.2932
+  },
+  {
+   "pr_auc": 0.0748,
+   "roc_auc": 0.6732,
+   "recall_top10": 0.2548,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 3,
+   "variant": "climate only",
+   "mean_year_roc": null,
+   "mean_year_pr": null,
+   "mean_year_top10": null
+  },
+  {
+   "pr_auc": 0.1112,
+   "roc_auc": 0.7545,
+   "recall_top10": 0.354,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 3,
+   "variant": "full",
+   "mean_year_roc": 0.7379,
+   "mean_year_pr": 0.1005,
+   "mean_year_top10": 0.3014
+  },
+  {
+   "pr_auc": 0.1108,
+   "roc_auc": 0.7608,
+   "recall_top10": 0.3555,
+   "base_rate": 0.03379,
+   "positives": 2076,
+   "n": 61440,
+   "disease": "add",
+   "h": 3,
+   "variant": "history+mobility",
+   "mean_year_roc": 0.7452,
+   "mean_year_pr": 0.1047,
+   "mean_year_top10": 0.3091
+  },
+  {
+   "pr_auc": 0.0139,
+   "roc_auc": 0.7191,
+   "recall_top10": 0.2752,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 1,
+   "variant": "climate only",
+   "mean_year_roc": 0.7043,
+   "mean_year_pr": 0.0281,
+   "mean_year_top10": 0.2559
+  },
+  {
+   "pr_auc": 0.038,
+   "roc_auc": 0.8387,
+   "recall_top10": 0.5459,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 1,
+   "variant": "full",
+   "mean_year_roc": 0.8378,
+   "mean_year_pr": 0.0665,
+   "mean_year_top10": 0.5716
+  },
+  {
+   "pr_auc": 0.0575,
+   "roc_auc": 0.8606,
+   "recall_top10": 0.6376,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 1,
+   "variant": "full+recent reports",
+   "mean_year_roc": 0.8572,
+   "mean_year_pr": 0.0729,
+   "mean_year_top10": 0.6356
+  },
+  {
+   "pr_auc": 0.0358,
+   "roc_auc": 0.8273,
+   "recall_top10": 0.5505,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 1,
+   "variant": "history only",
+   "mean_year_roc": 0.8326,
+   "mean_year_pr": 0.0709,
+   "mean_year_top10": 0.5952
+  },
+  {
+   "pr_auc": 0.0285,
+   "roc_auc": 0.8335,
+   "recall_top10": 0.5183,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 1,
+   "variant": "history+mobility",
+   "mean_year_roc": 0.8308,
+   "mean_year_pr": 0.0418,
+   "mean_year_top10": 0.5641
+  },
+  {
+   "pr_auc": 0.0638,
+   "roc_auc": 0.8772,
+   "recall_top10": 0.6697,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 1,
+   "variant": "history+recent reports",
+   "mean_year_roc": 0.8637,
+   "mean_year_pr": 0.0877,
+   "mean_year_top10": 0.653
+  },
+  {
+   "pr_auc": 0.0347,
+   "roc_auc": 0.8344,
+   "recall_top10": 0.5229,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 1,
+   "variant": "weather+history",
+   "mean_year_roc": 0.8377,
+   "mean_year_pr": 0.0589,
+   "mean_year_top10": 0.5218
+  },
+  {
+   "pr_auc": 0.0366,
+   "roc_auc": 0.8304,
+   "recall_top10": 0.5642,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 1,
+   "variant": "weather+satellite+history",
+   "mean_year_roc": 0.8384,
+   "mean_year_pr": 0.0621,
+   "mean_year_top10": 0.5899
+  },
+  {
+   "pr_auc": 0.0088,
+   "roc_auc": 0.7183,
+   "recall_top10": 0.289,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 2,
+   "variant": "climate only",
+   "mean_year_roc": 0.7183,
+   "mean_year_pr": 0.0198,
+   "mean_year_top10": 0.2775
+  },
+  {
+   "pr_auc": 0.0332,
+   "roc_auc": 0.835,
+   "recall_top10": 0.5413,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 2,
+   "variant": "full",
+   "mean_year_roc": 0.8362,
+   "mean_year_pr": 0.0516,
+   "mean_year_top10": 0.552
+  },
+  {
+   "pr_auc": 0.044,
+   "roc_auc": 0.8513,
+   "recall_top10": 0.6009,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 2,
+   "variant": "full+recent reports",
+   "mean_year_roc": 0.8451,
+   "mean_year_pr": 0.0511,
+   "mean_year_top10": 0.6146
+  },
+  {
+   "pr_auc": 0.0352,
+   "roc_auc": 0.8279,
+   "recall_top10": 0.5321,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 2,
+   "variant": "history only",
+   "mean_year_roc": 0.8336,
+   "mean_year_pr": 0.0719,
+   "mean_year_top10": 0.5884
+  },
+  {
+   "pr_auc": 0.0297,
+   "roc_auc": 0.8316,
+   "recall_top10": 0.555,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 2,
+   "variant": "history+mobility",
+   "mean_year_roc": 0.8307,
+   "mean_year_pr": 0.0425,
+   "mean_year_top10": 0.5732
+  },
+  {
+   "pr_auc": 0.0546,
+   "roc_auc": 0.8598,
+   "recall_top10": 0.6422,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 2,
+   "variant": "history+recent reports",
+   "mean_year_roc": 0.8463,
+   "mean_year_pr": 0.0774,
+   "mean_year_top10": 0.6121
+  },
+  {
+   "pr_auc": 0.0309,
+   "roc_auc": 0.8399,
+   "recall_top10": 0.5688,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 2,
+   "variant": "weather+history",
+   "mean_year_roc": 0.837,
+   "mean_year_pr": 0.0589,
+   "mean_year_top10": 0.5857
+  },
+  {
+   "pr_auc": 0.0292,
+   "roc_auc": 0.8252,
+   "recall_top10": 0.5275,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 2,
+   "variant": "weather+satellite+history",
+   "mean_year_roc": 0.8295,
+   "mean_year_pr": 0.049,
+   "mean_year_top10": 0.5559
+  },
+  {
+   "pr_auc": 0.0093,
+   "roc_auc": 0.7334,
+   "recall_top10": 0.3119,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 3,
+   "variant": "climate only",
+   "mean_year_roc": null,
+   "mean_year_pr": null,
+   "mean_year_top10": null
+  },
+  {
+   "pr_auc": 0.0281,
+   "roc_auc": 0.8176,
+   "recall_top10": 0.5642,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 3,
+   "variant": "full",
+   "mean_year_roc": 0.8251,
+   "mean_year_pr": 0.0436,
+   "mean_year_top10": 0.5569
+  },
+  {
+   "pr_auc": 0.0292,
+   "roc_auc": 0.8261,
+   "recall_top10": 0.5367,
+   "base_rate": 0.00355,
+   "positives": 218,
+   "n": 61440,
+   "disease": "malaria",
+   "h": 3,
+   "variant": "history+mobility",
+   "mean_year_roc": 0.8257,
+   "mean_year_pr": 0.0463,
+   "mean_year_top10": 0.5825
+  },
+  {
+   "disease": "chikungunya",
+   "h": 1,
+   "variant": "recent outbreaks (persistence)",
+   "mean_year_roc": 0.6231,
+   "mean_year_pr": 0.0775,
+   "mean_year_top10": 0.3527,
+   "base_rate": 0.0057
+  },
+  {
+   "disease": "chikungunya",
+   "h": 1,
+   "variant": "seasonal history (baseline)",
+   "mean_year_roc": 0.755,
+   "mean_year_pr": 0.0731,
+   "mean_year_top10": 0.5914,
+   "base_rate": 0.0057
+  },
+  {
+   "disease": "chikungunya",
+   "h": 2,
+   "variant": "recent outbreaks (persistence)",
+   "mean_year_roc": 0.5822,
+   "mean_year_pr": 0.0433,
+   "mean_year_top10": 0.2795,
+   "base_rate": 0.0057
+  },
+  {
+   "disease": "chikungunya",
+   "h": 2,
+   "variant": "seasonal history (baseline)",
+   "mean_year_roc": 0.7555,
+   "mean_year_pr": 0.0735,
+   "mean_year_top10": 0.5984,
+   "base_rate": 0.0057
+  },
+  {
+   "disease": "chikungunya",
+   "h": 3,
+   "variant": "recent outbreaks (persistence)",
+   "mean_year_roc": 0.5904,
+   "mean_year_pr": 0.0347,
+   "mean_year_top10": 0.2701,
+   "base_rate": 0.0057
+  },
+  {
+   "disease": "chikungunya",
+   "h": 3,
+   "variant": "seasonal history (baseline)",
+   "mean_year_roc": 0.755,
+   "mean_year_pr": 0.0727,
+   "mean_year_top10": 0.5965,
+   "base_rate": 0.0057
+  },
+  {
+   "disease": "cholera",
+   "h": 1,
+   "variant": "recent outbreaks (persistence)",
+   "mean_year_roc": 0.6359,
+   "mean_year_pr": 0.0278,
+   "mean_year_top10": 0.2047,
+   "base_rate": 0.00399
+  },
+  {
+   "disease": "cholera",
+   "h": 1,
+   "variant": "seasonal history (baseline)",
+   "mean_year_roc": 0.7889,
+   "mean_year_pr": 0.0361,
+   "mean_year_top10": 0.5398,
+   "base_rate": 0.00399
+  },
+  {
+   "disease": "cholera",
+   "h": 2,
+   "variant": "recent outbreaks (persistence)",
+   "mean_year_roc": 0.6018,
+   "mean_year_pr": 0.0108,
+   "mean_year_top10": 0.1434,
+   "base_rate": 0.00399
+  },
+  {
+   "disease": "cholera",
+   "h": 2,
+   "variant": "seasonal history (baseline)",
+   "mean_year_roc": 0.7886,
+   "mean_year_pr": 0.036,
+   "mean_year_top10": 0.5341,
+   "base_rate": 0.00399
+  },
+  {
+   "disease": "cholera",
+   "h": 3,
+   "variant": "recent outbreaks (persistence)",
+   "mean_year_roc": 0.5769,
+   "mean_year_pr": 0.0065,
+   "mean_year_top10": 0.1015,
+   "base_rate": 0.00399
+  },
+  {
+   "disease": "cholera",
+   "h": 3,
+   "variant": "seasonal history (baseline)",
+   "mean_year_roc": 0.7885,
+   "mean_year_pr": 0.0359,
+   "mean_year_top10": 0.5341,
+   "base_rate": 0.00399
+  },
+  {
+   "disease": "dengue",
+   "h": 1,
+   "variant": "recent outbreaks (persistence)",
+   "mean_year_roc": 0.6212,
+   "mean_year_pr": 0.0597,
+   "mean_year_top10": 0.3353,
+   "base_rate": 0.01367
+  },
+  {
+   "disease": "dengue",
+   "h": 1,
+   "variant": "seasonal history (baseline)",
+   "mean_year_roc": 0.7806,
+   "mean_year_pr": 0.0844,
+   "mean_year_top10": 0.5182,
+   "base_rate": 0.01367
+  },
+  {
+   "disease": "dengue",
+   "h": 2,
+   "variant": "recent outbreaks (persistence)",
+   "mean_year_roc": 0.5687,
+   "mean_year_pr": 0.0387,
+   "mean_year_top10": 0.2462,
+   "base_rate": 0.01367
+  },
+  {
+   "disease": "dengue",
+   "h": 2,
+   "variant": "seasonal history (baseline)",
+   "mean_year_roc": 0.7801,
+   "mean_year_pr": 0.0839,
+   "mean_year_top10": 0.5143,
+   "base_rate": 0.01367
+  },
+  {
+   "disease": "dengue",
+   "h": 3,
+   "variant": "recent outbreaks (persistence)",
+   "mean_year_roc": 0.5421,
+   "mean_year_pr": 0.031,
+   "mean_year_top10": 0.2094,
+   "base_rate": 0.01367
+  },
+  {
+   "disease": "dengue",
+   "h": 3,
+   "variant": "seasonal history (baseline)",
+   "mean_year_roc": 0.7804,
+   "mean_year_pr": 0.0835,
+   "mean_year_top10": 0.5134,
+   "base_rate": 0.01367
+  },
+  {
+   "disease": "add",
+   "h": 1,
+   "variant": "recent outbreaks (persistence)",
+   "mean_year_roc": 0.6157,
+   "mean_year_pr": 0.0804,
+   "mean_year_top10": 0.2848,
+   "base_rate": 0.03379
+  },
+  {
+   "disease": "add",
+   "h": 1,
+   "variant": "seasonal history (baseline)",
+   "mean_year_roc": 0.726,
+   "mean_year_pr": 0.1017,
+   "mean_year_top10": 0.308,
+   "base_rate": 0.03379
+  },
+  {
+   "disease": "add",
+   "h": 2,
+   "variant": "recent outbreaks (persistence)",
+   "mean_year_roc": 0.5845,
+   "mean_year_pr": 0.0611,
+   "mean_year_top10": 0.2386,
+   "base_rate": 0.03379
+  },
+  {
+   "disease": "add",
+   "h": 2,
+   "variant": "seasonal history (baseline)",
+   "mean_year_roc": 0.7257,
+   "mean_year_pr": 0.1015,
+   "mean_year_top10": 0.3081,
+   "base_rate": 0.03379
+  },
+  {
+   "disease": "add",
+   "h": 3,
+   "variant": "recent outbreaks (persistence)",
+   "mean_year_roc": 0.5641,
+   "mean_year_pr": 0.0525,
+   "mean_year_top10": 0.2031,
+   "base_rate": 0.03379
+  },
+  {
+   "disease": "add",
+   "h": 3,
+   "variant": "seasonal history (baseline)",
+   "mean_year_roc": 0.7242,
+   "mean_year_pr": 0.1013,
+   "mean_year_top10": 0.3074,
+   "base_rate": 0.03379
+  },
+  {
+   "disease": "malaria",
+   "h": 1,
+   "variant": "recent outbreaks (persistence)",
+   "mean_year_roc": 0.6226,
+   "mean_year_pr": 0.0464,
+   "mean_year_top10": 0.3395,
+   "base_rate": 0.00355
+  },
+  {
+   "disease": "malaria",
+   "h": 1,
+   "variant": "seasonal history (baseline)",
+   "mean_year_roc": 0.7412,
+   "mean_year_pr": 0.061,
+   "mean_year_top10": 0.5434,
+   "base_rate": 0.00355
+  },
+  {
+   "disease": "malaria",
+   "h": 2,
+   "variant": "recent outbreaks (persistence)",
+   "mean_year_roc": 0.6017,
+   "mean_year_pr": 0.0551,
+   "mean_year_top10": 0.2919,
+   "base_rate": 0.00355
+  },
+  {
+   "disease": "malaria",
+   "h": 2,
+   "variant": "seasonal history (baseline)",
+   "mean_year_roc": 0.7395,
+   "mean_year_pr": 0.0604,
+   "mean_year_top10": 0.5417,
+   "base_rate": 0.00355
+  },
+  {
+   "disease": "malaria",
+   "h": 3,
+   "variant": "recent outbreaks (persistence)",
+   "mean_year_roc": 0.6119,
+   "mean_year_pr": 0.0492,
+   "mean_year_top10": 0.3092,
+   "base_rate": 0.00355
+  },
+  {
+   "disease": "malaria",
+   "h": 3,
+   "variant": "seasonal history (baseline)",
+   "mean_year_roc": 0.7392,
+   "mean_year_pr": 0.0601,
+   "mean_year_top10": 0.5417,
+   "base_rate": 0.00355
+  }
+ ],
+ "cold_start": [
+  {
+   "disease": "chikungunya",
+   "group": "no earlier outbreak",
+   "share_rows": 0.767,
+   "outbreaks": 52,
+   "share_outbreaks": 0.149,
+   "full": 0.8266,
+   "history+mobility": 0.7872,
+   "weather+history": 0.8339,
+   "history only": 0.7711,
+   "climate only": 0.8191
+  },
+  {
+   "disease": "chikungunya",
+   "group": "earlier outbreaks",
+   "share_rows": 0.233,
+   "outbreaks": 298,
+   "share_outbreaks": 0.851,
+   "full": 0.7639,
+   "history+mobility": 0.7652,
+   "weather+history": 0.7701,
+   "history only": 0.7687,
+   "climate only": 0.7192
+  },
+  {
+   "disease": "cholera",
+   "group": "no earlier outbreak",
+   "share_rows": 0.728,
+   "outbreaks": 52,
+   "share_outbreaks": 0.212,
+   "full": 0.7924,
+   "history+mobility": 0.7834,
+   "weather+history": 0.7942,
+   "history only": 0.7765,
+   "climate only": 0.7597
+  },
+  {
+   "disease": "cholera",
+   "group": "earlier outbreaks",
+   "share_rows": 0.272,
+   "outbreaks": 193,
+   "share_outbreaks": 0.788,
+   "full": 0.7438,
+   "history+mobility": 0.7326,
+   "weather+history": 0.7328,
+   "history only": 0.732,
+   "climate only": 0.6685
+  },
+  {
+   "disease": "dengue",
+   "group": "no earlier outbreak",
+   "share_rows": 0.632,
+   "outbreaks": 141,
+   "share_outbreaks": 0.168,
+   "full": 0.7664,
+   "history+mobility": 0.7696,
+   "weather+history": 0.7629,
+   "history only": 0.7419,
+   "climate only": 0.7479
+  },
+  {
+   "disease": "dengue",
+   "group": "earlier outbreaks",
+   "share_rows": 0.368,
+   "outbreaks": 699,
+   "share_outbreaks": 0.832,
+   "full": 0.7396,
+   "history+mobility": 0.7412,
+   "weather+history": 0.7459,
+   "history only": 0.7386,
+   "climate only": 0.6928
+  },
+  {
+   "disease": "add",
+   "group": "no earlier outbreak",
+   "share_rows": 0.234,
+   "outbreaks": 140,
+   "share_outbreaks": 0.067,
+   "full": 0.7178,
+   "history+mobility": 0.6918,
+   "weather+history": 0.7067,
+   "history only": 0.6924,
+   "climate only": 0.6917
+  },
+  {
+   "disease": "add",
+   "group": "earlier outbreaks",
+   "share_rows": 0.766,
+   "outbreaks": 1936,
+   "share_outbreaks": 0.933,
+   "full": 0.7433,
+   "history+mobility": 0.7413,
+   "weather+history": 0.7395,
+   "history only": 0.7377,
+   "climate only": 0.6706
+  },
+  {
+   "disease": "malaria",
+   "group": "no earlier outbreak",
+   "share_rows": 0.729,
+   "outbreaks": 63,
+   "share_outbreaks": 0.289,
+   "full": 0.7703,
+   "history+mobility": 0.7517,
+   "weather+history": 0.7716,
+   "history only": 0.7222,
+   "climate only": 0.7149
+  },
+  {
+   "disease": "malaria",
+   "group": "earlier outbreaks",
+   "share_rows": 0.271,
+   "outbreaks": 155,
+   "share_outbreaks": 0.711,
+   "full": 0.7968,
+   "history+mobility": 0.7873,
+   "weather+history": 0.7889,
+   "history only": 0.7865,
+   "climate only": 0.686
+  }
+ ],
+ "tiers": {
+  "dengue|1": {
+   "thresholds": {
+    "very_high": 0.08817530395118003,
+    "high": 0.04430846166099739,
+    "moderate": 0.01757384676589611
+   },
+   "base_rate": 0.013671875,
+   "levels": {
+    "very_high": {
+     "share": 0.020003255208333334,
+     "outbreak_rate": 0.08462164361269324,
+     "outbreaks_caught": 0.12380952380952381
+    },
+    "high": {
+     "share": 0.05,
+     "outbreak_rate": 0.07552083333333333,
+     "outbreaks_caught": 0.2761904761904762
+    },
+    "moderate": {
+     "share": 0.12999674479166667,
+     "outbreak_rate": 0.03305371228245899,
+     "outbreaks_caught": 0.3142857142857143
+    },
+    "low": {
+     "share": 0.8,
+     "outbreak_rate": 0.0048828125,
+     "outbreaks_caught": 0.2857142857142857
+    }
+   }
+  },
+  "chikungunya|1": {
+   "thresholds": {
+    "very_high": 0.0535405260230052,
+    "high": 0.018503152023407934,
+    "moderate": 0.005080221759922519
+   },
+   "base_rate": 0.005696614583333333,
+   "levels": {
+    "very_high": {
+     "share": 0.020003255208333334,
+     "outbreak_rate": 0.07648494711147275,
+     "outbreaks_caught": 0.26857142857142857
+    },
+    "high": {
+     "share": 0.05,
+     "outbreak_rate": 0.032877604166666664,
+     "outbreaks_caught": 0.2885714285714286
+    },
+    "moderate": {
+     "share": 0.12999674479166667,
+     "outbreak_rate": 0.013521973206460498,
+     "outbreaks_caught": 0.30857142857142855
+    },
+    "low": {
+     "share": 0.8,
+     "outbreak_rate": 0.0009562174479166666,
+     "outbreaks_caught": 0.13428571428571429
+    }
+   }
+  },
+  "malaria|1": {
+   "thresholds": {
+    "very_high": 0.02488546961780676,
+    "high": 0.009852449315894685,
+    "moderate": 0.004053304166440807
+   },
+   "base_rate": 0.0035481770833333333,
+   "levels": {
+    "very_high": {
+     "share": 0.020003255208333334,
+     "outbreak_rate": 0.043124491456468676,
+     "outbreaks_caught": 0.24311926605504589
+    },
+    "high": {
+     "share": 0.05,
+     "outbreak_rate": 0.015625,
+     "outbreaks_caught": 0.22018348623853212
+    },
+    "moderate": {
+     "share": 0.12999674479166667,
+     "outbreak_rate": 0.006510579691999499,
+     "outbreaks_caught": 0.23853211009174313
+    },
+    "low": {
+     "share": 0.8,
+     "outbreak_rate": 0.0013224283854166667,
+     "outbreaks_caught": 0.2981651376146789
+    }
+   }
+  },
+  "add|1": {
+   "thresholds": {
+    "very_high": 0.16358829396177516,
+    "high": 0.09187017459658993,
+    "moderate": 0.04579989696520915
+   },
+   "base_rate": 0.0337890625,
+   "levels": {
+    "very_high": {
+     "share": 0.020003255208333334,
+     "outbreak_rate": 0.193653376729048,
+     "outbreaks_caught": 0.11464354527938343
+    },
+    "high": {
+     "share": 0.05,
+     "outbreak_rate": 0.1123046875,
+     "outbreaks_caught": 0.16618497109826588
+    },
+    "moderate": {
+     "share": 0.12999674479166667,
+     "outbreak_rate": 0.07011393514460999,
+     "outbreaks_caught": 0.2697495183044316
+    },
+    "low": {
+     "share": 0.8,
+     "outbreak_rate": 0.01898193359375,
+     "outbreaks_caught": 0.44942196531791906
+    }
+   }
+  },
+  "cholera|1": {
+   "thresholds": {
+    "very_high": 0.02737328170778558,
+    "high": 0.010343144484270367,
+    "moderate": 0.004117425566966039
+   },
+   "base_rate": 0.003987630208333333,
+   "levels": {
+    "very_high": {
+     "share": 0.020003255208333334,
+     "outbreak_rate": 0.04800650935720097,
+     "outbreaks_caught": 0.24081632653061225
+    },
+    "high": {
+     "share": 0.05,
+     "outbreak_rate": 0.015625,
+     "outbreaks_caught": 0.19591836734693877
+    },
+    "moderate": {
+     "share": 0.12999674479166667,
+     "outbreak_rate": 0.010016276449229998,
+     "outbreaks_caught": 0.32653061224489793
+    },
+    "low": {
+     "share": 0.8,
+     "outbreak_rate": 0.0011800130208333333,
+     "outbreaks_caught": 0.23673469387755103
+    }
+   }
+  },
+  "dengue|2": {
+   "thresholds": {
+    "very_high": 0.0917835574613266,
+    "high": 0.04590210192827786,
+    "moderate": 0.017159920576920472
+   },
+   "base_rate": 0.013671875,
+   "levels": {
+    "very_high": {
+     "share": 0.020003255208333334,
+     "outbreak_rate": 0.09764035801464606,
+     "outbreaks_caught": 0.14285714285714285
+    },
+    "high": {
+     "share": 0.05,
+     "outbreak_rate": 0.07356770833333333,
+     "outbreaks_caught": 0.26904761904761904
+    },
+    "moderate": {
+     "share": 0.12999674479166667,
+     "outbreak_rate": 0.03393013647176662,
+     "outbreaks_caught": 0.32261904761904764
+    },
+    "low": {
+     "share": 0.8,
+     "outbreak_rate": 0.004536946614583333,
+     "outbreaks_caught": 0.2654761904761905
+    }
+   }
+  },
+  "chikungunya|2": {
+   "thresholds": {
+    "very_high": 0.05489600918229177,
+    "high": 0.01870005935812096,
+    "moderate": 0.004947432867672286
+   },
+   "base_rate": 0.005696614583333333,
+   "levels": {
+    "very_high": {
+     "share": 0.020003255208333334,
+     "outbreak_rate": 0.07648494711147275,
+     "outbreaks_caught": 0.26857142857142857
+    },
+    "high": {
+     "share": 0.05,
+     "outbreak_rate": 0.037434895833333336,
+     "outbreaks_caught": 0.32857142857142857
+    },
+    "moderate": {
+     "share": 0.12999674479166667,
+     "outbreak_rate": 0.012395142105922123,
+     "outbreaks_caught": 0.28285714285714286
+    },
+    "low": {
+     "share": 0.8,
+     "outbreak_rate": 0.0008544921875,
+     "outbreaks_caught": 0.12
+    }
+   }
+  },
+  "malaria|2": {
+   "thresholds": {
+    "very_high": 0.023931557700888492,
+    "high": 0.009856345536875423,
+    "moderate": 0.004130131728014517
+   },
+   "base_rate": 0.0035481770833333333,
+   "levels": {
+    "very_high": {
+     "share": 0.020003255208333334,
+     "outbreak_rate": 0.043938161106590726,
+     "outbreaks_caught": 0.24770642201834864
+    },
+    "high": {
+     "share": 0.05,
+     "outbreak_rate": 0.013997395833333334,
+     "outbreaks_caught": 0.19724770642201836
+    },
+    "moderate": {
+     "share": 0.12999674479166667,
+     "outbreak_rate": 0.006760986603230249,
+     "outbreaks_caught": 0.24770642201834864
+    },
+    "low": {
+     "share": 0.8,
+     "outbreak_rate": 0.0013631184895833333,
+     "outbreaks_caught": 0.3073394495412844
+    }
+   }
+  },
+  "add|2": {
+   "thresholds": {
+    "very_high": 0.16340798495294218,
+    "high": 0.09146349843912063,
+    "moderate": 0.045848180235872886
+   },
+   "base_rate": 0.0337890625,
+   "levels": {
+    "very_high": {
+     "share": 0.020003255208333334,
+     "outbreak_rate": 0.19121236777868186,
+     "outbreaks_caught": 0.11319845857418112
+    },
+    "high": {
+     "share": 0.05,
+     "outbreak_rate": 0.11100260416666667,
+     "outbreaks_caught": 0.1642581888246628
+    },
+    "moderate": {
+     "share": 0.12999674479166667,
+     "outbreak_rate": 0.06786027294353324,
+     "outbreaks_caught": 0.2610789980732177
+    },
+    "low": {
+     "share": 0.8,
+     "outbreak_rate": 0.019490559895833332,
+     "outbreaks_caught": 0.4614643545279383
+    }
+   }
+  },
+  "cholera|2": {
+   "thresholds": {
+    "very_high": 0.030310531411442295,
+    "high": 0.010436263334481019,
+    "moderate": 0.0038115412375740276
+   },
+   "base_rate": 0.003987630208333333,
+   "levels": {
+    "very_high": {
+     "share": 0.020003255208333334,
+     "outbreak_rate": 0.04882017900732303,
+     "outbreaks_caught": 0.24489795918367346
+    },
+    "high": {
+     "share": 0.05,
+     "outbreak_rate": 0.016276041666666668,
+     "outbreaks_caught": 0.20408163265306123
+    },
+    "moderate": {
+     "share": 0.12999674479166667,
+     "outbreak_rate": 0.009390259171153124,
+     "outbreaks_caught": 0.30612244897959184
+    },
+    "low": {
+     "share": 0.8,
+     "outbreak_rate": 0.001220703125,
+     "outbreaks_caught": 0.24489795918367346
+    }
+   }
+  },
+  "dengue|3": {
+   "thresholds": {
+    "very_high": 0.09018785114934613,
+    "high": 0.04471536513640921,
+    "moderate": 0.017246197879487276
+   },
+   "base_rate": 0.013671875,
+   "levels": {
+    "very_high": {
+     "share": 0.020003255208333334,
+     "outbreak_rate": 0.09275834011391375,
+     "outbreaks_caught": 0.1357142857142857
+    },
+    "high": {
+     "share": 0.05,
+     "outbreak_rate": 0.07552083333333333,
+     "outbreaks_caught": 0.2761904761904762
+    },
+    "moderate": {
+     "share": 0.12999674479166667,
+     "outbreak_rate": 0.033304119193689745,
+     "outbreaks_caught": 0.31666666666666665
+    },
+    "low": {
+     "share": 0.8,
+     "outbreak_rate": 0.004638671875,
+     "outbreaks_caught": 0.2714285714285714
+    }
+   }
+  },
+  "chikungunya|3": {
+   "thresholds": {
+    "very_high": 0.05272004340627192,
+    "high": 0.018605484298890848,
+    "moderate": 0.0052170577683168335
+   },
+   "base_rate": 0.005696614583333333,
+   "levels": {
+    "very_high": {
+     "share": 0.020003255208333334,
+     "outbreak_rate": 0.07241659886086249,
+     "outbreaks_caught": 0.2542857142857143
+    },
+    "high": {
+     "share": 0.05,
+     "outbreak_rate": 0.036458333333333336,
+     "outbreaks_caught": 0.32
+    },
+    "moderate": {
+     "share": 0.12999674479166667,
+     "outbreak_rate": 0.012144735194691373,
+     "outbreaks_caught": 0.27714285714285714
+    },
+    "low": {
+     "share": 0.8,
+     "outbreak_rate": 0.0010579427083333333,
+     "outbreaks_caught": 0.14857142857142858
+    }
+   }
+  },
+  "malaria|3": {
+   "thresholds": {
+    "very_high": 0.02271445411247622,
+    "high": 0.009080412510734742,
+    "moderate": 0.004008909026484849
+   },
+   "base_rate": 0.0035481770833333333,
+   "levels": {
+    "very_high": {
+     "share": 0.020003255208333334,
+     "outbreak_rate": 0.03986981285598047,
+     "outbreaks_caught": 0.22477064220183487
+    },
+    "high": {
+     "share": 0.05,
+     "outbreak_rate": 0.018229166666666668,
+     "outbreaks_caught": 0.25688073394495414
+    },
+    "moderate": {
+     "share": 0.12999674479166667,
+     "outbreak_rate": 0.0057593589583072495,
+     "outbreaks_caught": 0.21100917431192662
+    },
+    "low": {
+     "share": 0.8,
+     "outbreak_rate": 0.0013631184895833333,
+     "outbreaks_caught": 0.3073394495412844
+    }
+   }
+  },
+  "add|3": {
+   "thresholds": {
+    "very_high": 0.15623106702516554,
+    "high": 0.0889007187084888,
+    "moderate": 0.04599200018964265
+   },
+   "base_rate": 0.0337890625,
+   "levels": {
+    "very_high": {
+     "share": 0.020003255208333334,
+     "outbreak_rate": 0.19528071602929212,
+     "outbreaks_caught": 0.11560693641618497
+    },
+    "high": {
+     "share": 0.05,
+     "outbreak_rate": 0.1171875,
+     "outbreaks_caught": 0.17341040462427745
+    },
+    "moderate": {
+     "share": 0.12999674479166667,
+     "outbreak_rate": 0.06360335545261049,
+     "outbreaks_caught": 0.24470134874759153
+    },
+    "low": {
+     "share": 0.8,
+     "outbreak_rate": 0.019694010416666668,
+     "outbreaks_caught": 0.4662813102119461
+    }
+   }
+  },
+  "cholera|3": {
+   "thresholds": {
+    "very_high": 0.03015261149023568,
+    "high": 0.01029198591177321,
+    "moderate": 0.003832808994227791
+   },
+   "base_rate": 0.003987630208333333,
+   "levels": {
+    "very_high": {
+     "share": 0.020003255208333334,
+     "outbreak_rate": 0.044751830756712775,
+     "outbreaks_caught": 0.22448979591836735
+    },
+    "high": {
+     "share": 0.05,
+     "outbreak_rate": 0.021809895833333332,
+     "outbreaks_caught": 0.27346938775510204
+    },
+    "moderate": {
+     "share": 0.12999674479166667,
+     "outbreak_rate": 0.008138224614999374,
+     "outbreaks_caught": 0.2653061224489796
+    },
+    "low": {
+     "share": 0.8,
+     "outbreak_rate": 0.0011800130208333333,
+     "outbreaks_caught": 0.23673469387755103
+    }
+   }
+  }
+ },
+ "tier_shares": {
+  "very_high": 0.02,
+  "high": 0.05,
+  "moderate": 0.13,
+  "low": 0.8
+ },
+ "karnataka_weekly": {
+  "summary": [
+   {
+    "h": 2,
+    "variant": "cases only",
+    "pr_auc": 0.853,
+    "roc_auc": 0.857,
+    "base_rate": 0.433
+   },
+   {
+    "h": 2,
+    "variant": "cases+climate",
+    "pr_auc": 0.848,
+    "roc_auc": 0.856,
+    "base_rate": 0.433
+   },
+   {
+    "h": 2,
+    "variant": "climate only",
+    "pr_auc": 0.555,
+    "roc_auc": 0.647,
+    "base_rate": 0.433
+   },
+   {
+    "h": 2,
+    "variant": "persistence",
+    "pr_auc": 0.796,
+    "roc_auc": 0.829,
+    "base_rate": 0.433
+   },
+   {
+    "h": 2,
+    "variant": "seasonal baseline",
+    "pr_auc": 0.605,
+    "roc_auc": 0.702,
+    "base_rate": 0.433
+   },
+   {
+    "h": 4,
+    "variant": "cases only",
+    "pr_auc": 0.722,
+    "roc_auc": 0.756,
+    "base_rate": 0.428
+   },
+   {
+    "h": 4,
+    "variant": "cases+climate",
+    "pr_auc": 0.719,
+    "roc_auc": 0.772,
+    "base_rate": 0.428
+   },
+   {
+    "h": 4,
+    "variant": "climate only",
+    "pr_auc": 0.547,
+    "roc_auc": 0.639,
+    "base_rate": 0.428
+   },
+   {
+    "h": 4,
+    "variant": "persistence",
+    "pr_auc": 0.715,
+    "roc_auc": 0.763,
+    "base_rate": 0.428
+   },
+   {
+    "h": 4,
+    "variant": "seasonal baseline",
+    "pr_auc": 0.596,
+    "roc_auc": 0.699,
+    "base_rate": 0.428
+   },
+   {
+    "h": 6,
+    "variant": "cases only",
+    "pr_auc": 0.672,
+    "roc_auc": 0.711,
+    "base_rate": 0.428
+   },
+   {
+    "h": 6,
+    "variant": "cases+climate",
+    "pr_auc": 0.674,
+    "roc_auc": 0.74,
+    "base_rate": 0.428
+   },
+   {
+    "h": 6,
+    "variant": "climate only",
+    "pr_auc": 0.557,
+    "roc_auc": 0.634,
+    "base_rate": 0.428
+   },
+   {
+    "h": 6,
+    "variant": "persistence",
+    "pr_auc": 0.662,
+    "roc_auc": 0.715,
+    "base_rate": 0.428
+   },
+   {
+    "h": 6,
+    "variant": "seasonal baseline",
+    "pr_auc": 0.593,
+    "roc_auc": 0.696,
+    "base_rate": 0.428
+   },
+   {
+    "h": 8,
+    "variant": "cases only",
+    "pr_auc": 0.595,
+    "roc_auc": 0.658,
+    "base_rate": 0.424
+   },
+   {
+    "h": 8,
+    "variant": "cases+climate",
+    "pr_auc": 0.656,
+    "roc_auc": 0.73,
+    "base_rate": 0.424
+   },
+   {
+    "h": 8,
+    "variant": "climate only",
+    "pr_auc": 0.571,
+    "roc_auc": 0.657,
+    "base_rate": 0.424
+   },
+   {
+    "h": 8,
+    "variant": "persistence",
+    "pr_auc": 0.614,
+    "roc_auc": 0.671,
+    "base_rate": 0.424
+   },
+   {
+    "h": 8,
+    "variant": "seasonal baseline",
+    "pr_auc": 0.593,
+    "roc_auc": 0.698,
+    "base_rate": 0.424
+   }
+  ],
+  "districts": 30,
+  "weeks": [
+   "2017-01-02",
+   "2024-08-26"
+  ],
+  "cases": 61343,
+  "test_years": [
+   2021,
+   2022,
+   2023,
+   2024
+  ],
+  "target": "4-week case total over weeks t+h-2..t+h+1 >= district 75th percentile of earlier years and >= 4 cases",
+  "source": "ICTS Karnataka district dengue (weekly), NASA POWER daily weather"
+ },
+ "limits": [
+  "IDSP publishes outbreak reports, not case counts; the forecast is for reported outbreaks and reflects surveillance strength as well as disease.",
+  "Reporting fell in 2020-2022 (COVID-19); probabilities are calibrated on 2015-2022 together.",
+  "Forecast windows are 4 weeks long; the model was trained on calendar months (4-4.4 weeks).",
+  "Mobility is a gravity-model estimate from population and distance, not measured travel.",
+  "Districts are 2011 boundaries; outbreaks in newer districts are placed in their 2011 parent district by location.",
+  "Climate is NASA POWER at the district centroid (about 50 km grid); local rainfall can differ.",
+  "Drivers are model associations (SHAP), not proof of cause."
+ ]
+}

@@ -1,0 +1,6 @@
+# Weekly India forecast run (GitHub Actions workflow india-weekly on main)
+lightgbm==4.7.0
+numpy==2.5.3
+pandas==3.0.5
+pyarrow==26.0.0
+requests==2.34.2
