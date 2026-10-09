@@ -20,7 +20,7 @@ class Boundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   static getDerivedStateFromError() { return { failed: true }; }
   override render() { return this.state.failed ? <p className="drawer-empty">The map could not be loaded.</p> : this.props.children; }
 }
-export const scenarioMetaQuery = (disease: string) => ({ queryKey: ['scenarios', 'meta', disease], queryFn: () => getScenarioMeta({ data: { disease } }), staleTime: 60_000 });
+export const scenarioMetaQuery = (disease: string) => ({ queryKey: ['scenarios', 'meta', disease], queryFn: () => getScenarioMeta({ data: { disease } }), staleTime: 60_000, refetchInterval: 120_000 });
 const axis = { tick: { fill: 'var(--muted-foreground)', fontSize: 11 }, stroke: 'var(--border)' };
 const bandIndex = (p: number | null) => { const l = riskFromProbability(p); return l ? RISK_SCALE.findIndex(r => r.label === l) : 4; };
 

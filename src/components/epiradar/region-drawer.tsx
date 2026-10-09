@@ -12,6 +12,7 @@ import { formatNumber, formatProbability, riskLabel } from '@/lib/surveillance';
 import { getLastSeason, getPredictionDrivers, getRegionForecast, getRegionSummary } from '@/lib/region.functions';
 import { buildForecastSeries, estimatedAdmissions, RECOMMENDED_ACTIONS, seasonStats, type ChartPoint } from '@/lib/region';
 import { RiskBadge, WeatherAgo } from './risk-workspace';
+import { isClimateFamily } from '@/lib/trust';
 import { getCasesClimate, getRegionWeather } from '@/lib/weather.functions';
 import { weatherSentence, type WeatherDay } from '@/lib/weather';
 
@@ -80,8 +81,8 @@ function Drivers({ prediction }: { prediction: string | null | undefined }) {
   const max = Math.max(...q.data.map(d => Math.abs(d.contribution ?? 0)), 1e-9);
   return <><ul className="driver-list">{q.data.map(d => {
     const v = d.contribution ?? 0; const width = `${(Math.abs(v) / max) * 50}%`;
-    return <li key={d.rank}><div className="driver-text"><span>{d.label ?? 'Unnamed driver'}</span><small>{d.family ?? '—'}</small></div>
-      <div className="driver-bar" aria-label={`${v >= 0 ? 'Raises' : 'Lowers'} risk by ${v.toFixed(3)}`}><span className={v >= 0 ? 'driver-up' : 'driver-down'} style={v >= 0 ? { left: '50%', width } : { right: '50%', width }} /></div>
+    return <li key={d.rank}><div className="driver-text"><span>{d.label ?? 'Unnamed driver'}</span><small>{d.family ?? '—'}{isClimateFamily(d.family) && <span className="climate-tag">climate</span>}</small></div>
+      <div className="driver-bar" aria-label={`${v >= 0 ? 'Raises' : 'Lowers'} risk by ${v.toFixed(3)}`}><span className={`${v >= 0 ? 'driver-up' : 'driver-down'} ${isClimateFamily(d.family) ? 'driver-climate' : ''}`} style={v >= 0 ? { left: '50%', width } : { right: '50%', width }} /></div>
       <span className="driver-value">{v >= 0 ? 'raises risk' : 'lowers risk'} · {v > 0 ? '+' : ''}{v.toFixed(3)}</span></li>;
   })}</ul><p className="drawer-caption">Contributions are SHAP values from the model. They explain the model's reasoning, not proven causes.</p></>;
 }
