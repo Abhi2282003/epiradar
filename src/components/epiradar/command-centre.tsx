@@ -4,11 +4,11 @@ import { useSearch, useRouter, type ErrorComponentProps } from '@tanstack/react-
 import { Activity, ArrowUpRight, Bell, MapPin, RefreshCw, ShieldCheck, TrendingUp, Users } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { PAGE_DETAILS, validateContext } from '@/lib/epiradar';
 import { surveillanceQuery } from '@/lib/surveillance-query';
 import { commandMetrics, fastestBuilding, formatNumber, formatProbability, joinMunicipalities, type LiveEvent } from '@/lib/surveillance';
 import { RiskWorkspace } from './risk-workspace';
+import { useReplayEvents } from '@/lib/live-store';
 
 function RelativeTime({ ts }: { ts: string | null }) {
   const [now, setNow] = useState<number | null>(null);
@@ -29,15 +29,7 @@ export function SurveillanceError({ reset }: ErrorComponentProps) {
 export function SurveillancePage({ kind }: { kind: 'command' | 'map' }) {
   const context = validateContext(useSearch({ strict: false }));
   const { data, isFetching, error, refetch } = useSuspenseQuery(surveillanceQuery(context.disease, context.horizon));
-  const client = useQueryClient();
-  useEffect(() => {
-    const channel = supabase.channel('epiradar-surveillance');
-    for (const table of ['predictions', 'alerts', 'live_events', 'data_sources']) {
-      channel.on('postgres_changes', { event: '*', schema: 'public', table }, () => { void client.invalidateQueries({ queryKey: ['surveillance'] }); });
-    }
-    channel.subscribe();
-    return () => { void supabase.removeChannel(channel); };
-  }, [client]);
+  const replayEvents = useReplayEvents();
   const rows = joinMunicipalities(data.regions, data.predictions);
   const metrics = commandMetrics(rows);
   const fastest = fastestBuilding(rows, data.baseline);
@@ -61,7 +53,7 @@ export function SurveillancePage({ kind }: { kind: 'command' | 'map' }) {
       <RiskWorkspace rows={rows} fullHeight={kind === 'map'} forecastError={data.errors.forecasts} />
       {kind === 'command' && <aside className="command-insights"><section className="panel"><div className="panel-header"><div><h2>Risk building fastest</h2><p className="panel-subtitle">1 week → {context.horizon} {context.horizon === 1 ? 'week' : 'weeks'} · same forecast issue</p></div><TrendingUp /></div>
         {fastest.length ? <ol className="fastest-list">{fastest.map(row => <li key={row.region.id}><Button variant="link" asChild><a href={`/?${new URLSearchParams({ disease: context.disease, horizon: String(context.horizon), region: row.region.id })}`}>{row.region.name}<ArrowUpRight /></a></Button><div><span>{formatProbability(row.baseline)} <span className="text-muted-foreground">→</span> <strong>{formatProbability(row.prediction?.outbreak_prob)}</strong></span><span className="risk-increase">+{Math.round(row.increase * 100)} pp</span></div></li>)}</ol> : <div className="insight-empty"><TrendingUp /><h3>{data.errors.forecasts ? 'Forecasts unavailable' : context.horizon === 1 ? 'Select a longer horizon' : 'No rising risk signals yet'}</h3><p>{context.horizon === 1 ? 'Risk increases compare the 1-week forecast with a longer horizon.' : data.baseline.length && forecastsLoaded ? 'No increases found among forecasts from the same issue week and model version.' : 'The five fastest-building risks will appear when matching 1-week and selected-horizon predictions are loaded.'}</p></div>}
-      </section><section className="panel"><div className="panel-header"><div><h2>Live event feed</h2><p className="panel-subtitle">Latest pipeline and surveillance events</p></div><Activity /></div>{data.events.length ? <ul className="event-feed">{data.events.map(event => <EventRow key={event.id} event={event} />)}</ul> : <div className="insight-empty"><Activity /><h3>{data.errors.events ? 'Events could not be retrieved' : 'No live events loaded'}</h3><p>Pipeline activity and surveillance updates will appear here as real events arrive.</p></div>}</section></aside>}
+      </section><section className="panel"><div className="panel-header"><div><h2>Live event feed</h2><p className="panel-subtitle">Latest pipeline and surveillance events</p></div><Activity /></div>{data.events.length || replayEvents.length ? <ul className="event-feed">{replayEvents.map(event => <li key={event.id} className="event-row"><span className="event-dot" /><div><div className="event-meta"><span className="replay-tag">REPLAY</span><RelativeTime ts={event.ts} /></div><p>{event.message}</p></div></li>)}{data.events.map(event => <EventRow key={event.id} event={event} />)}</ul> : <div className="insight-empty"><Activity /><h3>{data.errors.events ? 'Events could not be retrieved' : 'No live events loaded'}</h3><p>Pipeline activity and surveillance updates will appear here as real events arrive.</p></div>}</section></aside>}
     </div><footer className="page-footer"><span><ShieldCheck className="size-3" />DECISION SUPPORT · NOT A CLINICAL DIAGNOSIS</span><span>MODEL ASSOCIATIONS · NOT PROOF OF CAUSE</span></footer>
   </>;
 }

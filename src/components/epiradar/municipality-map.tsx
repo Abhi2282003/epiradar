@@ -7,6 +7,7 @@ import { formatNumber, formatProbability, riskLabel, type Municipality } from '@
 import { RISK_SCALE } from '@/lib/epiradar';
 import { Button } from '@/components/ui/button';
 import { LocateFixed } from 'lucide-react';
+import { usePulsingRegions } from '@/lib/live-store';
 import mapWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 
 function cssColor(token: string) {
@@ -19,7 +20,9 @@ function cssColor(token: string) {
   const pixel = ctx.getImageData(0, 0, 1, 1).data;
   return `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
 }
-export default function MunicipalityMap({ rows, selected, onSelect }: { rows: Municipality[]; selected?: string | undefined; onSelect: (id: string) => void }) {
+export default function MunicipalityMap({ rows, selected, onSelect, outlined, tooltip, label }: { rows: Municipality[]; selected?: string | undefined; onSelect: (id: string) => void; outlined?: Set<string> | undefined; tooltip?: ((row: Municipality) => string[]) | undefined; label?: string | undefined }) {
+  const pulsing = usePulsingRegions();
+  const tooltipRef = useRef(tooltip); tooltipRef.current = tooltip;
   const { data: boundaries } = useSuspenseQuery(boundariesQuery);
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -66,6 +69,8 @@ export default function MunicipalityMap({ rows, selected, onSelect }: { rows: Mu
         const color: ExpressionSpecification = ['match', ['get', 'risk'], RISK_SCALE[0].label, cssColor('--risk-low'), RISK_SCALE[1].label, cssColor('--risk-moderate'), RISK_SCALE[2].label, cssColor('--risk-high'), RISK_SCALE[3].label, cssColor('--risk-very-high'), cssColor('--risk-no-data')];
         map.addLayer({ id: 'municipality-fill', type: 'fill', source: 'municipalities', paint: { 'fill-color': color, 'fill-opacity': 0.65 } });
         map.addLayer({ id: 'municipality-outline', type: 'line', source: 'municipalities', paint: { 'line-color': cssColor('--background'), 'line-width': 1 } });
+        map.addLayer({ id: 'municipality-actual', type: 'line', source: 'municipalities', filter: ['==', ['get', 'actual'], true], paint: { 'line-color': '#ffffff', 'line-width': 3 } });
+        map.addLayer({ id: 'municipality-pulse', type: 'line', source: 'municipalities', filter: ['==', ['get', 'pulse'], true], paint: { 'line-color': cssColor('--primary'), 'line-width': 4, 'line-opacity': 1 } });
         map.addLayer({ id: 'municipality-selected', type: 'line', source: 'municipalities', filter: ['==', ['get', 'region_id'], ''], paint: { 'line-color': cssColor('--primary'), 'line-width': 3 } });
         if (boundsRef.current) map.fitBounds(boundsRef.current, { padding: 32, duration: 0 });
         setError(false);
@@ -77,7 +82,7 @@ export default function MunicipalityMap({ rows, selected, onSelect }: { rows: Mu
         map.getCanvas().style.cursor = row ? 'pointer' : '';
         const node = document.createElement('div');
         const title = document.createElement('strong'); title.textContent = row?.region.name ?? String(event.features?.[0]?.properties?.['name'] ?? 'Municipality'); node.append(title);
-        const lines = row ? [
+        const lines = row ? tooltipRef.current ? tooltipRef.current(row) : [
           `${formatProbability(row.prediction?.outbreak_prob)} · ${riskLabel(row.prediction?.risk_level)}`,
           `Expected cases: ${formatNumber(row.prediction?.cases_p50)}`,
           `80% range: ${formatNumber(row.prediction?.cases_p10)}–${formatNumber(row.prediction?.cases_p90)}`,
@@ -110,11 +115,18 @@ export default function MunicipalityMap({ rows, selected, onSelect }: { rows: Mu
     const byCode = new Map(rows.map(row => [String(row.region.official_code), row]));
     source.setData({ ...boundaries, features: boundaries.features.map(feature => {
       const row = byCode.get(String(feature.properties.id));
-      return { ...feature, properties: { ...feature.properties, risk: riskLabel(row?.prediction?.risk_level), region_id: row?.region.id ?? '' } };
+      return { ...feature, properties: { ...feature.properties, risk: riskLabel(row?.prediction?.risk_level), region_id: row?.region.id ?? '', actual: !!row && !!outlined?.has(row.region.id), pulse: !!row && pulsing.includes(row.region.id) } };
     }) });
     map?.setFilter('municipality-selected', ['==', ['get', 'region_id'], selected ?? '']);
-  }, [rows, selected, boundaries, ready]);
-  return <div className="map-stage"><div ref={container} className="map-canvas" aria-label="Rio de Janeiro municipality outbreak risk map" />
+  }, [rows, selected, boundaries, ready, outlined, pulsing]);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!pulsing.length || !map?.getLayer('municipality-pulse') || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let on = true;
+    const timer = setInterval(() => { on = !on; map.setPaintProperty('municipality-pulse', 'line-opacity', on ? 1 : 0.15); }, 400);
+    return () => { clearInterval(timer); if (map.getLayer('municipality-pulse')) map.setPaintProperty('municipality-pulse', 'line-opacity', 1); };
+  }, [pulsing, ready]);
+  return <div className="map-stage"><div ref={container} className="map-canvas" aria-label={label ?? "Rio de Janeiro municipality outbreak risk map"} />
     <Button className="map-fit" variant="secondary" size="icon" title="Fit all municipalities" aria-label="Fit all municipalities" onClick={() => { if (boundsRef.current) mapRef.current?.fitBounds(boundsRef.current, { padding: 32, duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 500 }); }}><LocateFixed /></Button>
     {error && <div className="map-message" role="alert">Map tiles could not load. Municipality data remains available in Table view.</div>}
   </div>;
