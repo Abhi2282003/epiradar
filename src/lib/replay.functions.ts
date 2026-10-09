@@ -2,7 +2,7 @@ import { createServerFn } from '@tanstack/react-start';
 import { createClient } from '@supabase/supabase-js';
 import type { Database, Json } from '@/integrations/supabase/types';
 
-function publicClient() {
+export function publicClient() {
   const url = process.env['SUPABASE_URL'];
   const key = process.env['SUPABASE_PUBLISHABLE_KEY'];
   if (!url || !key) throw new Error('Public data connection is not configured.');

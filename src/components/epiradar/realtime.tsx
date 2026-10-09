@@ -10,9 +10,9 @@ import type { Prediction, Region } from '@/lib/surveillance';
 type SurveillanceCache = { regions: Region[]; predictions: Prediction[] };
 const TABLE_KEYS: Record<string, string[][]> = {
   predictions: [['surveillance'], ['region-summary'], ['region-forecast'], ['drivers']],
-  alerts: [['surveillance']],
+  alerts: [['surveillance'], ['open-alerts']],
   live_events: [['surveillance']],
-  data_sources: [['surveillance'], ['freshness']],
+  data_sources: [['surveillance'], ['freshness'], ['trust']],
 };
 
 /** One app-wide realtime subscription; batches bursts from the pipeline into one refresh and one toast. */
