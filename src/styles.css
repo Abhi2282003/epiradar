@@ -44,6 +44,8 @@
   --risk-high: oklch(0.577 0.245 27.33);
   --risk-very-high: oklch(0.459 0.187 3.82);
   --risk-no-data: oklch(0.554 0.046 257.42);
+  --rain-0: oklch(0.93 0.03 230); --rain-1: oklch(0.82 0.08 230); --rain-2: oklch(0.69 0.12 235); --rain-3: oklch(0.55 0.14 245); --rain-4: oklch(0.42 0.14 255);
+  --suit-0: oklch(0.93 0.05 150); --suit-1: oklch(0.85 0.12 110); --suit-2: oklch(0.78 0.15 75); --suit-3: oklch(0.66 0.18 45); --suit-4: oklch(0.52 0.19 25);
   --status-ok: oklch(0.72 0.17 150);
 }
 :root[data-theme='light'] {
@@ -328,3 +330,14 @@ h1 { font-size: 29px; font-weight: 600; line-height: 1.3; margin: 0 0 9px; }
 .alert-list { display: grid; gap: 12px; }
 .alert-list li { border-top: 1px solid var(--border); padding-top: 10px; display: grid; gap: 4px; font-size: 12px; }
 .alert-row-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+
+.layer-switch { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 12px; }
+.layer-switch select { background: var(--card); color: var(--foreground); border: 1px solid var(--border); border-radius: 7px; padding: 5px 8px; font-size: 12px; }
+.layer-status { display: inline-flex; gap: 8px; align-items: center; font-family: var(--font-mono, ui-monospace, monospace); font-size: 11px; color: var(--muted-foreground); margin-left: auto; }
+.rain-0 { background: var(--rain-0); } .rain-1 { background: var(--rain-1); } .rain-2 { background: var(--rain-2); } .rain-3 { background: var(--rain-3); } .rain-4 { background: var(--rain-4); }
+.suit-0 { background: var(--suit-0); } .suit-1 { background: var(--suit-1); } .suit-2 { background: var(--suit-2); } .suit-3 { background: var(--suit-3); } .suit-4 { background: var(--suit-4); }
+.weather-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-bottom: 12px; }
+.weather-stats div { border: 1px solid var(--border); border-radius: 10px; padding: 10px; }
+.weather-stats span { display: block; font-size: 11px; color: var(--muted-foreground); }
+.weather-stats strong { font-variant-numeric: tabular-nums; font-size: 16px; }
+@media (max-width: 560px) { .weather-stats { grid-template-columns: repeat(2, minmax(0,1fr)); } }
