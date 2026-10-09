@@ -7,6 +7,8 @@ import { useQuery } from '@tanstack/react-query';
 import { DISEASES, validateContext } from '@/lib/epiradar';
 import { getRegionList } from '@/lib/region.functions';
 import { RegionDrawer } from './region-drawer';
+import { LivePill, useRealtimeUpdates } from './realtime';
+import { Toaster } from '@/components/ui/sonner';
 const navigation = [
   { to: '/', label: 'Command centre', icon: LayoutDashboard },
   { to: '/map', label: 'Map', icon: Map },
@@ -22,6 +24,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [light, setLight] = useState(false);
+  useRealtimeUpdates();
   const regions = useQuery({ queryKey: ['region-list'], queryFn: () => getRegionList(), enabled: paletteOpen, staleTime: 300_000 });
   const matches = (regions.data ?? []).filter(r => r.name.toLowerCase().includes(query.trim().toLowerCase())).slice(0, 12);
   const openRegion = (region: string) => { setPaletteOpen(false); setQuery(''); void navigate({ to: '.', search: (prev: Record<string, unknown>) => ({ ...validateContext(prev), region }) } as never); };
@@ -59,10 +62,11 @@ export function AppShell({ children }: { children: ReactNode }) {
         <label className="context-control"><span className="control-label">DISEASE</span><span className="select-wrap"><select aria-label="Disease" value={context.disease} onChange={event => navigate({ search: prev => ({ ...prev, disease: event.target.value, horizon: context.horizon }) })}>{DISEASES.map(disease => <option key={disease}>{disease}</option>)}</select><ChevronDown /></span></label>
         <div className="topbar-divider" />
         <label className="context-control"><span className="control-label">FORECAST HORIZON</span><span className="select-wrap"><select aria-label="Forecast horizon" value={context.horizon} onChange={event => navigate({ search: prev => ({ ...prev, disease: context.disease, horizon: Number(event.target.value) }) })}>{Array.from({ length: 8 }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1} {i === 0 ? 'week' : 'weeks'} ahead</option>)}</select><ChevronDown /></span></label>
-        <div className="topbar-tools"><Button variant="ghost" className="search-trigger" aria-label="Search regions" onClick={() => setPaletteOpen(true)}><Search /><span className="search-label">Search regions</span><kbd>⌘ K</kbd></Button><span className="live-pill" title="Live monitoring — forecasts refresh as data arrives"><span className="status-dot" />LIVE</span></div>
+        <div className="topbar-tools"><Button variant="ghost" className="search-trigger" aria-label="Search regions" onClick={() => setPaletteOpen(true)}><Search /><span className="search-label">Search regions</span><kbd>⌘ K</kbd></Button><LivePill /></div>
       </header>
       <main id="main-content" className="content">{children}</main>
       <RegionDrawer />
+      <Toaster position="bottom-right" />
     </div>
     <Dialog open={paletteOpen} onOpenChange={setPaletteOpen}><DialogContent><DialogTitle className="flex items-center gap-2"><Command className="size-5 text-primary" />Region search</DialogTitle><DialogDescription>Open a municipality to see its forecast, drivers and weather.</DialogDescription><input className="palette-input" aria-label="Search for a region" placeholder="Search for a region…" value={query} onChange={event => setQuery(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && matches[0]) openRegion(matches[0].id); }} />{regions.isPending ? <div className="palette-empty"><p>Loading municipalities…</p></div> : regions.isError ? <div className="palette-empty"><p>Municipalities could not be retrieved.</p></div> : matches.length ? <ul className="palette-results">{matches.map(r => <li key={r.id}><button type="button" onClick={() => openRegion(r.id)}><span>{r.name}</span><small>{r.admin1}</small></button></li>)}</ul> : <div className="palette-empty"><Search className="size-6" /><p>{regions.data?.length ? 'No municipalities match your search.' : 'No regions loaded yet.'}</p></div>}</DialogContent></Dialog>
   </div>;
