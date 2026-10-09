@@ -15,6 +15,7 @@ import { Route as MapRouteImport } from './routes/map'
 import { Route as ReplayRouteImport } from './routes/replay'
 import { Route as ScenariosRouteImport } from './routes/scenarios'
 import { Route as TrustRouteImport } from './routes/trust'
+import { Route as ApiPublicIngestRouteImport } from './routes/api/public/ingest'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const TrustRoute = TrustRouteImport.update({
   path: '/trust',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicIngestRoute = ApiPublicIngestRouteImport.update({
+  id: '/api/public/ingest',
+  path: '/api/public/ingest',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/replay': typeof ReplayRoute
   '/scenarios': typeof ScenariosRoute
   '/trust': typeof TrustRoute
+  '/api/public/ingest': typeof ApiPublicIngestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/replay': typeof ReplayRoute
   '/scenarios': typeof ScenariosRoute
   '/trust': typeof TrustRoute
+  '/api/public/ingest': typeof ApiPublicIngestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,14 +79,36 @@ export interface FileRoutesById {
   '/replay': typeof ReplayRoute
   '/scenarios': typeof ScenariosRoute
   '/trust': typeof TrustRoute
+  '/api/public/ingest': typeof ApiPublicIngestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/alerts' | '/map' | '/replay' | '/scenarios' | '/trust'
+  fullPaths:
+    | '/'
+    | '/alerts'
+    | '/map'
+    | '/replay'
+    | '/scenarios'
+    | '/trust'
+    | '/api/public/ingest'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/alerts' | '/map' | '/replay' | '/scenarios' | '/trust'
+  to:
+    | '/'
+    | '/alerts'
+    | '/map'
+    | '/replay'
+    | '/scenarios'
+    | '/trust'
+    | '/api/public/ingest'
   id:
-    '__root__' | '/' | '/alerts' | '/map' | '/replay' | '/scenarios' | '/trust'
+    | '__root__'
+    | '/'
+    | '/alerts'
+    | '/map'
+    | '/replay'
+    | '/scenarios'
+    | '/trust'
+    | '/api/public/ingest'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -88,6 +118,7 @@ export interface RootRouteChildren {
   ReplayRoute: typeof ReplayRoute
   ScenariosRoute: typeof ScenariosRoute
   TrustRoute: typeof TrustRoute
+  ApiPublicIngestRoute: typeof ApiPublicIngestRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -134,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrustRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/ingest': {
+      id: '/api/public/ingest'
+      path: '/api/public/ingest'
+      fullPath: '/api/public/ingest'
+      preLoaderRoute: typeof ApiPublicIngestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -144,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReplayRoute: ReplayRoute,
   ScenariosRoute: ScenariosRoute,
   TrustRoute: TrustRoute,
+  ApiPublicIngestRoute: ApiPublicIngestRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
