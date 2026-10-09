@@ -21,3 +21,4 @@
 - Preserve municipality selection, map/table mode and table sorting in validated URL context so both surveillance views remain shareable.
 - Compare forecast horizons only within the same issue week and model version, and leave incomplete aggregates unavailable rather than treating unknown values as zero.
 - One app-wide realtime subscription in the shell batches pipeline bursts into a single refresh/toast; replay events and pulses live only in browser memory, never the database.
+- Live weather enters only through the throttled public route /api/public/refresh-weather (Open-Meteo batches, 30-min throttle, scheduled every 6 h); weather aggregation and suitability live in one browser-safe module shared with tests.
