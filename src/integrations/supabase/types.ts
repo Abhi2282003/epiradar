@@ -1043,8 +1043,13 @@ export type Database = {
       ep_load_bt2: { Args: { p: Json }; Returns: number }
       ep_load_countries: { Args: { p: Json }; Returns: number }
       ep_load_fc: { Args: { p: Json }; Returns: number }
+      ep_load_india_burden: { Args: { p: Json }; Returns: number }
+      ep_load_india_districts: { Args: { p: Json }; Returns: number }
+      ep_load_india_states: { Args: { p: Json }; Returns: number }
       ep_load_series: { Args: { p: Json }; Returns: number }
       ep_load_series2: { Args: { p: Json }; Returns: number }
+      ep_load_series3: { Args: { p: Json }; Returns: number }
+      ep_poly_arcs: { Args: { s: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never
