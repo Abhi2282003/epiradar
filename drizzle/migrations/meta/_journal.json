@@ -8,6 +8,13 @@
       "when": 1791529902134,
       "tag": "0000_epiradar_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791534513648,
+      "tag": "0001_weather_now",
+      "breakpoints": true
     }
   ]
 }
