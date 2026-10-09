@@ -45,7 +45,9 @@ async function refresh() {
       batch.forEach((d, j) => rows.push({ district_id: d.id, updated_at: now, ...aggregateIndia(results[j]?.daily ?? {}, today) }));
     } catch (e) { failure = e instanceof Error ? e.message : String(e); break; }
   }
-  // Batches fetched before a failure are saved; districts not reached keep their previous rows.
+  // On a rate limit (HTTP 429) nothing is written, so every district keeps its last good row.
+  // Other failures save batches already fetched; districts not reached keep their previous rows.
+  if (failure?.includes('HTTP 429')) rows.length = 0;
   if (rows.length) {
     const up = await db.from('india_district_weather').upsert(rows as never, { onConflict: 'district_id' });
     if (up.error) return json({ error: 'Weather rows could not be saved', detail: up.error.message }, 500);
