@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AlertsRouteImport } from './routes/alerts'
 import { Route as BrazilRouteImport } from './routes/brazil'
+import { Route as IndiaRouteImport } from './routes/india'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as ReplayRouteImport } from './routes/replay'
 import { Route as ScenariosRouteImport } from './routes/scenarios'
@@ -37,6 +38,11 @@ const AlertsRoute = AlertsRouteImport.update({
 const BrazilRoute = BrazilRouteImport.update({
   id: '/brazil',
   path: '/brazil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndiaRoute = IndiaRouteImport.update({
+  id: '/india',
+  path: '/india',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MapRoute = MapRouteImport.update({
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/alerts': typeof AlertsRoute
   '/brazil': typeof BrazilRoute
+  '/india': typeof IndiaRoute
   '/map': typeof MapRoute
   '/replay': typeof ReplayRoute
   '/scenarios': typeof ScenariosRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/alerts': typeof AlertsRoute
   '/brazil': typeof BrazilRoute
+  '/india': typeof IndiaRoute
   '/map': typeof MapRoute
   '/replay': typeof ReplayRoute
   '/scenarios': typeof ScenariosRoute
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/alerts': typeof AlertsRoute
   '/brazil': typeof BrazilRoute
+  '/india': typeof IndiaRoute
   '/map': typeof MapRoute
   '/replay': typeof ReplayRoute
   '/scenarios': typeof ScenariosRoute
@@ -152,6 +161,7 @@ export interface FileRouteTypes {
     | '/'
     | '/alerts'
     | '/brazil'
+    | '/india'
     | '/map'
     | '/replay'
     | '/scenarios'
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/'
     | '/alerts'
     | '/brazil'
+    | '/india'
     | '/map'
     | '/replay'
     | '/scenarios'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/'
     | '/alerts'
     | '/brazil'
+    | '/india'
     | '/map'
     | '/replay'
     | '/scenarios'
@@ -201,6 +213,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AlertsRoute: typeof AlertsRoute
   BrazilRoute: typeof BrazilRoute
+  IndiaRoute: typeof IndiaRoute
   MapRoute: typeof MapRoute
   ReplayRoute: typeof ReplayRoute
   ScenariosRoute: typeof ScenariosRoute
@@ -235,6 +248,13 @@ declare module '@tanstack/react-router' {
       path: '/brazil'
       fullPath: '/brazil'
       preLoaderRoute: typeof BrazilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/india': {
+      id: '/india'
+      path: '/india'
+      fullPath: '/india'
+      preLoaderRoute: typeof IndiaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/map': {
@@ -321,6 +341,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AlertsRoute: AlertsRoute,
   BrazilRoute: BrazilRoute,
+  IndiaRoute: IndiaRoute,
   MapRoute: MapRoute,
   ReplayRoute: ReplayRoute,
   ScenariosRoute: ScenariosRoute,
