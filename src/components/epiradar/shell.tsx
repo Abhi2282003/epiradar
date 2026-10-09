@@ -15,7 +15,7 @@ const navigation = [
 export function AppShell({ children }: { children: ReactNode }) {
   const search = useSearch({ strict: false });
   const context = validateContext(search);
-  const navigate = useNavigate({ from: '__root__' });
+  const navigate = useNavigate({ from: '/' });
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [light, setLight] = useState(false);
