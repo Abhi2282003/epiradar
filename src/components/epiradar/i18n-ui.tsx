@@ -27,3 +27,9 @@ export function DataBadge({ kind }: { kind: BadgeKind }) {
     <button type="button" className={`data-badge data-badge-${kind}`}>{t(`badge.${kind}` as Key)}<Info className="size-3" /></button>
   </TooltipTrigger><TooltipContent className="max-w-72">{t(`badge.${kind}.tip` as Key)}</TooltipContent></Tooltip></TooltipProvider>;
 }
+
+/** Localised risk level label (input is the English band name). */
+export function RiskName({ label }: { label: string }) {
+  const t = useT();
+  return <>{t.lang === 'en' ? label : t(`risk.${label}` as Key) ?? label}</>;
+}
