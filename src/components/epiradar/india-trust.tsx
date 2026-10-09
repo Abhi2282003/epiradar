@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { AlertTriangle } from 'lucide-react';
 import { indiaModelCardQuery, indiaOverviewQuery } from '@/lib/india-query';
 import { INDIA_DISEASES, SUITABILITY_FORMULAS, indiaToday, yearsInfo } from '@/lib/india';
@@ -33,7 +33,12 @@ function IndiaModelCard() {
   if (q.isPending) return <p className="sub">{t('common.loading')}</p>;
   if (q.isError) return <p className="sub">{t('common.error')}</p>;
   if (!card) return <div className="forecast-notice">{t('tm.noCard')}</div>;
-  const yMin = metric === 'roc' ? 0.5 : 0;
+  const yDomain: [number, number | 'auto'] = metric === 'roc' ? [0.5, 1] : [0, 'auto'];
+  const cold = (Array.isArray(card['cold_start']) ? card['cold_start'] as { disease: string; group: string; share_outbreaks?: number; 'climate+history'?: number | null; 'history only'?: number | null; 'climate only'?: number | null }[] : [])
+    .filter(r => r.group === 'no earlier outbreak' && isFcDisease(r.disease));
+  const coldChart = cold.map(r => ({ disease: t(DISEASE_FC_KEY[r.disease as FcDisease]), share: r.share_outbreaks ?? null, 'climate+history': r['climate+history'] ?? null, 'history only': r['history only'] ?? null, 'climate only': r['climate only'] ?? null }));
+  const ka = card['karnataka_weekly'] as { summary?: { h: number; variant: string; pr_auc: number; roc_auc: number }[] } | undefined;
+  const kaChart = [2, 4, 6, 8].map(h => Object.fromEntries([['h', h], ...['cases+climate', 'cases only', 'persistence', 'seasonal baseline'].map(v => [v, ka?.summary?.find(x => x.h === h && x.variant === v)?.roc_auc ?? null])]));
   return <>
     {limits.length > 0 && <section className="limitations" aria-label={t('trust.india.limits')}><AlertTriangle /><div><h2>{t('trust.india.limits')}</h2><ul>{limits.map(c => <li key={c}>{c}</li>)}</ul></div></section>}
     <section className="replay-card"><h2>{t('tm.title')}</h2><p className="sub">{t('tm.sub')}</p>
@@ -43,7 +48,7 @@ function IndiaModelCard() {
     <section className="replay-card mt-4"><div className="panel-title-row"><div><h2>{t('tm.ablation')}</h2><p className="sub">{t('tm.ablationSub')}</p></div>
       <div className="view-toggle">{(['roc', 'pr', 'top'] as const).map(k => <button key={k} type="button" className={metric === k ? 'bg-secondary rounded px-2' : 'px-2'} aria-pressed={metric === k} onClick={() => setMetric(k)}>{k === 'roc' ? 'ROC-AUC' : k === 'pr' ? 'PR-AUC' : t('tm.colTop')}</button>)}</div></div>
       <div className="h-72 mt-2"><ResponsiveContainer><BarChart data={chart} margin={{ left: -12, right: 8 }}>
-        <CartesianGrid stroke="var(--border)" vertical={false} /><XAxis dataKey="disease" {...axis} /><YAxis domain={[yMin, 'auto']} {...axis} tickFormatter={v => metric === 'top' ? `${Math.round(v * 100)}%` : Number(v).toFixed(2)} />
+        <CartesianGrid stroke="var(--border)" vertical={false} /><XAxis dataKey="disease" {...axis} /><YAxis domain={yDomain} allowDataOverflow {...axis} tickFormatter={v => metric === 'top' ? `${Math.round(v * 100)}%` : Number(v).toFixed(2)} />
         <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', fontSize: 12 }} formatter={v => typeof v === 'number' ? (metric === 'top' ? `${(v * 100).toFixed(1)}%` : v.toFixed(3)) : '—'} />
         <Legend wrapperStyle={{ fontSize: 11 }} />
         <Bar name={t('tm.v.full')} dataKey="climate+history" fill="var(--primary)" isAnimationActive={false} />
@@ -52,6 +57,28 @@ function IndiaModelCard() {
         <Bar name={t('tm.v.seasonal')} dataKey="seasonal history (baseline)" fill="var(--risk-no-data)" isAnimationActive={false} />
       </BarChart></ResponsiveContainer></div>
     </section>
+    {coldChart.length > 0 && <section className="replay-card mt-4"><h2>{t('tm.cold')}</h2><p className="sub">{t('tm.coldSub')}</p>
+      <div className="h-64 mt-2"><ResponsiveContainer><BarChart data={coldChart} margin={{ left: -12, right: 8 }}>
+        <CartesianGrid stroke="var(--border)" vertical={false} /><XAxis dataKey="disease" {...axis} /><YAxis domain={[0.5, 1]} allowDataOverflow {...axis} tickFormatter={v => Number(v).toFixed(2)} />
+        <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', fontSize: 12 }} formatter={v => typeof v === 'number' ? v.toFixed(3) : '—'} />
+        <Legend wrapperStyle={{ fontSize: 11 }} />
+        <Bar name={t('tm.v.full')} dataKey="climate+history" fill="var(--primary)" isAnimationActive={false} />
+        <Bar name={t('tm.v.hist')} dataKey="history only" fill="var(--muted-foreground)" isAnimationActive={false} />
+        <Bar name={t('tm.v.clim')} dataKey="climate only" fill="var(--rain-3)" isAnimationActive={false} />
+      </BarChart></ResponsiveContainer></div>
+      <p className="sub">{coldChart.map(r => `${r.disease}: ${t('tm.coldShare', { x: r.share == null ? '—' : Math.round(r.share * 100) })}`).join(' · ')}</p>
+    </section>}
+    {kaChart.some(r => r['cases+climate'] != null) && <section className="replay-card mt-4"><h2>{t('tm.ka')}</h2><p className="sub">{t('tm.kaSub')}</p>
+      <div className="h-64 mt-2"><ResponsiveContainer><LineChart data={kaChart} margin={{ left: -12, right: 8 }}>
+        <CartesianGrid stroke="var(--border)" vertical={false} /><XAxis dataKey="h" {...axis} tickFormatter={h => t('tm.weeks', { n: h })} /><YAxis domain={[0.6, 0.9]} allowDataOverflow {...axis} tickFormatter={v => Number(v).toFixed(2)} />
+        <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', fontSize: 12 }} labelFormatter={h => t('tm.weeks', { n: Number(h) })} formatter={v => typeof v === 'number' ? v.toFixed(3) : '—'} />
+        <Legend wrapperStyle={{ fontSize: 11 }} />
+        <Line name={t('tm.ka.cc')} dataKey="cases+climate" stroke="var(--primary)" strokeWidth={2.5} isAnimationActive={false} />
+        <Line name={t('tm.ka.c')} dataKey="cases only" stroke="var(--muted-foreground)" strokeWidth={2} isAnimationActive={false} />
+        <Line name={t('tm.ka.p')} dataKey="persistence" stroke="var(--risk-moderate)" strokeDasharray="5 4" isAnimationActive={false} />
+        <Line name={t('tm.ka.s')} dataKey="seasonal baseline" stroke="var(--risk-no-data)" strokeDasharray="2 3" isAnimationActive={false} />
+      </LineChart></ResponsiveContainer></div>
+    </section>}
     {tiers && <section className="replay-card mt-4"><h2>{t('tm.levels')}</h2><p className="sub">{t('tm.levelsSub')}</p>
       <div className="municipality-table-wrap mt-2"><table className="municipality-table"><thead><tr><th>{t('tm.colDisease')}</th>{(['very_high', 'high', 'moderate', 'low'] as Tier[]).map(k => <th key={k}><TierBadge tier={k} /></th>)}<th>{t('tm.colBase')}</th></tr></thead>
         <tbody>{FC_DISEASES.map(d => { const s = tiers[`${d}|1`]; return s ? <tr key={d}><td>{t(DISEASE_FC_KEY[d])}</td>{(['very_high', 'high', 'moderate', 'low'] as Tier[]).map(k => <td key={k}>{p0(s.levels?.[k]?.outbreak_rate ?? undefined)}</td>)}<td>{p0(s.base_rate)}</td></tr> : null; })}</tbody></table></div>

@@ -64,7 +64,7 @@ export function IndiaDistrictDrawer({ districts, states }: { districts: District
               <div><dt>{t('dd.usual')}</dt><dd>{pctText(sel.typical_prob, 1)}</dd></div>
             </dl>
             <p className="sub mt-2">{isTier(sel.risk_level) && <TierBadge tier={sel.risk_level} />} {x == null ? t('fcx.noUsual') : t('fcx.vsUsual', { x: x >= 10 ? Math.round(x) : x.toFixed(1) })}{pp != null && Math.abs(pp) >= 0.5 ? ` · ${pp > 0 ? t('fcx.climateUp', { pp: pp.toFixed(1) }) : t('fcx.climateDown', { pp: Math.abs(pp).toFixed(1) })}` : ''}{sel.rank_india ? ` · ${t('dd.rank', { r: sel.rank_india, n: formatIN(districts.length) })}` : ''}</p>
-            {drivers.length > 0 && <><h4 className="dd-h4">{t('dd.drivers')}</h4><ul className="fc-drivers">{drivers.map((dr, i) => <DriverLine key={i} d={dr} inputs={inp} />)}</ul><p className="sub mt-1">{t('dd.driversNote')}</p></>}
+            {drivers.length > 0 && <><h4 className="dd-h4">{t('dd.drivers')}</h4><ul className="fc-drivers">{drivers.map((dr, i) => <DriverLine key={i} d={dr} inputs={inp} />)}</ul><p className="fc-note mt-1">{t('dd.driversNote')}</p></>}
           </section>}
           {inputs && <section className="drawer-section"><h3><CloudRain />{t('dd.inputs')}</h3><dl className="mini-stats">
             <div><dt>{t('dd.rain3m')}</dt><dd>{rain3 == null ? '—' : `${formatIN(rain3)} mm`}{rainPct != null && <small className="block text-muted-foreground">{t('dd.vsNormal', { x: `${rainPct > 0 ? '+' : ''}${Math.round(rainPct)}` })}</small>}</dd></div>
@@ -74,14 +74,14 @@ export function IndiaDistrictDrawer({ districts, states }: { districts: District
             <div><dt>{t('drawer.aedes')}</dt><dd>{aed == null ? '—' : aed.toFixed(2)}</dd></div>
             <div><dt>{t('drawer.anopheles')}</dt><dd>{ano == null ? '—' : ano.toFixed(2)}</dd></div>
             <div><dt>{t('dd.normal', { month: monthLabel(month, t.lang) })}</dt><dd>{nRain == null ? '—' : `${formatIN(nRain)} mm`} · {nT == null ? '—' : `${nT.toFixed(1)} °C`}</dd></div>
-          </dl><p className="sub mt-1">NASA POWER · {monthLabel(q.data?.issue_month, t.lang)}</p></section>}
+          </dl><p className="fc-note mt-1">NASA POWER · {monthLabel(q.data?.issue_month, t.lang)}</p></section>}
           <section className="drawer-section"><h3><ShieldCheck />{t('fcx.precautions')}</h3><Precautions disease={disease} tier={isTier(sel?.risk_level) ? sel!.risk_level : null} /></section>
           <section className="drawer-section"><div className="panel-title-row"><h3><History />{t('dd.history')}</h3><DataBadge kind="reported" /></div>
             {hist.total ? <>
               <p className="sub">{t('dd.outbreaks')}: {formatIN(hist.total)} · {t('term.cases')}: {formatIN(hist.cases)}</p>
               <div className="dd-charts"><div><p className="control-label">{t('dd.byYear')}</p><div className="h-36"><ResponsiveContainer><BarChart data={hist.yearRows} margin={{ left: -24, right: 4 }}><CartesianGrid stroke="var(--border)" vertical={false} /><XAxis dataKey="y" {...axis} tickFormatter={y => `'${String(y).slice(2)}`} interval={1} /><YAxis allowDecimals={false} {...axis} /><Tooltip {...tip} formatter={v => [v, t('dd.outbreaks')]} /><Bar dataKey="n" fill="var(--primary)" isAnimationActive={false} /></BarChart></ResponsiveContainer></div></div>
                 <div><p className="control-label">{t('dd.byMonth')}</p><div className="h-36"><ResponsiveContainer><BarChart data={hist.months} margin={{ left: -24, right: 4 }}><CartesianGrid stroke="var(--border)" vertical={false} /><XAxis dataKey="m" {...axis} tickFormatter={m => monthNames[Number(m) - 1] ?? ''} /><YAxis allowDecimals={false} {...axis} /><Tooltip {...tip} labelFormatter={m => monthLabel(`2000-${String(m).padStart(2, '0')}`, t.lang).replace(' 2000', '')} formatter={v => [v, t('dd.outbreaks')]} /><Bar dataKey="n" fill="var(--rain-3)" isAnimationActive={false} /></BarChart></ResponsiveContainer></div></div></div>
-              <p className="sub mt-1">IDSP weekly outbreak reports via EpiClim (2009–2022)</p></> : <p className="drawer-empty">{t('dd.noHistory')}</p>}
+              <p className="fc-note mt-1">IDSP weekly outbreak reports via EpiClim (2009–2022)</p></> : <p className="drawer-empty">{t('dd.noHistory')}</p>}
           </section>
         </>}
       </>}
