@@ -15,7 +15,7 @@ export type WorldMapProps = {
   selected?: string | undefined; onSelect: (iso3: string) => void; onLayerStatus: (key: string, ok: boolean) => void; onBoundaries: (ok: boolean) => void;
 };
 
-function cssColor(token: string) {
+export function cssColor(token: string) {
   const c = document.createElement('canvas'); c.width = c.height = 1;
   const ctx = c.getContext('2d'); const raw = getComputedStyle(document.documentElement).getPropertyValue(token).trim();
   if (!ctx) return raw;
@@ -27,7 +27,7 @@ const ALL_RASTERS = [...BASE_LAYERS, ...OVERLAYS];
 const rid = (l: RasterLayer) => `raster-${l.key}`;
 const WIND_TOKENS = ['--rain-1', '--primary', '--risk-moderate', '--risk-high'];
 
-function hatch(color: string) {
+export function hatch(color: string) {
   const size = 8; const c = document.createElement('canvas'); c.width = c.height = size;
   const ctx = c.getContext('2d')!; ctx.strokeStyle = color; ctx.lineWidth = 1.2;
   ctx.beginPath(); ctx.moveTo(0, size); ctx.lineTo(size, 0); ctx.stroke();
