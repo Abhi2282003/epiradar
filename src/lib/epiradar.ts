@@ -14,6 +14,10 @@ export function validateContext(search: Record<string, unknown>) {
   return {
     disease: typeof search['disease'] === 'string' && DISEASES.some(d => d === search['disease']) ? search['disease'] : 'Dengue',
     horizon: search['horizon'] == null ? 4 : normalizeHorizon(search['horizon']),
+    ...(typeof search['region'] === 'string' && search['region'].length <= 100 ? { region: search['region'] } : {}),
+    ...(search['view'] === 'table' ? { view: 'table' as const } : {}),
+    ...(typeof search['sort'] === 'string' && ['name', 'population', 'probability', 'level', 'cases'].includes(search['sort']) ? { sort: search['sort'] } : {}),
+    ...(search['desc'] === true || search['desc'] === 'true' ? { desc: true } : {}),
   };
 }
 export const PAGE_DETAILS = {
