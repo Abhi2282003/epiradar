@@ -12,8 +12,8 @@ export function normalizeHorizon(value: unknown) {
 }
 export function validateContext(search: Record<string, unknown>) {
   return {
-    disease: typeof search.disease === 'string' && DISEASES.some(d => d === search.disease) ? search.disease : 'Dengue',
-    horizon: search.horizon == null ? 4 : normalizeHorizon(search.horizon),
+    disease: typeof search['disease'] === 'string' && DISEASES.some(d => d === search['disease']) ? search['disease'] : 'Dengue',
+    horizon: search['horizon'] == null ? 4 : normalizeHorizon(search['horizon']),
   };
 }
 export const PAGE_DETAILS = {

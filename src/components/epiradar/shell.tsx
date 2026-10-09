@@ -15,14 +15,14 @@ const navigation = [
 export function AppShell({ children }: { children: ReactNode }) {
   const search = useSearch({ strict: false });
   const context = validateContext(search);
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: '__root__' });
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [light, setLight] = useState(false);
   useEffect(() => {
     const saved = localStorage.getItem('epiradar-theme') === 'light';
     setLight(saved);
-    document.documentElement.dataset.theme = saved ? 'light' : 'dark';
+    document.documentElement.dataset['theme'] = saved ? 'light' : 'dark';
     const shortcut = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault(); setPaletteOpen(open => !open);
@@ -33,7 +33,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, []);
   const toggleTheme = () => {
     const next = !light; setLight(next);
-    document.documentElement.dataset.theme = next ? 'light' : 'dark';
+    document.documentElement.dataset['theme'] = next ? 'light' : 'dark';
     localStorage.setItem('epiradar-theme', next ? 'light' : 'dark');
   };
   return <div className="app-shell">
