@@ -4,7 +4,6 @@ import { useSearch, useRouter, type ErrorComponentProps } from '@tanstack/react-
 import { Activity, ArrowUpRight, Bell, MapPin, RefreshCw, ShieldCheck, TrendingUp, Users } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { PAGE_DETAILS, validateContext } from '@/lib/epiradar';
 import { surveillanceQuery } from '@/lib/surveillance-query';
 import { commandMetrics, fastestBuilding, formatNumber, formatProbability, joinMunicipalities, type LiveEvent } from '@/lib/surveillance';
