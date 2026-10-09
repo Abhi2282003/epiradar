@@ -19,7 +19,7 @@ describe('year selection', () => {
 describe('helpers', () => {
   it('batches 100 per request', () => expect(chunk(Array.from({ length: 250 }), 100).map(c => c.length)).toEqual([100, 100, 50]));
   it('CFR is deaths per 100 cases', () => { expect(cfr(1000, 5)).toBe(0.5); expect(cfr(0, 1)).toBeNull(); });
-  it('weather older than 36 h is stale', () => { const now = Date.parse('2026-01-02T12:00:00Z'); expect(isStale('2026-01-01T00:00:00Z', now)).toBe(true); expect(isStale('2026-01-01T12:00:00Z', now)).toBe(false); });
+  it('weather older than 36 h is stale', () => { const now = Date.parse('2026-01-02T12:00:00Z'); expect(isStale('2026-12-31T23:00:00Z', Date.parse('2027-01-02T12:00:01Z'))).toBe(true); expect(isStale('2026-01-01T12:00:00Z', now)).toBe(false); });
   it('bins missing values as no data', () => { const b = quantileBreaks([1, 2, 3, 4, 5]); expect(binOf(null, b)).toBe(-1); expect(binOf(5, b)).toBe(4); });
   it('uses Indian digit grouping', () => expect(formatIN(1234567)).toBe('12,34,567'));
 });
