@@ -11,7 +11,10 @@ import { validateContext } from '@/lib/epiradar';
 import { formatNumber, formatProbability, riskLabel } from '@/lib/surveillance';
 import { getLastSeason, getPredictionDrivers, getRegionForecast, getRegionSummary } from '@/lib/region.functions';
 import { buildForecastSeries, estimatedAdmissions, RECOMMENDED_ACTIONS, seasonStats, type ChartPoint } from '@/lib/region';
-import { RiskBadge } from './risk-workspace';
+import { RiskBadge, WeatherAgo } from './risk-workspace';
+import { getCasesClimate, getRegionWeather } from '@/lib/weather.functions';
+import { weatherSentence, type WeatherDay } from '@/lib/weather';
+import { ReferenceArea } from 'recharts';
 
 const fmtDate = (value: string | null | undefined) => value ? new Date(`${value.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) : '—';
 const shortDate = (value: string) => new Date(`${value.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
@@ -111,6 +114,61 @@ function LiveWeather({ lat, lon }: { lat: number | null; lon: number | null }) {
   </>;
 }
 
+const axisTick = { fill: 'var(--muted-foreground)', fontSize: 10 };
+const one = (v: number | null | undefined, unit: string, d = 0) => v == null ? '—' : `${v.toFixed(d)}${unit}`;
+function WeatherSection({ region }: { region: string }) {
+  const q = useQuery({ queryKey: ['weather', 'region', region], queryFn: () => getRegionWeather({ data: { region } }), staleTime: 60_000 });
+  if (q.isPending) return <Skeleton className="h-64" />;
+  if (q.isError) return <Unavailable>Weather could not be retrieved.</Unavailable>;
+  const w = q.data;
+  if (!w) return <Unavailable>Daily weather will appear after the next Open-Meteo refresh for this municipality.</Unavailable>;
+  const days = (Array.isArray(w.daily) ? w.daily : []) as WeatherDay[];
+  const firstFc = days.find(d => d.forecast)?.date, lastDay = days[days.length - 1]?.date;
+  const sentence = weatherSentence(w);
+  return <>
+    <div className="weather-stats">
+      <div><span>Rain, last 7 days</span><strong>{one(w.rain_7d_mm, ' mm')}</strong></div>
+      <div><span>Rain, next 16 days</span><strong>{one(w.fc_rain_16d_mm, ' mm')}</strong></div>
+      <div><span>Mean temp, 7 days</span><strong>{one(w.tmean_7d, ' °C', 1)}</strong></div>
+      <div><span>Suitability</span><strong>{w.tsuit_7d == null ? '—' : `${Math.round(w.tsuit_7d * 100)}% of peak`}</strong></div>
+    </div>
+    {sentence && <p className="drawer-narrative">{sentence}</p>}
+    {days.length > 0 && <div className="h-56"><ResponsiveContainer width="100%" height="100%"><ComposedChart data={days} margin={{ top: 16, right: 0, bottom: 0, left: -16 }}>
+      <CartesianGrid stroke="var(--border)" vertical={false} />
+      {firstFc && lastDay && <ReferenceArea x1={firstFc} x2={lastDay} yAxisId="rain" fill="var(--muted-foreground)" fillOpacity={0.12} label={{ value: 'Forecast', position: 'insideTop', fill: 'var(--muted-foreground)', fontSize: 11 }} />}
+      <XAxis dataKey="date" tickFormatter={shortDate} tick={axisTick} stroke="var(--border)" minTickGap={24} />
+      <YAxis yAxisId="rain" tick={axisTick} stroke="var(--border)" />
+      <YAxis yAxisId="temp" orientation="right" tick={axisTick} stroke="var(--border)" domain={['auto', 'auto']} unit="°" />
+      <Tooltip content={({ active, payload }) => { const d = payload?.[0]?.payload as WeatherDay | undefined; if (!active || !d) return null; return <div className="chart-tooltip"><strong>{fmtDate(d.date)}{d.forecast ? ' · Forecast' : ''}</strong><p>Rain: {one(d.rain, ' mm', 1)}</p><p>Mean temp: {one(d.tmean, ' °C', 1)}</p><p>Max / min: {one(d.tmax, '°', 1)} / {one(d.tmin, '°', 1)}</p><p>Humidity: {one(d.rh, '%')}</p></div>; }} />
+      <Bar yAxisId="rain" dataKey="rain" fill="var(--rain-3)" radius={[2, 2, 0, 0]} isAnimationActive={false} />
+      <Line yAxisId="temp" dataKey="tmean" stroke="var(--risk-moderate)" strokeWidth={2} dot={false} isAnimationActive={false} connectNulls />
+    </ComposedChart></ResponsiveContainer></div>}
+    <p className="drawer-caption">Bars: daily rain (mm) · Line: mean temperature (°C) · Last 28 days and 16-day forecast · Open-Meteo · updated <WeatherAgo ts={w.updated_at} /></p>
+  </>;
+}
+function CasesClimate({ region, disease }: { region: string; disease: string }) {
+  const [temp, setTemp] = useState(false);
+  const q = useQuery({ queryKey: ['cases-climate', region, disease], queryFn: () => getCasesClimate({ data: { region, disease } }), staleTime: 300_000 });
+  if (!q.data || !q.data.some(r => r.rain_mm != null)) return null;
+  const key = temp ? 'temp_mean' : 'rain_mm';
+  return <Section title="Cases and climate">
+    <div className="chart-toggle" role="group" aria-label="Climate variable">
+      <Button size="sm" variant={!temp ? 'secondary' : 'ghost'} aria-pressed={!temp} onClick={() => setTemp(false)}>Rain</Button>
+      <Button size="sm" variant={temp ? 'secondary' : 'ghost'} aria-pressed={temp} onClick={() => setTemp(true)}>Temperature</Button>
+    </div>
+    <div className="h-56"><ResponsiveContainer width="100%" height="100%"><ComposedChart data={q.data} margin={{ top: 8, right: 0, bottom: 0, left: -16 }}>
+      <CartesianGrid stroke="var(--border)" vertical={false} />
+      <XAxis dataKey="week_start" tickFormatter={shortDate} tick={axisTick} stroke="var(--border)" minTickGap={24} />
+      <YAxis yAxisId="cases" tick={axisTick} stroke="var(--border)" tickFormatter={v => formatNumber(v)} />
+      <YAxis yAxisId="climate" orientation="right" tick={axisTick} stroke="var(--border)" unit={temp ? '°' : ''} domain={['auto', 'auto']} />
+      <Tooltip content={({ active, payload }) => { const d = payload?.[0]?.payload as { week_start: string; cases: number | null; rain_mm: number | null; temp_mean: number | null } | undefined; if (!active || !d) return null; return <div className="chart-tooltip"><strong>Week of {fmtDate(d.week_start)}</strong><p>Cases: {formatNumber(d.cases)}</p><p>Rain: {one(d.rain_mm, ' mm', 1)}</p><p>Mean temp: {one(d.temp_mean, ' °C', 1)}</p></div>; }} />
+      <Bar yAxisId="cases" dataKey="cases" fill="var(--foreground)" fillOpacity={0.55} isAnimationActive={false} />
+      <Line yAxisId="climate" dataKey={key} stroke={temp ? 'var(--risk-moderate)' : 'var(--rain-3)'} strokeWidth={2} dot={false} isAnimationActive={false} connectNulls />
+    </ComposedChart></ResponsiveContainer></div>
+    <p className="drawer-caption">Last 52 weeks · Bars: weekly cases · Line: {temp ? 'mean temperature (°C)' : 'weekly rain (mm)'} · associations, not proof of cause</p>
+  </Section>;
+}
+
 function HospitalLoad({ cases }: { cases: number | null | undefined }) {
   const [rate, setRate] = useState<number | null>(null);
   const [custom, setCustom] = useState('');
@@ -159,6 +217,8 @@ export function RegionDrawer() {
           <Section title="Recommended actions" icon={<ListChecks />}>{p && RECOMMENDED_ACTIONS[level] ? <><p className="drawer-action"><RiskBadge level={p.risk_level} />{RECOMMENDED_ACTIONS[level]}</p><p className="drawer-caption">Public-health operations guidance, not medical advice.</p></> : <Unavailable>Actions appear once a risk level is available.</Unavailable>}</Section>
           <Section title="Hospital load" icon={<Hospital />}><HospitalLoad cases={p?.cases_p50} /></Section>
           <Section title="Live weather · Open-Meteo" icon={<CloudRain />}><LiveWeather lat={r.lat} lon={r.lon} /></Section>
+          <Section title="Weather" icon={<Thermometer />}><WeatherSection region={r.id} /></Section>
+          <CasesClimate region={r.id} disease={context.disease} />
           <Section title="Last season"><LastSeason region={r.id} disease={context.disease} /></Section>
           <p className="drawer-caption">Data: OpenDengue V1.3 weekly cases · Forecast {p?.model_version ?? 'unavailable'}, issued for the week of {fmtDate(p?.issue_week)}</p>
         </>}
