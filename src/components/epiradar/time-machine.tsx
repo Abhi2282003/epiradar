@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Slider } from '@/components/ui/slider';
 import { RISK_SCALE } from '@/lib/epiradar';
 import { getReplay } from '@/lib/replay.functions';
-import { ALERT_CUTOFF, byRegion, firstAlertsAt, municipalityLead, riskFromProbability, scorecard, shiftWeeks, stateSeries, weeksBetween, type BacktestRow } from '@/lib/replay';
+import { ALERT_CUTOFF, defaultSeason, seasonOf, seasonsOf, byRegion, firstAlertsAt, municipalityLead, riskFromProbability, scorecard, shiftWeeks, stateSeries, weeksBetween, type BacktestRow } from '@/lib/replay';
 import { formatNumber, formatProbability, type Municipality, type Prediction } from '@/lib/surveillance';
 import { addReplayEvents } from '@/lib/live-store';
 
@@ -74,7 +74,11 @@ function MunicipalityReplay({ name, rows, week, onClose }: { name: string; rows:
 }
 
 export function TimeMachine() {
-  const { data } = useSuspenseQuery(replayQuery);
+  const { data: all } = useSuspenseQuery(replayQuery);
+  const seasons = useMemo(() => seasonsOf(all.rows), [all.rows]);
+  const [season, setSeason] = useState<number | null>(() => defaultSeason(seasons));
+  const activeSeason = season != null && seasons.includes(season) ? season : defaultSeason(seasons);
+  const data = useMemo(() => ({ ...all, rows: all.rows.filter(r => seasonOf(r.target_week) === activeSeason) }), [all, activeSeason]);
   const regions = useMemo(() => byRegion(data.rows), [data.rows]);
   const weeks = useMemo(() => [...new Set(data.rows.map(r => r.target_week))].sort(), [data.rows]);
   const series = useMemo(() => stateSeries(data.rows), [data.rows]);
@@ -119,7 +123,8 @@ export function TimeMachine() {
   if (!data.rows.length) return <div className="empty-content"><h3>No backtests loaded</h3><p>The 2024 season replay will appear once backtest rows for dengue at a 4-week horizon are loaded.</p></div>;
   const pct = (v: number | null) => v == null ? '—' : `${Math.round(v * 100)}%`;
   return <>
-    <div className="replay-banner" role="note">REPLAY MODE · 2024 dengue season, Rio de Janeiro state · each week's risk was forecast 4 weeks earlier by epiradar-cases-v1, trained on data up to 2022 and calibrated on 2023</div>
+    <div className="season-picker"><label htmlFor="season" className="control-label">SEASON</label><select id="season" value={activeSeason ?? ''} onChange={e => { setSeason(Number(e.target.value)); setIndex(0); setPlaying(false); setSelected(null); lastAnnounced.current = null; }}>{seasons.map(y => <option key={y} value={y}>{y}</option>)}</select><span className="sub">{formatNumber(data.rows.length)} replay rows · weeks {weeks[0] ? fmt(weeks[0]) : '—'} to {weeks.length ? fmt(weeks[weeks.length - 1]) : '—'}</span></div>
+    <div className="replay-banner" role="note">REPLAY MODE · {activeSeason} dengue season, Rio de Janeiro state · each week's risk was forecast 4 weeks earlier by epiradar-cases-v1, trained on data up to 2022 and calibrated on 2023</div>
     <div className="replay-layout">
       <div className="replay-stack">
         <section className="replay-card">
