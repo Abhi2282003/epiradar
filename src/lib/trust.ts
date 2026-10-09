@@ -28,10 +28,44 @@ export function accuracyReading(metrics: HorizonMetric[], horizon: number) {
   if (m.seasonal != null) parts.push(`and ${dec(m.seasonal)} for 'usual for the season'`);
   return parts.join(' ');
 }
+/** Climate driver families get a "climate" tag and cool colours; case-based families stay neutral. */
+export const CLIMATE_FAMILIES = ['Rainfall', 'Temperature', 'Humidity', 'Water'];
+export const isClimateFamily = (family: string | null | undefined) => !!family && CLIMATE_FAMILIES.some(f => family.trim().toLowerCase().startsWith(f.toLowerCase()));
+export const scopeLabel = (card: Card) => text(card?.['scope_label']);
+export const climateFeatures = (card: Card) => Array.isArray(card?.['climate_features']) ? (card!['climate_features'] as unknown[]).flatMap(c => text(c) ? [text(c)!] : []) : [];
+/** Brazil-wide lead times, else the training-scope lead times labelled with scope_label. */
+export function wideLeadTimes(card: Card): { title: string; data: Card } {
+  const brazil = asCard(card?.['lead_time_h4_brazil']);
+  if (brazil) return { title: 'All Brazil, ≥10k people', data: brazil };
+  return { title: scopeLabel(card) ?? 'Training scope', data: asCard(card?.['lead_time_h4_training_scope']) };
+}
+export type AblationRow = { h: number; with: number | null; without: number | null; focusWith: number | null; focusWithout: number | null; gain: number | null };
+export function climateAblation(card: Card): AblationRow[] | null {
+  const list = card?.['climate_ablation'];
+  if (!Array.isArray(list)) return null;
+  return list.flatMap(item => {
+    const m = asCard(item); const h = num(m?.['h']);
+    if (!m || h == null) return [];
+    const w = num(m['pr_auc_with_climate']), wo = num(m['pr_auc_without_climate']);
+    return [{ h, with: w, without: wo, focusWith: num(m['focus_pr_auc_with_climate']), focusWithout: num(m['focus_pr_auc_without_climate']), gain: w != null && wo != null ? w - wo : null }];
+  }).sort((a, b) => a.h - b.h);
+}
+/** Honest one-line reading: the largest gain if measurable (≥ 0.005 PR-AUC), and horizons with no gain. */
+export function ablationReading(rows: AblationRow[]) {
+  const known = rows.filter(r => r.gain != null);
+  if (!known.length) return null;
+  const weeks = (h: number) => `${h} ${h === 1 ? 'week' : 'weeks'} ahead`;
+  const best = known.reduce((a, b) => (b.gain! > a.gain! ? b : a));
+  const flat = known.filter(r => r.gain! < 0.005).map(r => r.h);
+  const span = (hs: number[]) => hs.length === 1 ? `${hs[0]} ${hs[0] === 1 ? 'week' : 'weeks'}` : `${hs[0]}–${hs[hs.length - 1]} weeks`;
+  if (best.gain! < 0.005) return `No measurable gain from climate at any horizon (best ${best.gain! >= 0 ? '+' : ''}${best.gain!.toFixed(3)} PR-AUC at ${weeks(best.h)}).`;
+  const head = `Climate adds +${best.gain!.toFixed(2)} PR-AUC at ${weeks(best.h)}`;
+  return flat.length ? `${head}; no measurable gain at ${span(flat)}${flat.length > 1 && flat.some((h, i) => i && h !== flat[i - 1]! + 1) ? ' (not contiguous)' : ''}.` : `${head}.`;
+}
 export function driverBars(card: Card) {
-  const d = asCard(card?.['driver_importance_h4_focus_2024']);
+  const d = asCard(card?.['driver_importance_h4_focus']) ?? asCard(card?.['driver_importance_h4_focus_2024']);
   if (!d) return [];
-  return Object.entries(d).flatMap(([label, v]) => num(v) == null ? [] : [{ label, value: num(v)! }]).sort((a, b) => b.value - a.value);
+  return Object.entries(d).flatMap(([label, v]) => num(v) == null ? [] : [{ label, value: num(v)!, climate: isClimateFamily(label) }]).sort((a, b) => b.value - a.value);
 }
 export const caveats = (card: Card) => Array.isArray(card?.['caveats']) ? (card!['caveats'] as unknown[]).flatMap(c => text(c) ? [text(c)!] : []) : [];
 
