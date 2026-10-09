@@ -17,6 +17,10 @@ import { BASE_LAYERS, OVERLAYS, addDays, layerDate } from '@/lib/world';
 import { DISEASE_KEY, formatIN, stateName, useT, type Key, type Lang } from '@/lib/i18n';
 import { DataBadge } from './i18n-ui';
 import { suitClass, type DistrictPoint, type Focus, type StateValue } from './india-map';
+import { IndiaForecastPanel, TierBadge, addMonths, useForecastContext } from './india-forecast';
+import { IndiaDistrictDrawer } from './india-district-drawer';
+import { indiaForecastQuery } from '@/lib/india-query';
+import { DISEASE_FC_KEY, TIERS, TIER_KEY, isTier, monthLabel, pctText, tierIndex } from '@/lib/india-forecast';
 
 const IndiaMap = lazy(() => import('./india-map'));
 const axis = { tick: { fill: 'var(--muted-foreground)', fontSize: 11 }, stroke: 'var(--border)' };
@@ -83,6 +87,12 @@ export function IndiaPage() {
   const [status, setStatus] = useState<Record<string, boolean | undefined>>({});
   const [focus, setFocus] = useState<Focus>({ nonce: 0 });
   const [refreshing, setRefreshing] = useState(false);
+  const [dotMode, setDotMode] = useState<'forecast' | 'suit'>('forecast');
+  const fcx = useForecastContext();
+  const fq = useQuery(indiaForecastQuery(fcx.disease, fcx.horizon));
+  const fcBy = useMemo(() => new Map((fq.data?.rows ?? []).map(r => [r.district_id, r])), [fq.data]);
+  const fcMonth = fq.data?.issue_month ? addMonths(fq.data.issue_month, fcx.horizon) : null;
+  const byForecast = dotMode === 'forecast' && fcBy.size > 0;
   useEffect(() => { setToday(indiaToday()); }, []);
   useEffect(() => { const h = setTimeout(() => setPicked(dateInput || null), 400); return () => clearTimeout(h); }, [dateInput]);
 
@@ -113,9 +123,11 @@ export function IndiaPage() {
   const points: DistrictPoint[] = useMemo(() => data.districts.flatMap(d => {
     if (d.lat == null || d.lon == null) return [];
     const w = weatherBy.get(d.id); const suit = w ? (vector === 'aedes' ? w.aedes_suitability : w.anopheles_suitability) : null;
-    return [{ id: d.id, name: d.name, lat: d.lat, lon: d.lon, population: d.population, suit, windSpeed: w?.wind_speed_max ?? null, windDir: w?.wind_dir_deg ?? null, cloud: w?.cloud_cover ?? null,
-      lines: [`${t('term.suitability')}: ${n1(suit, 2)}`, `${t('term.temperature')}: ${n1(w?.temp_mean_7d)} °C · ${t('term.humidity')}: ${n1(w?.humidity_7d, 0)}%`, `${t('drawer.rain14')}: ${n1(w?.rain_14d_mm)} mm`, `${t('term.population')}: ${formatIN(d.population)}`] }];
-  }), [data.districts, weatherBy, vector, t.lang]); // eslint-disable-line react-hooks/exhaustive-deps
+    const f = fcBy.get(d.id); const level = f && isTier(f.risk_level) ? tierIndex(f.risk_level) : null;
+    const fcLines = f ? [`${t(DISEASE_FC_KEY[fcx.disease])} · ${monthLabel(fcMonth, t.lang)}: ${isTier(f.risk_level) ? t(TIER_KEY[f.risk_level]) : '—'} (${pctText(f.prob)})`] : [];
+    return [{ id: d.id, name: d.name, lat: d.lat, lon: d.lon, population: d.population, suit, level, windSpeed: w?.wind_speed_max ?? null, windDir: w?.wind_dir_deg ?? null, cloud: w?.cloud_cover ?? null,
+      lines: [...fcLines, `${t('term.suitability')}: ${n1(suit, 2)}`, `${t('term.temperature')}: ${n1(w?.temp_mean_7d)} °C · ${t('term.humidity')}: ${n1(w?.humidity_7d, 0)}%`, `${t('drawer.rain14')}: ${n1(w?.rain_14d_mm)} mm`, `${t('term.population')}: ${formatIN(d.population)}`] }];
+  }), [data.districts, weatherBy, vector, t.lang, fcBy, fcx.disease, fcMonth]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const kpi = useMemo(() => {
     const withCases = yearRows.filter(r => r.cases != null);
@@ -170,6 +182,8 @@ export function IndiaPage() {
   return <>
     <p className="eyebrow">{t('india.eyebrow')}</p>
     <div className="page-heading"><div><h1>{t('india.title')}</h1><p className="page-description">{t('india.description')}</p></div></div>
+    <IndiaForecastPanel districts={data.districts} states={data.states} />
+    <h2 className="india-section-title">{t('india.reportedTitle')}</h2>
     <div className="india-toolbar">
       <div className="disease-tabs" role="tablist" aria-label={t('topbar.disease')}>{INDIA_DISEASES.map(d => <button key={d} role="tab" aria-selected={disease === d} onClick={() => setSearch({ india: d, year: undefined, state: context.state })}>{t(DISEASE_KEY[d]!)}</button>)}</div>
       {info.years.length ? <label className="year-slider"><span className="control-label">{t('india.yearLabel')}</span>
@@ -190,9 +204,12 @@ export function IndiaPage() {
           {choropleth && <><small className="metric-foot">{t('legend.incidence')}</small><ul className="world-legend">{breaks.length ? [...breaks, null].map((b, i) => <li key={i}><span className="risk-swatch" style={{ background: `var(--rain-${i})` }} />{i === 0 ? `< ${n1(b, 1)}` : b == null ? `≥ ${n1(breaks[i - 1], 1)}` : `${n1(breaks[i - 1], 1)}–${n1(b, 1)}`}</li>) : null}<li><span className="hatch-swatch" />{t('legend.noData')}</li></ul></>}
           {topoQ.isError ? <p className="layer-unavailable">{t('map.boundariesFailed')}</p> : topoQ.isSuccess && !topoQ.data && <p className="layer-unavailable">{t('map.noBoundaries')}</p>}
         </fieldset>
-        <fieldset><legend className="control-label">{t('map.districts')} <DataBadge kind="suitability" /></legend>
-          <label className="layer-row"><input type="checkbox" checked={dots} onChange={e => setDots(e.target.checked)} /><span>{t('map.dots')}<small>{t(`vector.${vector}`)}</small></span></label>
-          {dots && <ul className="world-legend">{['0–0.25', '0.25–0.5', '0.5–0.75', '≥ 0.75'].map((l, i) => <li key={l}><span className={`risk-swatch suit-${i}`} />{l}</li>)}<li><span className="risk-swatch risk-4" />{t('legend.noData')}</li></ul>}
+        <fieldset><legend className="control-label">{t('fcx.mapMode')} <DataBadge kind={byForecast ? 'forecast' : 'suitability'} /></legend>
+          <label className="layer-row"><input type="radio" name="india-dots" checked={dotMode === 'forecast'} disabled={!fcBy.size} onChange={() => setDotMode('forecast')} /><span>{t('fcx.mapForecast', { disease: t(DISEASE_FC_KEY[fcx.disease]), month: monthLabel(fcMonth, t.lang) })}</span></label>
+          <label className="layer-row"><input type="radio" name="india-dots" checked={dotMode === 'suit'} onChange={() => setDotMode('suit')} /><span>{t('fcx.mapSuit')}<small>{t(`vector.${vector}`)}</small></span></label>
+          <label className="layer-row"><input type="checkbox" checked={dots} onChange={e => setDots(e.target.checked)} /><span>{t('map.dots')}</span></label>
+          {dots && (byForecast ? <ul className="world-legend">{[...TIERS].reverse().map(k => <li key={k}><TierBadge tier={k} /></li>)}</ul>
+            : <ul className="world-legend">{['0–0.25', '0.25–0.5', '0.5–0.75', '≥ 0.75'].map((l, i) => <li key={l}><span className={`risk-swatch suit-${i}`} />{l}</li>)}<li><span className="risk-swatch risk-4" />{t('legend.noData')}</li></ul>)}
           <label className="layer-row"><input type="checkbox" checked={wind} disabled={!data.weather.length} onChange={e => setWind(e.target.checked)} /><span>{t('map.wind')}</span></label>
           <label className="layer-row"><input type="checkbox" checked={cloud} disabled={!data.weather.length} onChange={e => setCloud(e.target.checked)} /><span>{t('map.cloud')}</span></label>
           <SuitabilityFormula />
@@ -223,6 +240,7 @@ export function IndiaPage() {
         {today ? <Suspense fallback={<Skeleton className="map-loading" />}>
           <IndiaMap topo={topoQ.data?.topo ?? null} globe={globe} base={base} overlays={overlays} today={today} picked={picked} states={stateValues} choropleth={choropleth}
             districts={points} dots={dots} wind={wind} cloud={cloud} selected={context.state} focus={focus} noDataLabel={t('map.noDataArea')} failedLabel={t('map.failed')}
+            colorBy={byForecast ? 'level' : 'suit'} onSelectDistrict={id => setSearch({ district: id })}
             onSelect={id => setSearch({ state: id })} onLayerStatus={(k, ok) => setStatus(p => (p[k] === true || p[k] === ok ? p : { ...p, [k]: ok }))} />
         </Suspense> : <Skeleton className="map-loading" />}
       </section>
@@ -235,6 +253,7 @@ export function IndiaPage() {
     </div>
     <footer className="page-footer"><span><ShieldCheck className="size-3" />{t('footer.decision')}</span><span>NCVBDC · DataMeet (CC BY 2.5 India) · Open-Meteo · NASA GIBS</span></footer>
     <StateDrawer data={data} year={year} disease={disease} />
+    <IndiaDistrictDrawer districts={data.districts} states={data.states} />
   </>;
 }
 

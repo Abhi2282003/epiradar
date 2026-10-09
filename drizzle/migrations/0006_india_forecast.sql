@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS public.india_forecasts (district_id text NOT NULL REFERENCES public.india_districts(id) ON DELETE CASCADE, disease_id text NOT NULL, horizon smallint NOT NULL CHECK (horizon BETWEEN 1 AND 6), issue_month date NOT NULL, target_month date NOT NULL, prob real NOT NULL CHECK (prob >= 0 AND prob <= 1), prob_no_climate real, typical_prob real, risk_level text NOT NULL CHECK (risk_level IN ('low', 'moderate', 'high', 'very_high')), rank_india integer, drivers jsonb NOT NULL DEFAULT '[]'::jsonb, inputs jsonb NOT NULL DEFAULT '{}'::jsonb, model_version text NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY (district_id, disease_id, horizon, issue_month));
+CREATE INDEX IF NOT EXISTS india_forecasts_lookup_idx ON public.india_forecasts (issue_month, disease_id, horizon, prob DESC);
+CREATE TABLE IF NOT EXISTS public.india_outbreaks (district_id text NOT NULL REFERENCES public.india_districts(id) ON DELETE CASCADE, disease_id text NOT NULL, month date NOT NULL, outbreaks integer NOT NULL, cases integer, deaths integer, PRIMARY KEY (district_id, disease_id, month));
+GRANT SELECT ON public.india_forecasts, public.india_outbreaks TO anon, authenticated;
+GRANT ALL ON public.india_forecasts, public.india_outbreaks TO service_role;
+ALTER TABLE public.india_forecasts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.india_outbreaks ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read" ON public.india_forecasts;
+DROP POLICY IF EXISTS "Public read" ON public.india_outbreaks;
+CREATE POLICY "Public read" ON public.india_forecasts FOR SELECT USING (true);
+CREATE POLICY "Public read" ON public.india_outbreaks FOR SELECT USING (true);

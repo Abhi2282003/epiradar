@@ -488,6 +488,100 @@ export type Database = {
         }
         Relationships: []
       }
+      india_forecasts: {
+        Row: {
+          created_at: string
+          disease_id: string
+          district_id: string
+          drivers: Json
+          horizon: number
+          inputs: Json
+          issue_month: string
+          model_version: string
+          prob: number
+          prob_no_climate: number | null
+          rank_india: number | null
+          risk_level: string
+          target_month: string
+          typical_prob: number | null
+        }
+        Insert: {
+          created_at?: string
+          disease_id: string
+          district_id: string
+          drivers?: Json
+          horizon: number
+          inputs?: Json
+          issue_month: string
+          model_version: string
+          prob: number
+          prob_no_climate?: number | null
+          rank_india?: number | null
+          risk_level: string
+          target_month: string
+          typical_prob?: number | null
+        }
+        Update: {
+          created_at?: string
+          disease_id?: string
+          district_id?: string
+          drivers?: Json
+          horizon?: number
+          inputs?: Json
+          issue_month?: string
+          model_version?: string
+          prob?: number
+          prob_no_climate?: number | null
+          rank_india?: number | null
+          risk_level?: string
+          target_month?: string
+          typical_prob?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "india_forecasts_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "india_districts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      india_outbreaks: {
+        Row: {
+          cases: number | null
+          deaths: number | null
+          disease_id: string
+          district_id: string
+          month: string
+          outbreaks: number
+        }
+        Insert: {
+          cases?: number | null
+          deaths?: number | null
+          disease_id: string
+          district_id: string
+          month: string
+          outbreaks: number
+        }
+        Update: {
+          cases?: number | null
+          deaths?: number | null
+          disease_id?: string
+          district_id?: string
+          month?: string
+          outbreaks?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "india_outbreaks_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "india_districts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       india_district_weather: {
         Row: {
           aedes_suitability: number | null

@@ -11,6 +11,7 @@ import { ALERT_CUTOFF, byRegion } from '@/lib/replay';
 import { alertHistory, asCard, cardCutoff, closestToCutoff, pct } from '@/lib/trust';
 import { replayQuery } from './time-machine';
 import { RiskBadge } from './risk-workspace';
+import { IndiaAlertsSection } from './india-alerts';
 
 const fmt = (w: string | null | undefined) => w ? new Date(`${w.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) : '—';
 type SortKey = 'name' | 'first' | 'onset' | 'peak' | 'lead' | 'outcome';
@@ -36,6 +37,8 @@ export function AlertsPage() {
   return <>
     <p className="eyebrow">{page.eyebrow}</p>
     <div className="page-heading"><div><h1><PageTitle kind={'alerts'} /></h1><p className="page-description">{page.description}</p></div></div>
+    <IndiaAlertsSection />
+    <h2 className="india-section-title mt-6">Brazil forecast lab · municipal alerts</h2>
     <div className="trust-grid">
       <section className="replay-card"><h2>Active alerts</h2><p className="sub">Open alerts · {context.disease} · newest first</p>
         {alerts.length ? <ul className="alert-list">{alerts.map(a => <li key={a.id}><div className="alert-row-head"><Button variant="link" className="p-0 h-auto" onClick={() => a.region_id && open(a.region_id)}>{a.region_name ?? a.region_id ?? '—'}</Button><RiskBadge level={a.level} /></div><p>{a.message ?? '—'}</p><span className="font-mono text-xs text-muted-foreground">Lead {a.lead_weeks ?? '—'} weeks · issued {a.issued_at ? fmt(a.issued_at) : '—'}</span></li>)}</ul>

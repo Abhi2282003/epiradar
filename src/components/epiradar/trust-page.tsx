@@ -44,8 +44,8 @@ export function TrustPage() {
   return <>
     <p className="eyebrow">{page.eyebrow}</p>
     <div className="page-heading"><div><h1>{page.title}</h1><p className="page-description">{page.description}</p></div></div>
-    <Tabs defaultValue="brazil">
-      <TabsList><TabsTrigger value="brazil">{t('trust.tab.brazil')}</TabsTrigger><TabsTrigger value="world">{t('trust.tab.world')}</TabsTrigger><TabsTrigger value="india">{t('trust.tab.india')}</TabsTrigger></TabsList>
+    <Tabs defaultValue="india">
+      <TabsList><TabsTrigger value="india">{t('trust.tab.india')}</TabsTrigger><TabsTrigger value="world">{t('trust.tab.world')}</TabsTrigger><TabsTrigger value="brazil">{t('trust.tab.brazil')}</TabsTrigger></TabsList>
       <TabsContent value="brazil" className="mt-4"><ScopeView run={data.run} world={false} /></TabsContent>
       <TabsContent value="world" className="mt-4"><ScopeView run={data.worldRun} world /></TabsContent>
       <TabsContent value="india" className="mt-4"><IndiaTrust /></TabsContent>

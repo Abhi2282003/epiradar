@@ -9,13 +9,15 @@ import { INDIA_BOUNDS } from '@/lib/india';
 import { cssColor, hatch } from './world-map';
 
 export type StateValue = { id: string; title: string; lines: string[]; bin: number };
-export type DistrictPoint = { id: string; name: string; lat: number; lon: number; population: number | null; suit: number | null; windSpeed: number | null; windDir: number | null; cloud: number | null; lines: string[] };
+export type DistrictPoint = { id: string; name: string; lat: number; lon: number; population: number | null; suit: number | null; level?: number | null; windSpeed: number | null; windDir: number | null; cloud: number | null; lines: string[] };
 export type Focus = { nonce: number; bounds?: [[number, number], [number, number]]; center?: [number, number]; zoom?: number };
 export type IndiaMapProps = {
   topo: Topology | null; globe: boolean; base: string; overlays: Record<string, { on: boolean; opacity: number }>;
   today: string; picked: string | null; states: Map<string, StateValue>; choropleth: boolean;
   districts: DistrictPoint[]; dots: boolean; wind: boolean; cloud: boolean; selected?: string | undefined; focus: Focus;
   noDataLabel: string; onSelect: (id: string) => void; onLayerStatus: (key: string, ok: boolean) => void; failedLabel: string;
+  /** 'level' colours dots by forecast risk level (0 low … 3 very high); default colours by suitability. */
+  colorBy?: 'suit' | 'level'; onSelectDistrict?: (id: string) => void;
 };
 const ALL_RASTERS = [...BASE_LAYERS, ...OVERLAYS];
 const rid = (l: RasterLayer) => `raster-${l.key}`;
@@ -99,12 +101,17 @@ export default function IndiaMap(props: IndiaMapProps) {
       for (const id of ['state-fill', 'state-nodata']) {
         map.on('mousemove', id, stateHover);
         map.on('mouseleave', id, () => { popup.remove(); map.getCanvas().style.cursor = ''; });
-        map.on('click', id, e => { const sid = String(e.features?.[0]?.properties?.['id'] ?? ''); if (propsRef.current.states.has(sid)) { popup.remove(); propsRef.current.onSelect(sid); } });
+        map.on('click', id, e => { if (e.defaultPrevented) return; const hit = map.getLayer('district-dots') && map.getLayoutProperty('district-dots', 'visibility') === 'visible' ? map.queryRenderedFeatures(e.point, { layers: ['district-dots'] }) : []; if (hit.length) return; const sid = String(e.features?.[0]?.properties?.['id'] ?? ''); if (propsRef.current.states.has(sid)) { popup.remove(); propsRef.current.onSelect(sid); } });
       }
       map.on('mousemove', 'district-dots', e => {
         const id = String(e.features?.[0]?.properties?.['id'] ?? '');
         const d = propsRef.current.districts.find(x => x.id === id);
-        if (d) show(e, d.name, d.lines);
+        if (d) { show(e, d.name, d.lines); map.getCanvas().style.cursor = propsRef.current.onSelectDistrict ? 'pointer' : ''; }
+      });
+      map.on('mouseleave', 'district-dots', () => { popup.remove(); map.getCanvas().style.cursor = ''; });
+      map.on('click', 'district-dots', e => {
+        const id = String(e.features?.[0]?.properties?.['id'] ?? '');
+        if (id && propsRef.current.onSelectDistrict) { popup.remove(); e.preventDefault(); propsRef.current.onSelectDistrict(id); }
       });
       map.on('error', e => {
         const src = (e as unknown as { sourceId?: string }).sourceId;
@@ -159,11 +166,15 @@ export default function IndiaMap(props: IndiaMapProps) {
     const map = mapRef.current; const src = map?.getSource('districts') as GeoJSONSource | undefined;
     if (!src) return;
     const colors = ['--risk-low', '--risk-moderate', '--risk-high', '--risk-very-high'].map(cssColor);
-    src.setData({ type: 'FeatureCollection', features: props.districts.map(d => ({ type: 'Feature', geometry: { type: 'Point', coordinates: [d.lon, d.lat] }, properties: { id: d.id, population: d.population, suitColor: suitClass(d.suit) >= 0 ? colors[suitClass(d.suit)] : null, windDir: d.windDir, windSpeed: d.windSpeed, cloud: d.cloud } })) });
+    const byLevel = props.colorBy === 'level';
+    const colorOf = (d: DistrictPoint) => byLevel ? (d.level != null && d.level >= 0 ? colors[d.level] ?? null : null) : suitClass(d.suit) >= 0 ? colors[suitClass(d.suit)] : null;
+    // draw higher levels last so they sit on top
+    const list = byLevel ? [...props.districts].sort((a, b) => (a.level ?? -1) - (b.level ?? -1)) : props.districts;
+    src.setData({ type: 'FeatureCollection', features: list.map(d => ({ type: 'Feature', geometry: { type: 'Point', coordinates: [d.lon, d.lat] }, properties: { id: d.id, population: d.population, suitColor: colorOf(d), windDir: d.windDir, windSpeed: d.windSpeed, cloud: d.cloud } })) });
     map!.setLayoutProperty('district-dots', 'visibility', props.dots ? 'visible' : 'none');
     map!.setLayoutProperty('district-wind', 'visibility', props.wind ? 'visible' : 'none');
     map!.setLayoutProperty('district-cloud', 'visibility', props.cloud ? 'visible' : 'none');
-  }, [props.districts, props.dots, props.wind, props.cloud, ready]);
+  }, [props.districts, props.dots, props.wind, props.cloud, props.colorBy, ready]);
 
   // Focus
   useEffect(() => {

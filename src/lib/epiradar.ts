@@ -23,10 +23,14 @@ export function validateContext(search: Record<string, unknown>) {
     ...(typeof search['india'] === 'string' && ['dengue', 'chikungunya', 'malaria'].includes(search['india']) ? { india: search['india'] as 'dengue' | 'chikungunya' | 'malaria' } : {}),
     ...(Number.isInteger(Number(search['year'])) && Number(search['year']) >= 2000 && Number(search['year']) <= 2100 && search['year'] != null && search['year'] !== '' ? { year: Number(search['year']) } : {}),
     ...(typeof search['who'] === 'string' && ['malaria', 'cholera'].includes(search['who']) ? { who: search['who'] as 'malaria' | 'cholera' } : {}),
+    // India district forecast: disease, months ahead, open district
+    ...(typeof search['fd'] === 'string' && ['dengue', 'chikungunya', 'malaria', 'add', 'cholera'].includes(search['fd']) ? { fd: search['fd'] as 'dengue' | 'chikungunya' | 'malaria' | 'add' | 'cholera' } : {}),
+    ...([1, 2, 3].includes(Number(search['fh'])) ? { fh: Number(search['fh']) as 1 | 2 | 3 } : {}),
+    ...(typeof search['district'] === 'string' && /^IN-D\d{1,4}$/.test(search['district']) ? { district: search['district'] } : {}),
   };
 }
 export const PAGE_DETAILS = {
-  india: { title: 'India overview', description: 'India: reported dengue, chikungunya and malaria by state, with live district climate suitability.', eyebrow: 'INDIA' },
+  india: { title: 'India overview', description: 'India: climate-informed outbreak forecasts, alerts and precautions for every district, with reported burden and live climate suitability.', eyebrow: 'INDIA' },
   world: { title: 'World', description: 'Global dengue outlook by country with live satellite, climate and weather layers.', eyebrow: 'GLOBAL SURVEILLANCE' },
   command: { title: 'Command centre', description: 'Anticipate emerging outbreaks and prioritise your public health response.', eyebrow: 'OUTBREAK INTELLIGENCE' },
   map: { title: 'Map', description: 'Locate regional outbreak risk to focus surveillance and resources.', eyebrow: 'REGIONAL SURVEILLANCE' },

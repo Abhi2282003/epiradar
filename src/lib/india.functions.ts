@@ -2,7 +2,7 @@ import { createServerFn } from '@tanstack/react-start';
 import { publicClient } from '@/lib/replay.functions';
 import { isIndiaDisease, KARNATAKA } from '@/lib/india';
 
-const INDIA_SOURCES = ['ncvbdc', 'datameet_boundaries', 'open_meteo_india', 'who_gho', 'icts_karnataka'];
+const INDIA_SOURCES = ['ncvbdc', 'datameet_boundaries', 'open_meteo_india', 'who_gho', 'icts_karnataka', 'epiclim_idsp', 'nasa_power_india', 'india_forecast'];
 
 /** Everything /india needs: states, yearly burden (all three diseases), districts, district weather, IND monthly dengue. */
 export const getIndiaOverview = createServerFn({ method: 'GET' }).handler(async () => {
