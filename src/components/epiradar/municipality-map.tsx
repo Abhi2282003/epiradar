@@ -18,7 +18,7 @@ function cssColor(token: string) {
   const pixel = ctx.getImageData(0, 0, 1, 1).data;
   return `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
 }
-export default function MunicipalityMap({ rows, selected, onSelect }: { rows: Municipality[]; selected?: string; onSelect: (id: string) => void }) {
+export default function MunicipalityMap({ rows, selected, onSelect }: { rows: Municipality[]; selected?: string | undefined; onSelect: (id: string) => void }) {
   const { data: boundaries } = useSuspenseQuery(boundariesQuery);
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -39,7 +39,7 @@ export default function MunicipalityMap({ rows, selected, onSelect }: { rows: Mu
     let cancelled = false;
     let cleanup: (() => void) | undefined;
     setError(false);
-    void import('maplibre-gl').then(({ default: maplibre }) => {
+    void import('maplibre-gl').then(maplibre => {
       if (cancelled || !container.current) return;
       const map = new maplibre.Map({
         container: container.current,
@@ -61,7 +61,7 @@ export default function MunicipalityMap({ rows, selected, onSelect }: { rows: Mu
       if (!bounds.isEmpty()) boundsRef.current = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()];
       map.on('load', () => {
         map.addSource('municipalities', { type: 'geojson', data: boundaries });
-        const color: ExpressionSpecification = ['match', ['get', 'risk'], ...RISK_SCALE.flatMap((risk, index) => [risk.label, cssColor(['--risk-low', '--risk-moderate', '--risk-high', '--risk-very-high', '--risk-no-data'][index] ?? '--risk-no-data')]), cssColor('--risk-no-data')];
+        const color: ExpressionSpecification = ['match', ['get', 'risk'], RISK_SCALE[0].label, cssColor('--risk-low'), RISK_SCALE[1].label, cssColor('--risk-moderate'), RISK_SCALE[2].label, cssColor('--risk-high'), RISK_SCALE[3].label, cssColor('--risk-very-high'), cssColor('--risk-no-data')];
         map.addLayer({ id: 'municipality-fill', type: 'fill', source: 'municipalities', paint: { 'fill-color': color, 'fill-opacity': 0.65 } });
         map.addLayer({ id: 'municipality-outline', type: 'line', source: 'municipalities', paint: { 'line-color': cssColor('--background'), 'line-width': 1 } });
         map.addLayer({ id: 'municipality-selected', type: 'line', source: 'municipalities', filter: ['==', ['get', 'region_id'], ''], paint: { 'line-color': cssColor('--primary'), 'line-width': 3 } });
