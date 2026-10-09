@@ -1,11 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-const ALLOWED = new Set(['regions', 'observations', 'predictions', 'drivers', 'alerts', 'scenarios', 'backtests', 'model_runs', 'data_sources', 'live_events']);
 const CONFLICT: Record<string, string> = {
   regions: 'id', observations: 'region_id,disease_id,week_start', predictions: 'id', drivers: 'prediction_id,rank',
   alerts: 'id', scenarios: 'region_id,disease_id,rain_delta_pct,temp_delta_c,horizon_weeks',
   backtests: 'region_id,disease_id,target_week,horizon_weeks', model_runs: 'model_version', data_sources: 'id', live_events: 'id',
+  countries: 'iso3', country_series: 'iso3,disease_id,month', country_forecasts: 'iso3,disease_id,target_month,horizon_months',
+  country_backtests: 'iso3,disease_id,target_month,horizon_months', world_weather_grid: 'lat,lon', admin1_burden: 'country_iso3,admin1,disease_id,year',
 };
+const ALLOWED = new Set(Object.keys(CONFLICT));
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
 function safeEqual(a: string, b: string) {

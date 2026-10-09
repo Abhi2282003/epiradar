@@ -15,8 +15,10 @@ import { Route as MapRouteImport } from './routes/map'
 import { Route as ReplayRouteImport } from './routes/replay'
 import { Route as ScenariosRouteImport } from './routes/scenarios'
 import { Route as TrustRouteImport } from './routes/trust'
+import { Route as WorldRouteImport } from './routes/world'
 import { Route as ApiPublicIngestRouteImport } from './routes/api/public/ingest'
 import { Route as ApiPublicRefreshWeatherRouteImport } from './routes/api/public/refresh-weather'
+import { Route as ApiPublicRefreshWorldWeatherRouteImport } from './routes/api/public/refresh-world-weather'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -48,6 +50,11 @@ const TrustRoute = TrustRouteImport.update({
   path: '/trust',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorldRoute = WorldRouteImport.update({
+  id: '/world',
+  path: '/world',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicIngestRoute = ApiPublicIngestRouteImport.update({
   id: '/api/public/ingest',
   path: '/api/public/ingest',
@@ -58,6 +65,12 @@ const ApiPublicRefreshWeatherRoute = ApiPublicRefreshWeatherRouteImport.update({
   path: '/api/public/refresh-weather',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicRefreshWorldWeatherRoute =
+  ApiPublicRefreshWorldWeatherRouteImport.update({
+    id: '/api/public/refresh-world-weather',
+    path: '/api/public/refresh-world-weather',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,8 +79,10 @@ export interface FileRoutesByFullPath {
   '/replay': typeof ReplayRoute
   '/scenarios': typeof ScenariosRoute
   '/trust': typeof TrustRoute
+  '/world': typeof WorldRoute
   '/api/public/ingest': typeof ApiPublicIngestRoute
   '/api/public/refresh-weather': typeof ApiPublicRefreshWeatherRoute
+  '/api/public/refresh-world-weather': typeof ApiPublicRefreshWorldWeatherRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -76,8 +91,10 @@ export interface FileRoutesByTo {
   '/replay': typeof ReplayRoute
   '/scenarios': typeof ScenariosRoute
   '/trust': typeof TrustRoute
+  '/world': typeof WorldRoute
   '/api/public/ingest': typeof ApiPublicIngestRoute
   '/api/public/refresh-weather': typeof ApiPublicRefreshWeatherRoute
+  '/api/public/refresh-world-weather': typeof ApiPublicRefreshWorldWeatherRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -87,8 +104,10 @@ export interface FileRoutesById {
   '/replay': typeof ReplayRoute
   '/scenarios': typeof ScenariosRoute
   '/trust': typeof TrustRoute
+  '/world': typeof WorldRoute
   '/api/public/ingest': typeof ApiPublicIngestRoute
   '/api/public/refresh-weather': typeof ApiPublicRefreshWeatherRoute
+  '/api/public/refresh-world-weather': typeof ApiPublicRefreshWorldWeatherRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -99,8 +118,10 @@ export interface FileRouteTypes {
     | '/replay'
     | '/scenarios'
     | '/trust'
+    | '/world'
     | '/api/public/ingest'
     | '/api/public/refresh-weather'
+    | '/api/public/refresh-world-weather'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -109,8 +130,10 @@ export interface FileRouteTypes {
     | '/replay'
     | '/scenarios'
     | '/trust'
+    | '/world'
     | '/api/public/ingest'
     | '/api/public/refresh-weather'
+    | '/api/public/refresh-world-weather'
   id:
     | '__root__'
     | '/'
@@ -119,8 +142,10 @@ export interface FileRouteTypes {
     | '/replay'
     | '/scenarios'
     | '/trust'
+    | '/world'
     | '/api/public/ingest'
     | '/api/public/refresh-weather'
+    | '/api/public/refresh-world-weather'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -130,8 +155,10 @@ export interface RootRouteChildren {
   ReplayRoute: typeof ReplayRoute
   ScenariosRoute: typeof ScenariosRoute
   TrustRoute: typeof TrustRoute
+  WorldRoute: typeof WorldRoute
   ApiPublicIngestRoute: typeof ApiPublicIngestRoute
   ApiPublicRefreshWeatherRoute: typeof ApiPublicRefreshWeatherRoute
+  ApiPublicRefreshWorldWeatherRoute: typeof ApiPublicRefreshWorldWeatherRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -178,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrustRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/world': {
+      id: '/world'
+      path: '/world'
+      fullPath: '/world'
+      preLoaderRoute: typeof WorldRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/ingest': {
       id: '/api/public/ingest'
       path: '/api/public/ingest'
@@ -192,6 +226,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicRefreshWeatherRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/refresh-world-weather': {
+      id: '/api/public/refresh-world-weather'
+      path: '/api/public/refresh-world-weather'
+      fullPath: '/api/public/refresh-world-weather'
+      preLoaderRoute: typeof ApiPublicRefreshWorldWeatherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -202,8 +243,10 @@ const rootRouteChildren: RootRouteChildren = {
   ReplayRoute: ReplayRoute,
   ScenariosRoute: ScenariosRoute,
   TrustRoute: TrustRoute,
+  WorldRoute: WorldRoute,
   ApiPublicIngestRoute: ApiPublicIngestRoute,
   ApiPublicRefreshWeatherRoute: ApiPublicRefreshWeatherRoute,
+  ApiPublicRefreshWorldWeatherRoute: ApiPublicRefreshWorldWeatherRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
-import { Activity, Bell, ChevronDown, Command, FlaskConical, History, LayoutDashboard, Map, Moon, Radar, Search, ShieldCheck, Sun, Unplug } from 'lucide-react';
+import { Bell, ChevronDown, Command, FlaskConical, Globe2, History, LayoutDashboard, Map, Moon, Radar, Search, ShieldCheck, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { useQuery } from '@tanstack/react-query';
@@ -10,6 +10,7 @@ import { RegionDrawer } from './region-drawer';
 import { LivePill, useRealtimeUpdates } from './realtime';
 import { Toaster } from '@/components/ui/sonner';
 const navigation = [
+  { to: '/world', label: 'World', icon: Globe2 },
   { to: '/', label: 'Command centre', icon: LayoutDashboard },
   { to: '/map', label: 'Map', icon: Map },
   { to: '/scenarios', label: 'Scenario lab', icon: FlaskConical },

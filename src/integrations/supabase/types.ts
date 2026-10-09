@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin1_burden: {
+        Row: {
+          admin1: string
+          cases: number | null
+          country_iso3: string
+          disease_id: string
+          incidence: number | null
+          note: string | null
+          population: number | null
+          source: string | null
+          year: number
+        }
+        Insert: {
+          admin1: string
+          cases?: number | null
+          country_iso3: string
+          disease_id: string
+          incidence?: number | null
+          note?: string | null
+          population?: number | null
+          source?: string | null
+          year: number
+        }
+        Update: {
+          admin1?: string
+          cases?: number | null
+          country_iso3?: string
+          disease_id?: string
+          incidence?: number | null
+          note?: string | null
+          population?: number | null
+          source?: string | null
+          year?: number
+        }
+        Relationships: []
+      }
       alerts: {
         Row: {
           disease_id: string | null
@@ -118,6 +154,165 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      countries: {
+        Row: {
+          area_km2: number | null
+          dengue_first: string | null
+          dengue_last: string | null
+          dengue_resolution: string | null
+          has_forecast: boolean | null
+          iso_num: string | null
+          iso3: string
+          lat: number | null
+          lon: number | null
+          name: string | null
+          population: number | null
+          region: string | null
+          subregion: string | null
+        }
+        Insert: {
+          area_km2?: number | null
+          dengue_first?: string | null
+          dengue_last?: string | null
+          dengue_resolution?: string | null
+          has_forecast?: boolean | null
+          iso_num?: string | null
+          iso3: string
+          lat?: number | null
+          lon?: number | null
+          name?: string | null
+          population?: number | null
+          region?: string | null
+          subregion?: string | null
+        }
+        Update: {
+          area_km2?: number | null
+          dengue_first?: string | null
+          dengue_last?: string | null
+          dengue_resolution?: string | null
+          has_forecast?: boolean | null
+          iso_num?: string | null
+          iso3?: string
+          lat?: number | null
+          lon?: number | null
+          name?: string | null
+          population?: number | null
+          region?: string | null
+          subregion?: string | null
+        }
+        Relationships: []
+      }
+      country_backtests: {
+        Row: {
+          cases_actual: number | null
+          disease_id: string
+          horizon_months: number
+          iso3: string
+          outbreak_actual: boolean | null
+          outbreak_prob: number | null
+          target_month: string
+        }
+        Insert: {
+          cases_actual?: number | null
+          disease_id: string
+          horizon_months: number
+          iso3: string
+          outbreak_actual?: boolean | null
+          outbreak_prob?: number | null
+          target_month: string
+        }
+        Update: {
+          cases_actual?: number | null
+          disease_id?: string
+          horizon_months?: number
+          iso3?: string
+          outbreak_actual?: boolean | null
+          outbreak_prob?: number | null
+          target_month?: string
+        }
+        Relationships: []
+      }
+      country_forecasts: {
+        Row: {
+          cases_p10: number | null
+          cases_p50: number | null
+          cases_p90: number | null
+          disease_id: string
+          drivers: Json | null
+          horizon_months: number
+          iso3: string
+          issue_month: string | null
+          model_version: string | null
+          narrative: string | null
+          outbreak_prob: number | null
+          risk_level: string | null
+          target_month: string
+          threshold: number | null
+        }
+        Insert: {
+          cases_p10?: number | null
+          cases_p50?: number | null
+          cases_p90?: number | null
+          disease_id: string
+          drivers?: Json | null
+          horizon_months: number
+          iso3: string
+          issue_month?: string | null
+          model_version?: string | null
+          narrative?: string | null
+          outbreak_prob?: number | null
+          risk_level?: string | null
+          target_month: string
+          threshold?: number | null
+        }
+        Update: {
+          cases_p10?: number | null
+          cases_p50?: number | null
+          cases_p90?: number | null
+          disease_id?: string
+          drivers?: Json | null
+          horizon_months?: number
+          iso3?: string
+          issue_month?: string | null
+          model_version?: string | null
+          narrative?: string | null
+          outbreak_prob?: number | null
+          risk_level?: string | null
+          target_month?: string
+          threshold?: number | null
+        }
+        Relationships: []
+      }
+      country_series: {
+        Row: {
+          cases: number | null
+          disease_id: string
+          iso3: string
+          month: string
+          mu: number | null
+          outbreak: boolean | null
+          threshold: number | null
+        }
+        Insert: {
+          cases?: number | null
+          disease_id: string
+          iso3: string
+          month: string
+          mu?: number | null
+          outbreak?: boolean | null
+          threshold?: number | null
+        }
+        Update: {
+          cases?: number | null
+          disease_id?: string
+          iso3?: string
+          month?: string
+          mu?: number | null
+          outbreak?: boolean | null
+          threshold?: number | null
+        }
+        Relationships: []
       }
       data_sources: {
         Row: {
@@ -245,18 +440,21 @@ export type Database = {
           created_at: string | null
           disease_id: string | null
           model_version: string
+          scope: string | null
         }
         Insert: {
           card?: Json | null
           created_at?: string | null
           disease_id?: string | null
           model_version: string
+          scope?: string | null
         }
         Update: {
           card?: Json | null
           created_at?: string | null
           disease_id?: string | null
           model_version?: string
+          scope?: string | null
         }
         Relationships: []
       }
@@ -514,8 +712,73 @@ export type Database = {
           },
         ]
       }
+      world_weather_grid: {
+        Row: {
+          cloud_cover: number | null
+          lat: number
+          lon: number
+          precip_mm: number | null
+          rh: number | null
+          temp_c: number | null
+          updated_at: string | null
+          wind_dir: number | null
+          wind_speed: number | null
+        }
+        Insert: {
+          cloud_cover?: number | null
+          lat: number
+          lon: number
+          precip_mm?: number | null
+          rh?: number | null
+          temp_c?: number | null
+          updated_at?: string | null
+          wind_dir?: number | null
+          wind_speed?: number | null
+        }
+        Update: {
+          cloud_cover?: number | null
+          lat?: number
+          lon?: number
+          precip_mm?: number | null
+          rh?: number | null
+          temp_c?: number | null
+          updated_at?: string | null
+          wind_dir?: number | null
+          wind_speed?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
+      country_cases_12m: {
+        Row: {
+          cases_12m: number | null
+          disease_id: string | null
+          iso3: string | null
+          last_month: string | null
+          months_reported: number | null
+        }
+        Relationships: []
+      }
+      latest_country_forecasts: {
+        Row: {
+          cases_p10: number | null
+          cases_p50: number | null
+          cases_p90: number | null
+          disease_id: string | null
+          drivers: Json | null
+          horizon_months: number | null
+          iso3: string | null
+          issue_month: string | null
+          model_version: string | null
+          narrative: string | null
+          outbreak_prob: number | null
+          risk_level: string | null
+          target_month: string | null
+          threshold: number | null
+        }
+        Relationships: []
+      }
       latest_predictions: {
         Row: {
           cases_p10: number | null

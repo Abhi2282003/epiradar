@@ -20,3 +20,9 @@
 - [x] Scenario lab with empty state + live climate outlook
 - [x] Climate card keys, climate driver tags, season picker, tests
 - [ ] Verify the full Scenario lab with real rows — blocked until the climate model writes scenarios
+
+# Worldwide, part 1
+- [x] World tables, views, ingest allow-list, model scope tabs
+- [x] /world globe map, GIBS + JRC layers, live wind/cloud grid, country drawer, header stats, tests
+- [ ] Verify country choropleth, drawer charts and backtests with real rows — blocked until country data is loaded
+- [ ] Part 2: India view and admin1 burden

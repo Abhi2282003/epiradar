@@ -18,9 +18,11 @@ export function validateContext(search: Record<string, unknown>) {
     ...(search['view'] === 'table' ? { view: 'table' as const } : {}),
     ...(typeof search['sort'] === 'string' && ['name', 'population', 'probability', 'level', 'cases'].includes(search['sort']) ? { sort: search['sort'] } : {}),
     ...(search['desc'] === true || search['desc'] === 'true' ? { desc: true } : {}),
+    ...(typeof search['country'] === 'string' && /^[A-Z]{3}$/.test(search['country']) ? { country: search['country'] } : {}),
   };
 }
 export const PAGE_DETAILS = {
+  world: { title: 'World', description: 'Global dengue outlook by country with live satellite, climate and weather layers.', eyebrow: 'GLOBAL SURVEILLANCE' },
   command: { title: 'Command centre', description: 'Anticipate emerging outbreaks and prioritise your public health response.', eyebrow: 'OUTBREAK INTELLIGENCE' },
   map: { title: 'Map', description: 'Locate regional outbreak risk to focus surveillance and resources.', eyebrow: 'REGIONAL SURVEILLANCE' },
   scenarios: { title: 'Scenario lab', description: 'Explore how changing climate conditions could influence outbreak risk.', eyebrow: 'CLIMATE & RESPONSE' },
