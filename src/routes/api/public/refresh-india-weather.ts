@@ -3,7 +3,7 @@ import { backoffUntil, rateLimitNote } from '@/lib/india';
 import { aggregateIndia, chunk, indiaToday, INDIA_DAILY_VARS, OPEN_METEO_BATCH, type IndiaDaily } from '@/lib/india';
 
 const THROTTLE_MS = 6 * 3_600_000;
-const PAUSE_MS = 3000;
+const PAUSE_MS = 20_000; // Open-Meteo counts each location; stay under the per-minute limit
 const SOURCE = 'open_meteo_india';
 const META = { name: 'Open-Meteo live district weather (India)', cadence: 'Daily ~05:40 IST; on demand at most every 6 hours' };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
@@ -45,15 +45,17 @@ async function refresh() {
       batch.forEach((d, j) => rows.push({ district_id: d.id, updated_at: now, ...aggregateIndia(results[j]?.daily ?? {}, today) }));
     } catch (e) { failure = e instanceof Error ? e.message : String(e); break; }
   }
-  // Batches fetched before a failure are saved; districts not reached keep their previous rows.
+  // On a rate limit (HTTP 429) nothing is written, so every district keeps its last good row.
+  // Other failures save batches already fetched; districts not reached keep their previous rows.
+  if (failure?.includes('HTTP 429')) rows.length = 0;
   if (rows.length) {
     const up = await db.from('india_district_weather').upsert(rows as never, { onConflict: 'district_id' });
     if (up.error) return json({ error: 'Weather rows could not be saved', detail: up.error.message }, 500);
   }
   const now = new Date().toISOString();
   if (failure) {
-    await db.from('data_sources').upsert({ id: SOURCE, ...META, status: 'degraded', note: `${failure.includes('HTTP 429') ? `${rateLimitNote()} ` : ''}Refresh stopped: ${failure}. Kept previous values; ${rows.length} of ${list.length} districts updated.`.slice(0, 500) });
-    return json({ error: 'Open-Meteo refresh stopped', detail: failure, updated: rows.length }, 502);
+    await db.from('data_sources').upsert({ id: SOURCE, ...META, status: 'degraded', note: `${failure.includes('HTTP 429') && !/Minutely/i.test(failure) ? `${rateLimitNote()} ` : ''}Refresh stopped: ${failure}. Kept previous values; ${rows.length} of ${list.length} districts updated.`.slice(0, 500) });
+    return json({ ok: false, error: 'Open-Meteo refresh stopped', detail: failure, updated: rows.length });
   }
   await db.from('data_sources').upsert({ id: SOURCE, ...META, status: 'ok', last_success_at: now, rows_last_run: rows.length, note: `Last 14 days + 7-day forecast for ${rows.length} districts, as of ${today}` });
   await db.from('live_events').insert({ kind: 'weather', severity: 'info', message: `India district weather refreshed: ${rows.length} districts (Open-Meteo)` });

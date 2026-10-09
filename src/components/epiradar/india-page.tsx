@@ -152,8 +152,8 @@ export function IndiaPage() {
     setRefreshing(true);
     try {
       const res = await fetch('/api/public/refresh-india-weather', { method: 'POST' });
-      const body = await res.json() as { cached?: boolean; updated?: number; detail?: string };
-      if (!res.ok) toast.error(`${t('weather.refresh')}: ${body.detail ?? res.status}`);
+      const body = await res.json() as { ok?: boolean; cached?: boolean; updated?: number; detail?: string };
+      if (!res.ok || body.ok === false) toast.error(`${t('weather.refresh')}: ${body.detail ?? res.status}`);
       else toast(body.cached ? `${t('weather.stored')} · ${body.updated ?? 0}` : `${t('weather.refresh')} · ${body.updated ?? 0}`);
     } catch { toast.error(t('common.error')); }
     await client.invalidateQueries({ queryKey: ['india'] }); setRefreshing(false);

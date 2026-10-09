@@ -9,6 +9,8 @@ import { PAGE_DETAILS, validateContext } from '@/lib/epiradar';
 import { trustQuery } from '@/lib/surveillance-query';
 import { formatNumber } from '@/lib/surveillance';
 import { ablationReading, accuracyReading, asCard, caveats, climateAblation, climateFeatures, dec, driverBars, horizonMetrics, num, pct, scopeLabel, sourceTone, text, wideLeadTimes, type Card } from '@/lib/trust';
+import { useT } from '@/lib/i18n';
+import { IndiaTrust } from './india-trust';
 
 const axis = { tick: { fill: 'var(--muted-foreground)', fontSize: 11 }, stroke: 'var(--border)' };
 const dash = (v: string | null) => v ?? '—';
@@ -38,13 +40,15 @@ export function TrustPage() {
   const context = validateContext(useSearch({ strict: false }));
   const { data } = useSuspenseQuery(trustQuery(context.disease));
   const page = PAGE_DETAILS.trust;
+  const t = useT();
   return <>
     <p className="eyebrow">{page.eyebrow}</p>
     <div className="page-heading"><div><h1>{page.title}</h1><p className="page-description">{page.description}</p></div></div>
     <Tabs defaultValue="brazil">
-      <TabsList><TabsTrigger value="brazil">Brazil municipalities</TabsTrigger><TabsTrigger value="world">World, national</TabsTrigger></TabsList>
+      <TabsList><TabsTrigger value="brazil">{t('trust.tab.brazil')}</TabsTrigger><TabsTrigger value="world">{t('trust.tab.world')}</TabsTrigger><TabsTrigger value="india">{t('trust.tab.india')}</TabsTrigger></TabsList>
       <TabsContent value="brazil" className="mt-4"><ScopeView run={data.run} world={false} /></TabsContent>
       <TabsContent value="world" className="mt-4"><ScopeView run={data.worldRun} world /></TabsContent>
+      <TabsContent value="india" className="mt-4"><IndiaTrust /></TabsContent>
     </Tabs>
     <section className="replay-card mt-5"><h2>Data sources</h2><p className="sub">Updates live as the pipeline reports</p>
       {data.sources.length ? <div className="municipality-table-wrap"><table className="municipality-table"><thead><tr><th>Source</th><th>Status</th><th>Cadence</th><th>Last success</th><th>Rows last run</th><th>Note</th></tr></thead>

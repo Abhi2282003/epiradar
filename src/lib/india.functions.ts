@@ -23,7 +23,8 @@ export const getIndiaOverview = createServerFn({ method: 'GET' }).handler(async 
 export const getIndiaTopo = createServerFn({ method: 'GET' }).handler(async () => {
   const r = await publicClient().from('geo_assets').select('topo,source,license,updated_at').eq('id', 'india-states-v1').maybeSingle();
   if (r.error) throw new Error('India boundaries could not be retrieved');
-  return r.data as { topo: unknown; source: string | null; license: string | null; updated_at: string | null } | null;
+  if (!r.data) return null;
+  return { topoJson: JSON.stringify(r.data.topo), source: r.data.source as string | null, license: r.data.license as string | null, updated_at: r.data.updated_at as string | null };
 });
 
 /** Karnataka ICTS weekly district history, paged past the 1,000-row default. */

@@ -26,3 +26,11 @@
 - [x] /world globe map, GIBS + JRC layers, live wind/cloud grid, country drawer, header stats, tests
 - [ ] Verify country choropleth, drawer charts and backtests with real rows — blocked until country data is loaded
 - [ ] Part 2: India view and admin1 burden
+
+# India-first, part 2
+- [x] India tables, landing /india, /brazil move, grouped nav, EN/HI/MR
+- [x] India map, KPIs, state drawer, Pune spotlight, seasonality, Karnataka history
+- [x] District weather refresh (640 districts), WHO and ICTS refreshes, 12-hourly schedules
+- [x] Model & data India tab, formula/year/dictionary/batching tests
+- [ ] World map: WHO malaria/cholera choropleth and drawer charts
+- [ ] World map: India outline per DataMeet with caveat footer
