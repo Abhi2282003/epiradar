@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useSearch, useRouter, type ErrorComponentProps } from '@tanstack/react-router';
 import { Activity, ArrowUpRight, Bell, MapPin, RefreshCw, ShieldCheck, TrendingUp, Users } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { PAGE_DETAILS, validateContext } from '@/lib/epiradar';
-import { surveillanceQuery } from '@/lib/surveillance-query';
+import { surveillanceQuery, trustQuery } from '@/lib/surveillance-query';
+import { asCard, cardCutoff, pct } from '@/lib/trust';
 import { commandMetrics, fastestBuilding, formatNumber, formatProbability, joinMunicipalities, type LiveEvent } from '@/lib/surveillance';
 import { RiskWorkspace } from './risk-workspace';
 import { useReplayEvents } from '@/lib/live-store';
@@ -35,7 +36,8 @@ export function SurveillancePage({ kind }: { kind: 'command' | 'map' }) {
   const fastest = fastestBuilding(rows, data.baseline);
   const page = PAGE_DETAILS[kind];
   const forecastsLoaded = data.predictions.length > 0;
-  const openAlerts = data.errors.alerts || data.alerts.length === 0 ? null : data.alerts.filter(alert => alert.status === 'open').length;
+  const openAlerts = data.errors.alerts ? null : data.alerts.filter(alert => alert.status === 'open').length;
+  const cutoff = cardCutoff(asCard(useQuery(trustQuery(context.disease)).data?.run?.card));
   const provenance = [...new Map(data.predictions.map(row => [`${row.issue_week}:${row.model_version}`, { week: row.issue_week, version: row.model_version }])).values()];
   return <>
     <p className="eyebrow">{page.eyebrow}</p><div className="page-heading"><div><h1>{page.title}</h1><p className="page-description">{page.description}</p></div><Button variant="outline" size="sm" disabled={isFetching} onClick={() => refetch()} aria-label="Refresh surveillance data"><RefreshCw className={isFetching ? 'refresh-spinning' : ''} />Refresh</Button></div>
@@ -45,7 +47,7 @@ export function SurveillancePage({ kind }: { kind: 'command' | 'map' }) {
         { label: 'High / Very high risk', value: metrics.elevated, icon: MapPin, note: forecastsLoaded ? 'Municipalities with elevated risk' : 'Awaiting municipality forecasts' },
         { label: 'People in elevated-risk areas', value: metrics.population, icon: Users, note: 'Resident population · not predicted infections' },
         { label: 'Expected cases', value: metrics.cases, icon: Activity, note: `${context.horizon}-week horizon · median estimates` },
-        { label: 'Open alerts', value: openAlerts, icon: Bell, note: data.errors.alerts ? 'Alert data could not be retrieved' : data.alerts.length ? `Open warnings · ${context.disease}` : 'No alert records loaded' },
+        { label: 'Open alerts', value: openAlerts, icon: Bell, note: data.errors.alerts ? 'Alert data could not be retrieved' : openAlerts ? `Open warnings · ${context.disease}` : `None open · alert at ≥ ${pct(cutoff)}` }` : 'No alert records loaded' },
       ].map(metric => <div className="command-metric" key={metric.label}><div className="metric-label">{metric.label}<metric.icon /></div><strong>{formatNumber(metric.value)}</strong><p>{metric.note}</p></div>)}</div>
       <div className="provenance">{provenance.length ? provenance.map(item => <span key={`${item.week}:${item.version}`}>Forecast issued for the week of {item.week ?? 'unavailable'} · {item.version ?? 'Model version unavailable'}</span>) : <span>Forecast issue week and model version will appear when predictions are loaded.</span>}<span>Cases: OpenDengue V1.3 (probable dengue cases, weekly, by municipality)</span><span>{forecastsLoaded ? `${formatNumber(data.predictions.length)} of ${formatNumber(data.regions.length)} municipalities with forecasts` : 'Forecast data not loaded yet'}</span></div>
     </>}
