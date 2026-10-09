@@ -12,13 +12,15 @@ export const getTrust = createServerFn({ method: 'GET' })
       client.from('data_sources').select('*').order('name'),
     ]);
     if (disease.error || sources.error) throw new Error('Model and data information could not be retrieved');
-    let run: { model_version: string; created_at: string | null; card: unknown } | null = null;
-    if (disease.data) {
-      const r = await client.from('model_runs').select('model_version,created_at,card').eq('disease_id', disease.data.id).order('created_at', { ascending: false }).limit(1).maybeSingle();
+    type Run = { model_version: string; created_at: string | null; card: never } | null;
+    const latest = async (scope: string): Promise<Run> => {
+      if (!disease.data) return null;
+      const r = await client.from('model_runs').select('model_version,created_at,card').eq('disease_id', disease.data.id).eq('scope', scope).order('created_at', { ascending: false }).limit(1).maybeSingle();
       if (r.error) throw new Error('Model card could not be retrieved');
-      run = r.data;
-    }
-    return { run: run as { model_version: string; created_at: string | null; card: never } | null, sources: sources.data ?? [] };
+      return r.data as Run;
+    };
+    const [run, worldRun] = await Promise.all([latest('brazil-municipal'), latest('world-national')]);
+    return { run, worldRun, sources: sources.data ?? [] };
   });
 
 /** Open alerts for the disease, newest first, with municipality names. */
