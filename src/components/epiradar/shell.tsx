@@ -3,7 +3,10 @@ import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { Activity, Bell, ChevronDown, Command, FlaskConical, History, LayoutDashboard, Map, Moon, Radar, Search, ShieldCheck, Sun, Unplug } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { useQuery } from '@tanstack/react-query';
 import { DISEASES, validateContext } from '@/lib/epiradar';
+import { getRegionList } from '@/lib/region.functions';
+import { RegionDrawer } from './region-drawer';
 const navigation = [
   { to: '/', label: 'Command centre', icon: LayoutDashboard },
   { to: '/map', label: 'Map', icon: Map },
@@ -19,6 +22,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [light, setLight] = useState(false);
+  const regions = useQuery({ queryKey: ['region-list'], queryFn: () => getRegionList(), enabled: paletteOpen, staleTime: 300_000 });
+  const matches = (regions.data ?? []).filter(r => r.name.toLowerCase().includes(query.trim().toLowerCase())).slice(0, 12);
+  const openRegion = (region: string) => { setPaletteOpen(false); setQuery(''); void navigate({ to: '.', search: (prev: Record<string, unknown>) => ({ ...validateContext(prev), region }) } as never); };
   useEffect(() => {
     const saved = localStorage.getItem('epiradar-theme') === 'light';
     setLight(saved);
@@ -56,7 +62,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="topbar-tools"><Button variant="ghost" className="search-trigger" aria-label="Search regions" onClick={() => setPaletteOpen(true)}><Search /><span className="search-label">Search regions</span><kbd>⌘ K</kbd></Button><span className="live-pill" title="Live monitoring — forecasts refresh as data arrives"><span className="status-dot" />LIVE</span></div>
       </header>
       <main id="main-content" className="content">{children}</main>
+      <RegionDrawer />
     </div>
-    <Dialog open={paletteOpen} onOpenChange={setPaletteOpen}><DialogContent><DialogTitle className="flex items-center gap-2"><Command className="size-5 text-primary" />Region search</DialogTitle><DialogDescription>Surveillance regions will appear here once data is loaded.</DialogDescription><input className="palette-input" aria-label="Search for a region" placeholder="Search for a region…" value={query} onChange={event => setQuery(event.target.value)} /><div className="palette-empty"><Search className="size-6" /><p>{query ? 'No regions available to search.' : 'No regions loaded yet.'}</p><p>Region data is not loaded yet.</p></div></DialogContent></Dialog>
+    <Dialog open={paletteOpen} onOpenChange={setPaletteOpen}><DialogContent><DialogTitle className="flex items-center gap-2"><Command className="size-5 text-primary" />Region search</DialogTitle><DialogDescription>Open a municipality to see its forecast, drivers and weather.</DialogDescription><input className="palette-input" aria-label="Search for a region" placeholder="Search for a region…" value={query} onChange={event => setQuery(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && matches[0]) openRegion(matches[0].id); }} />{regions.isPending ? <div className="palette-empty"><p>Loading municipalities…</p></div> : regions.isError ? <div className="palette-empty"><p>Municipalities could not be retrieved.</p></div> : matches.length ? <ul className="palette-results">{matches.map(r => <li key={r.id}><button type="button" onClick={() => openRegion(r.id)}><span>{r.name}</span><small>{r.admin1}</small></button></li>)}</ul> : <div className="palette-empty"><Search className="size-6" /><p>{regions.data?.length ? 'No municipalities match your search.' : 'No regions loaded yet.'}</p></div>}</DialogContent></Dialog>
   </div>;
 }
