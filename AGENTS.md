@@ -30,3 +30,4 @@
 - The India what-if lab reads the precomputed per-district scenarios grid (rain × temperature, same model) from each forecast row; it never runs a model in the browser, and what-if state lives only in validated URL context (wr, wt).
 - Blind spots, the situation brief and expected outbreaks by state are derived from india_forecasts rows (silent, prob_climate_only, risk_level, prob) through server functions; nothing is fabricated when rows are missing.
 - india_mobility holds gravity-model travel links (6 per district); the district drawer reads at most 10 links for one district and the map draws only the selected district's links.
+- The weekly India forecast is produced by the GitHub Actions workflow india-weekly (.github/workflows; model bundle and runner on the pipeline-data branch) and loaded only through /api/public/ingest (india_forecasts, then model_runs, then data_sources).
