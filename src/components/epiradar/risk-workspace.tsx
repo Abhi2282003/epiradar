@@ -39,9 +39,9 @@ function LayerLegend({ layer }: { layer: WeatherLayer }) {
 }
 export function RiskWorkspace({ rows, fullHeight = false, forecastError = false }: { rows: Municipality[]; fullHeight?: boolean; forecastError?: boolean }) {
   const context = validateContext(useSearch({ strict: false }));
-  const navigate = useNavigate({ from: '/' });
+  const navigate = useNavigate({ from: '/brazil' });
   const pathname = useRouterState({ select: state => state.location.pathname });
-  const to = pathname === '/map' ? '/map' : '/';
+  const to = pathname === '/map' ? '/map' : '/brazil';
   const select = (region: string) => { void navigate({ to, search: prev => ({ ...validateContext(prev), region }) }); };
   const table = context.view === 'table';
   const sorted = sortMunicipalities(rows, context.sort ?? 'name', context.desc ?? false);

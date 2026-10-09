@@ -172,8 +172,8 @@ function CountryDrawer({ grid, today }: { grid: GridCell[] | null; today: string
           <header className="drawer-header"><span className="control-label">{context.disease.toUpperCase()} · NATIONAL</span><SheetTitle className="drawer-title">{k.name ?? k.iso3}</SheetTitle>
             <SheetDescription>{[k.subregion, k.region].filter(Boolean).join(', ') || '—'} · Population {formatNumber(k.population)}</SheetDescription></header>
           <div className="flex flex-wrap gap-2">
-            {k.iso3 === 'BRA' && <Button asChild size="sm"><Link to="/" search={{ disease: context.disease, horizon: context.horizon }}>Open municipal view</Link></Button>}
-            {k.iso3 === 'IND' && <Button size="sm" disabled title="Coming next">Open India view · coming next</Button>}
+            {k.iso3 === 'BRA' && <Button asChild size="sm"><Link to="/brazil" search={{ disease: context.disease, horizon: context.horizon }}>Open municipal view</Link></Button>}
+            {k.iso3 === 'IND' && <Button asChild size="sm"><Link to="/india" search={{ disease: context.disease, horizon: context.horizon }}>Open India view</Link></Button>}
           </div>
           <section className="drawer-section"><h3><Globe2 />Data coverage</h3>
             <dl className="def-list"><div><dt>Resolution</dt><dd>{k.dengue_resolution ?? '—'}</dd></div><div><dt>First month</dt><dd>{monthLabel(k.dengue_first)}</dd></div><div><dt>Last month</dt><dd>{monthLabel(k.dengue_last)}</dd></div></dl>

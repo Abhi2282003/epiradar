@@ -1,15 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { PageSkeleton } from '@/components/epiradar/pages';
-import { SurveillancePage, SurveillanceError } from '@/components/epiradar/command-centre';
-import { surveillanceQuery } from '@/lib/surveillance-query';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { pageHead } from '@/lib/epiradar';
 
+// India is the landing page; "/" forwards to /india and keeps any shared search context.
 export const Route = createFileRoute('/')({
-  loaderDeps: ({ search }) => ({ disease: search.disease, horizon: search.horizon }),
-  loader: async ({ context, deps }) => { await context.queryClient.ensureQueryData(surveillanceQuery(deps.disease, deps.horizon)); },
-  head: () => pageHead('command'),
-  pendingComponent: PageSkeleton,
-  errorComponent: SurveillanceError,
-  notFoundComponent: () => <p>No surveillance workspace found.</p>,
-  component: () => <SurveillancePage kind="command" />,
+  beforeLoad: ({ search }) => { throw redirect({ to: '/india', search }); },
+  head: () => pageHead('india'),
 });
