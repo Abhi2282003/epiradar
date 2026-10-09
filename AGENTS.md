@@ -15,3 +15,4 @@
 - Keep risk definitions and context validation in one shared browser-safe module; use semantic CSS tokens for risk swatches so theming remains centralised.
 - Render explicit empty states until real data is connected; do not seed demonstration health records.
 - Use theme storage only for appearance preferences, never for surveillance data.
+- Pipeline data enters only through the token-protected server route /api/public/ingest (allow-listed tables, service-role upsert); clients get read-only access except alert status updates by signed-in users.
