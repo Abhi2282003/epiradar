@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { ArrowDown, ArrowUp, ArrowUpDown, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -20,8 +20,8 @@ export function AlertsPage() {
   const page = PAGE_DETAILS.alerts;
   const { data: surv } = useSuspenseQuery(surveillanceQuery(context.disease, context.horizon));
   const { data: alerts } = useSuspenseQuery(openAlertsQuery(context.disease));
-  const trust = useQuery(trustQuery(context.disease));
-  const replay = useQuery(replayQuery);
+  const trust = useSuspenseQuery(trustQuery(context.disease));
+  const replay = useSuspenseQuery(replayQuery);
   const cutoff = cardCutoff(asCard(trust.data?.run?.card));
   const open = (region: string) => { void navigate({ to: '.', search: (prev: Record<string, unknown>) => ({ ...validateContext(prev), region }) } as never); };
   const closest = closestToCutoff(joinMunicipalities(surv.regions, surv.predictions), cutoff);
