@@ -85,6 +85,12 @@ def main():
     if os.environ.get("GITHUB_STEP_SUMMARY"):
         with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as f:
             f.write(summary)
+    if os.environ.get("GITHUB_ACTIONS") == "true" and not a.ingest:
+        w1 = fc[fc.horizon == 1]
+        hi = ", ".join(f"{NAMES.get(d, d)} {int(g.risk_level.isin(['high', 'very_high']).sum())}" for d, g in w1.groupby("disease_id"))
+        n_cov = int((covered > 0).sum())
+        log(f"::notice title=India forecast {issue}::Weather {start} to {issue} for {n_cov} of {nd} districts. "
+            f"Weeks 1-4 districts at high or very high risk: {hi}. Blind spots: {int(w1[w1.silent].district_id.nunique())} districts.")
     log(summary)
 
     if a.ingest:
