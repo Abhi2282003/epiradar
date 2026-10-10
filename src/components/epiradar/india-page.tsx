@@ -184,7 +184,7 @@ export function IndiaPage() {
     [t('kpi.cfr'), kpi.rate == null ? '—' : `${kpi.rate.toFixed(2)}%`, t('term.deaths'), 'reported'],
     [t('kpi.states'), formatIN(rows.length ? kpi.reporting : null), t('kpi.ofStates', { n: formatIN(data.states.length) }), 'reported'],
     [t('kpi.favourable', { vector: t(`vector.${vector}`) }), formatIN(kpi.withW ? kpi.fav : null), t('kpi.ofDistricts', { n: formatIN(kpi.withW) }), 'suitability'],
-    [t('kpi.people'), kpi.people == null ? '—' : `≥ ${formatIN(kpi.people)}`, t('kpi.atLeast'), 'suitability'],
+    [t('kpi.people'), kpi.people == null ? '—' : `${kpi.missingPop ? '≥ ' : ''}${formatIN(kpi.people)}`, kpi.missingPop ? t('kpi.atLeast') : t('fcx.kpi.census'), 'suitability'],
   ];
 
   return <>

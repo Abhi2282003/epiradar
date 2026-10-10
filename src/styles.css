@@ -447,6 +447,7 @@ h1 { font-size: 29px; font-weight: 600; line-height: 1.3; margin: 0 0 9px; }
 .fc-toolbar > div, .whatif-controls > label, .whatif-controls > div { min-width: 0; max-width: 100%; }
 .fc-kpis { grid-template-columns: repeat(5, minmax(0,1fr)); }
 .fc-kpis .command-metric > strong { font-size: 26px; margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
+.fc-kpis .command-metric > strong.kpi-long { font-size: 22px; white-space: nowrap; }
 .fc-kpis .command-metric .metric-label { min-height: 0; display: flex; gap: 6px; align-items: center; }
 .fc-grid { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(0,1fr); gap: 20px; margin-top: 18px; }
 .fc-h3 { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; margin: 0 0 4px; }

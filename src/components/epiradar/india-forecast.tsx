@@ -108,10 +108,11 @@ function Brief({ horizon, districts, states, issue }: { horizon: number; distric
   const lines = FC_DISEASES.map(d => {
     const hi = q.data.rows.filter(r => r.disease_id === d && (r.risk_level === 'high' || r.risk_level === 'very_high'));
     const people = hi.reduce((a, r) => a + (districts.get(r.district_id)?.population ?? 0), 0);
+    const unknown = hi.some(r => districts.get(r.district_id)?.population == null);
     const by = new Map<string, number>();
     for (const r of hi) { const s = districts.get(r.district_id)?.state_id; if (s) by.set(s, (by.get(s) ?? 0) + 1); }
     const top = [...by.entries()].sort((a, b) => b[1] - a[1]).slice(0, 2).map(([s, n]) => `${stateName(states.get(s), t.lang)} (${n})`).join(', ');
-    return hi.length ? t('brief.line', { disease: t(DISEASE_FC_KEY[d]), n: formatIN(hi.length), people: formatIN(people), states: top || '—' }) : t('brief.none', { disease: t(DISEASE_FC_KEY[d]) });
+    return hi.length ? t('brief.line', { disease: t(DISEASE_FC_KEY[d]), n: formatIN(hi.length), people: unknown ? t('brief.atLeast', { n: formatIN(people) }) : formatIN(people), states: top || '—' }) : t('brief.none', { disease: t(DISEASE_FC_KEY[d]) });
   });
   const silent = new Set(q.data.rows.filter(r => r.silent).map(r => r.district_id)).size;
   return <div className="fc-brief"><h3 className="fc-h3"><Newspaper className="size-4" />{t('brief.title')} · {t('fcx.weeks', { w: WEEKS_OF[horizon]! })}, {windowLabel(windowStart(issue, horizon), t.lang)}</h3>
@@ -134,6 +135,7 @@ export function IndiaForecastPanel({ districts, states }: { districts: DistrictM
   const vh = rows.filter(r => r.level === 'very_high').length;
   const hi = rows.filter(r => r.level === 'high').length;
   const people = alerts.reduce((a, r) => a + (byId.get(r.district_id)?.population ?? 0), 0);
+  const noPop = alerts.filter(r => byId.get(r.district_id)?.population == null).length;
   const climateUp = rows.filter(r => (climateEffectPp(r.p, r.prob_no_climate) ?? 0) >= 1).length;
   const moved = useMemo(() => {
     if (!whatIf) return null;
@@ -172,7 +174,7 @@ export function IndiaForecastPanel({ districts, states }: { districts: DistrictM
       <div className="kpi-strip fc-kpis mt-3">
         <div className="command-metric"><span className="metric-label">{t('fcx.kpi.vh')}</span><strong>{formatIN(vh)}</strong><small className="metric-foot">{t('fcx.kpi.ofDistricts', { n: formatIN(rows.length) })}</small></div>
         <div className="command-metric"><span className="metric-label">{t('fcx.kpi.h')}</span><strong>{formatIN(hi)}</strong><small className="metric-foot">{t('fcx.kpi.ofDistricts', { n: formatIN(rows.length) })}</small></div>
-        <div className="command-metric"><span className="metric-label"><Users className="size-3" />{t('fcx.kpi.people')}</span><strong>{alerts.length ? formatIN(people) : '0'}</strong><small className="metric-foot">{t('fcx.kpi.census')}</small></div>
+        <div className="command-metric"><span className="metric-label"><Users className="size-3" />{t('fcx.kpi.people')}</span><strong className={noPop ? 'kpi-long' : undefined}>{alerts.length ? `${noPop ? '≥ ' : ''}${formatIN(people)}` : '0'}</strong><small className="metric-foot">{noPop ? t('fcx.kpi.censusMissing', { n: formatIN(noPop) }) : t('fcx.kpi.census')}</small></div>
         <div className="command-metric"><span className="metric-label">{t('fcx.kpi.climate')}</span><strong>{formatIN(climateUp)}</strong><small className="metric-foot">{t('fcx.kpi.climateFoot')}</small></div>
         <div className="command-metric"><span className="metric-label">{t('fcx.kpi.skill')}</span><strong>{caught == null ? '—' : `${Math.round(caught * 100)}%`}</strong><small className="metric-foot">{t('fcx.kpi.skillFoot', { share: flaggedShare == null ? '—' : Math.round(flaggedShare * 100) })}</small></div>
       </div>
